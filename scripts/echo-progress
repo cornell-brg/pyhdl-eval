@@ -1,0 +1,77 @@
+#!/usr/bin/env python
+#=========================================================================
+# echo-progress [options] remainder
+#=========================================================================
+#
+#  -h --help           Display this message
+#     --nsteps         Total number of steps
+#     --stepno         Which step is this
+#     --verbose        Verbose mode (1=on,0=off)
+#
+# Used to print a progress indicator from makefile. Code adapted from:
+#
+#  https://stackoverflow.com/questions/451413
+#
+# Author : Christopher Batten
+# Date   : Feb 26, 2024
+#
+
+import argparse
+import sys
+import os
+import re
+import math
+
+#-------------------------------------------------------------------------
+# Command line processing
+#-------------------------------------------------------------------------
+
+class ArgumentParserWithCustomError(argparse.ArgumentParser):
+  def error( self, msg = "" ):
+    if ( msg ): print("\n ERROR: %s" % msg)
+    print("")
+    file = open( sys.argv[0] )
+    for ( lineno, line ) in enumerate( file ):
+      if ( line[0] != '#' ): sys.exit(msg != "")
+      if ( (lineno == 2) or (lineno >= 4) ): print( line[1:].rstrip("\n") )
+
+def parse_cmdline():
+  p = ArgumentParserWithCustomError( add_help=False )
+
+  p.add_argument( "-h", "--help",    action="store_true" )
+  p.add_argument(       "--stepno",  type=int, required=True )
+  p.add_argument(       "--nsteps",  type=int, required=True )
+  p.add_argument(       "--verbose", type=int, required=True )
+
+  p.add_argument( "remainder", nargs=argparse.REMAINDER )
+
+  opts = p.parse_args()
+  if opts.help: p.error()
+  return opts
+
+#-------------------------------------------------------------------------
+# Main
+#-------------------------------------------------------------------------
+
+def main():
+
+  opts = parse_cmdline()
+
+  # Read the prompt file
+
+  if opts.verbose:
+    sys.stdout.write("\n")
+
+  nchars = int(math.log(opts.nsteps, 10)) + 1
+  fmt_str = "[{:Xd}/{:Xd}]({:6.2f}%)".replace("X", str(nchars))
+  progress = 100 * opts.stepno / opts.nsteps
+  sys.stdout.write(fmt_str.format(opts.stepno, opts.nsteps, progress))
+  for item in opts.remainder:
+    sys.stdout.write(" ")
+    sys.stdout.write(item)
+  sys.stdout.write("\n")
+
+  if opts.verbose:
+    sys.stdout.write("\n")
+
+main()

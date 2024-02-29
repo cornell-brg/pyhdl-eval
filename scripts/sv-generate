@@ -1,0 +1,204 @@
+#!/usr/bin/env python
+#=========================================================================
+# sv-verilog [options] prompt-filename
+#=========================================================================
+#
+#  -v --verbose        Display the prompt
+#  -h --help           Display this message
+#  -m --model          LLM model to use (default: gpt-3.5-turbo)
+#  -e --explain        Let the model include an explanation
+#  -o --output         File to write verilog to (default: stdout)
+#
+# Use GPT to generate verilog from the given prompt.
+#
+# Author : Christopher Batten
+# Date   : Feb 22, 2024
+#
+
+import argparse
+import sys
+import os
+import re
+
+from adlrchat.langchain import LLMGatewayChat
+from langchain.schema   import SystemMessage, HumanMessage
+from langchain.callbacks import get_openai_callback
+
+#-------------------------------------------------------------------------
+# Command line processing
+#-------------------------------------------------------------------------
+
+class ArgumentParserWithCustomError(argparse.ArgumentParser):
+  def error( self, msg = "" ):
+    if ( msg ): print("\n ERROR: %s" % msg)
+    print("")
+    file = open( sys.argv[0] )
+    for ( lineno, line ) in enumerate( file ):
+      if ( line[0] != '#' ): sys.exit(msg != "")
+      if ( (lineno == 2) or (lineno >= 4) ): print( line[1:].rstrip("\n") )
+
+def parse_cmdline():
+  p = ArgumentParserWithCustomError( add_help=False )
+
+  p.add_argument( "-h", "--help",        action="store_true" )
+  p.add_argument( "-v", "--verbose",     action="store_true" )
+  p.add_argument( "-m", "--model",       type=str, default="gpt-3.5-turbo" )
+  p.add_argument( "-e", "--explanation", action="store_true" )
+  p.add_argument( "-o", "--output",      type=str, default="-" )
+  p.add_argument( "prompt_filename" )
+
+  opts = p.parse_args()
+  if opts.help: p.error()
+  return opts
+
+#-------------------------------------------------------------------------
+# OutputFile
+#-------------------------------------------------------------------------
+
+class OutputFile:
+
+  def __init__( self, output, verbose ):
+    self.verbose = verbose
+    self.output  = output
+    self.fh = sys.stdout
+    if self.output != '-':
+      self.fh = open( self.output, 'w' )
+
+  def __del__( self ):
+    self.fh.close()
+
+  def print( self, string ):
+    print( string, file=self.fh )
+    if self.output != '-' and self.verbose:
+      print( string )
+
+  def vprint( self, string ):
+    if self.verbose:
+      print( string )
+
+#-------------------------------------------------------------------------
+# Context
+#-------------------------------------------------------------------------
+
+system_msg="""
+You only complete chats with syntax correct Verilog code. End the Verilog
+module code completion with 'endmodule'. Do not include module, input and
+output definitions
+"""
+
+prompt_prefix="""
+// Implement the Verilog module based on the following description.
+// Assume that sigals are positive clock/clk triggered unless otherwise.
+"""
+
+#-------------------------------------------------------------------------
+# Main
+#-------------------------------------------------------------------------
+
+def main():
+
+  opts = parse_cmdline()
+
+  # Check for an output file
+
+  out = OutputFile( opts.output, opts.verbose )
+
+  # Log parameters
+
+  model       = opts.model
+  temperature = 0.8
+  top_p       = 0.95
+  max_tokens  = 1024
+
+  out.vprint( "" )
+  out.vprint( f"model       = {model}"       )
+  out.vprint( f"temperature = {temperature}" )
+  out.vprint( f"top_p       = {top_p}"       )
+  out.vprint( f"max_tokens  = {max_tokens}"  )
+
+  # Read the prompt file
+
+  with open(opts.prompt_filename) as file:
+    prompt = file.read()
+
+  # prefix each line with a comment and add the prompt prefix
+
+  prefix = True
+  prefixed_prompt = []
+
+  for line in prompt.splitlines():
+
+    if "module TopModule" in line:
+      prefixed_prompt.append("")
+      prefix = False
+
+    if prefix:
+      prefixed_prompt.append("// " + line)
+    else:
+      prefixed_prompt.append(line)
+
+  prefixed_prompt = "\n".join(prefixed_prompt)
+
+  full_prompt = prompt_prefix + prefixed_prompt
+
+  # Print system message and prompt
+
+  out.vprint("")
+  out.vprint("System Message")
+  out.vprint("-"*74)
+  out.vprint(system_msg)
+
+  out.vprint("Prompt")
+  out.vprint("-"*74)
+  out.vprint(full_prompt.rstrip())
+
+  # Create LLM messages
+
+  msgs = [ SystemMessage(system_msg), HumanMessage(full_prompt) ]
+
+  # Query the LLM
+
+  llm = LLMGatewayChat(
+    model       = model,
+    temperature = temperature,
+    top_p       = top_p,
+    max_tokens  = max_tokens,
+  )
+
+  for _ in range(10):
+    try:
+      with get_openai_callback() as cb:
+        resp = llm.invoke(msgs)
+        break
+    except:
+      print("ERROR: LLM query failed, retrying in 20 seconds")
+      time.sleep(20)
+
+  # Display the response
+
+  out.vprint("")
+  out.vprint("Reponse")
+  out.vprint("-"*74)
+
+  # Remove backtick lines from response
+
+  out.print("")
+  for line in iter(resp.content.splitlines()):
+    if not line.startswith("```"):
+      out.print(line)
+  out.print("")
+
+  # Display statistics
+
+  out.vprint("Statistics")
+  out.vprint("-"*74)
+
+  out.vprint("")
+  out.vprint(f"prompt_tokens = {cb.prompt_tokens}")
+  out.vprint(f"resp_tokens   = {cb.completion_tokens}")
+  out.vprint(f"total_tokens  = {cb.total_tokens}")
+  out.vprint(f"total_cost    = {cb.total_cost}")
+  out.vprint("")
+
+main()
+

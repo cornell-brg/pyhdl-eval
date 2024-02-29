@@ -1,0 +1,242 @@
+#=========================================================================
+# Makefile
+#=========================================================================
+
+#-------------------------------------------------------------------------
+# Basic setup
+#-------------------------------------------------------------------------
+
+# Remove all default implicit rules since they can cause subtle bugs
+# and they just make things run slower
+.SUFFIXES:
+% : %,v
+% : RCS/%,v
+% : RCS/%
+% : s.%
+% : SCCS/s.%
+
+# Default is to build the prereqs of the all target (defined at bottom)
+default : all
+.PHONY : default
+
+src_dir      := @srcdir@
+scripts_dir  := $(src_dir)/scripts
+
+#-------------------------------------------------------------------------
+# Programs
+#-------------------------------------------------------------------------
+
+GENERATE_VERILOG=$(scripts_dir)/sv-generate
+IVERILOG_COMPILE=@IVERILOG@ -Wall -Winfloop -Wno-timescale -g2012 -s tb
+
+#-------------------------------------------------------------------------
+# Dataset
+#-------------------------------------------------------------------------
+
+VPATH = ../dataset
+include problems.mk
+
+# Define prompt files
+
+problem_prompts := $(patsubst %, %_prompt.txt, $(problems))
+
+# Define number of samples and sample strings
+
+NUM_SAMPLES      := 20
+sample_num_strs  := $(shell seq --format "%02g" 1 $(NUM_SAMPLES))
+
+#-------------------------------------------------------------------------
+# Progress indicator
+#-------------------------------------------------------------------------
+# Here is some neat code that enables a more compact output with a
+# progress indication:
+#
+#  https://stackoverflow.com/questions/451413
+#
+
+REDIRECT_LOG= &>
+REDIRECT_APPEND_LOG= &>>
+VERBOSE:=0
+QUIET=@
+ifeq ($(VERBOSE),1)
+  QUIET=
+  REDIRECT_LOG= 2>&1 | tee
+  REDIRECT_APPEND_LOG= 2>&1 | tee -a
+endif
+
+ifndef ECHO
+
+# Do a dry run of make with with given targets and count number of
+# times we see HIT_MARK which shows up for every instance of ECHO
+
+HIT_TOTAL := $(shell \
+  $(MAKE) $(MAKECMDGOALS) --dry-run ECHO="HIT_MARK" | grep -c "HIT_MARK" )
+
+# Create a counter which will increment every instance of ECHO
+
+N := x
+HIT_COUNT = $(words $N)$(eval N := x $N)
+
+# Create the output counter
+
+ECHO = $(scripts_dir)/echo-progress \
+         --nsteps=$(HIT_TOTAL) --stepno=$(HIT_COUNT) --verbose=$(VERBOSE)
+
+endif
+
+#-------------------------------------------------------------------------
+# Template for per-problem rules
+#-------------------------------------------------------------------------
+# The template is instantiated for each of the problems.
+#
+# Arguments:
+#  $(1) : real problem name (ie with underscores, no dashes)
+#
+
+define problem_template
+
+# Generate verilog samples
+
+$(1)_sv_samples       := $$(patsubst %, $(1)/$(1)_sample%.sv, $$(sample_num_strs))
+$(1)_sv_generate_logs := $$(patsubst %, $(1)/$(1)_sample%-sv-generate.log, $$(sample_num_strs))
+
+$$($(1)_sv_samples) : %.sv : $(1)_prompt.txt
+	@$$(ECHO) Generating $$(notdir $$@) verilog
+	$$(QUIET) mkdir -p $(1)
+	$$(QUIET) $$(GENERATE_VERILOG) --model=gpt-4 --verbose \
+              --output $$@.tmp $$< \
+              $(REDIRECT_LOG) $$*-sv-generate.log
+	$$(QUIET) cat ../dataset/$(1)_ifc.txt $$@.tmp > $$@
+	$$(QUIET) rm $$@.tmp
+
+$(1)-sv-generate : $$($(1)_sv_samples)
+
+sv_samples       += $$($(1)_sv_samples)
+sv_generate_logs += $$($(1)_sv_generate_logs)
+
+sv_generate_targets += $$($(1)_sv_samples)
+sv_generate_junk    += $$($(1)_sv_samples)
+sv_generate_junk    += $$($(1)_sv_generate_logs)
+
+# Test verilog samples
+
+$(1)_sv_iv_test_bins = \
+  $$(patsubst %.sv, %, $$($(1)_sv_samples))
+
+$(1)_sv_iv_test_logs = \
+  $$(patsubst %.sv, %-sv-iv-test.log, $$($(1)_sv_samples))
+
+$$($(1)_sv_iv_test_logs) : %-sv-iv-test.log : %.sv $(1)_test.sv $(1)_ref.sv
+	@$$(ECHO)  Testing $$(notdir $$*) with iverilog
+	-$$(QUIET) $(IVERILOG_COMPILE) -o $$* $$^ \
+               $(REDIRECT_LOG) $$*-sv-iv-test.log
+	-$$(QUIET) ./$$* \
+               $(REDIRECT_APPEND_LOG) $$@
+
+$(1)-sv-iv-test : $$($(1)_sv_iv_test_logs)
+
+sv_iv_test_bins += $$($(1)_sv_iv_test_bins)
+sv_iv_test_logs += $$($(1)_sv_iv_test_logs)
+
+sv_iv_test_targets += $$($(1)_sv_iv_test_logs)
+
+sv_iv_test_junk += $$($(1)_sv_iv_test_bins)
+sv_iv_test_junk += $$($(1)_sv_iv_test_logs)
+
+# Add subdirectory to junk
+
+junk += $(1)
+
+endef
+
+$(foreach problem, $(problems), \
+   $(eval $(call problem_template,$(problem))))
+
+#-------------------------------------------------------------------------
+# Top level targets
+#-------------------------------------------------------------------------
+
+sv-generate : $(sv_generate_targets)
+sv-generate-clean :
+	rm -rf *~ \#* $(sv_generate_junk)
+
+sv-iv-test : $(sv_iv_test_targets)
+sv-iv-test-clean :
+	rm -rf *~ \#* $(sv_iv_test_junk)
+
+sv-iv-analyze : $(sv_iv_test_targets)
+	$(scripts_dir)/sv-iv-analyze --csv=summary.csv $(problems)
+
+#-------------------------------------------------------------------------
+# pregen
+#-------------------------------------------------------------------------
+# Save the generated code and logs so that we can rerun experiments
+# without having to regenerate all of the generated code with an LLM.
+
+pregen_dir_en := @pregen_dir_en@
+pregen_dir    := @pregen_dir@
+
+ifeq ($(pregen_dir_en),yes)
+pregen:
+	rm -rf $(pregen_dir)/pregen-tmp
+	mkdir -p $(pregen_dir)/pregen-tmp
+	find . -name "*.sv" | cpio -pdm $(pregen_dir)/pregen-tmp
+	find . -name "*-sv-generate.log" | cpio -pdm $(pregen_dir)/pregen-tmp
+	mv $(pregen_dir)/pregen-tmp $(pregen_dir)/$(shell date '+%Y-%m-%d-%H-%M')
+else
+pregen:
+	@echo "ERROR: pregen directory was not set with configure"
+endif
+
+#-------------------------------------------------------------------------
+# Regenerate configure information
+#-------------------------------------------------------------------------
+
+configure_prereq = \
+  $(src_dir)/configure.ac \
+
+$(src_dir)/configure : $(configure_prereq)
+	cd $(src_dir) && autoconf && autoheader
+
+config.status : $(src_dir)/configure
+	./config.status --recheck
+
+makefile_prereq := \
+  config.status \
+  $(src_dir)/Makefile.in \
+
+Makefile : $(makefile_prereq)
+	./config.status
+
+dist_junk += \
+  config.status Makefile config.log \
+
+#-------------------------------------------------------------------------
+# Default
+#-------------------------------------------------------------------------
+
+all : sv-iv-analyze
+.PHONY : all
+
+#-------------------------------------------------------------------------
+# Makefile debugging
+#-------------------------------------------------------------------------
+# This handy rule will display the contents of any make variable by
+# using the target debug-<varname>. So for example, make debug-junk will
+# display the contents of the junk variable.
+
+debug-% :
+	@echo $* = $($*)
+
+#-------------------------------------------------------------------------
+# Clean up junk
+#-------------------------------------------------------------------------
+
+clean :
+	rm -rf *~ \#* wave.vcd $(junk)
+
+distclean :
+	rm -rf *~ \#* wave.vcd $(junk) $(dist_junk)
+
+.PHONY : clean
+

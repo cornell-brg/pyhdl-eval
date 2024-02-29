@@ -1,0 +1,81 @@
+#=========================================================================
+# Toplevel configure.ac for running LLM codegen experiments
+#=========================================================================
+
+#-------------------------------------------------------------------------
+# Project metadata
+#-------------------------------------------------------------------------
+
+m4_define( proj_name,         [LLM Code Generation Experiments])
+m4_define( proj_maintainer,   [Christopher Batten])
+m4_define( proj_abbreviation, [pymtl-verilog-eval])
+
+#-------------------------------------------------------------------------
+# Project version information
+#-------------------------------------------------------------------------
+# Version information is meant to be managed through a version control
+# system's tags and revision numbers. In a working copy the version will
+# not be defined here (you should just use the version control system's
+# mechanisms). When we make a distribution then we can set the version
+# here as formed by the scripts/vcs-version.sh script so that the
+# distribution knows what version it came from. If you are not using
+# version control then it is fine to set this directly.
+
+m4_define( proj_version, [?])
+
+#-------------------------------------------------------------------------
+# Setup
+#-------------------------------------------------------------------------
+
+AC_INIT(proj_name,proj_version,proj_maintainer,proj_abbreviation)
+AC_CONFIG_SRCDIR([dataset/Prob001_zero_prompt.txt])
+
+#-------------------------------------------------------------------------
+# Basic checks
+#-------------------------------------------------------------------------
+
+AC_CHECK_PROGS([IVERILOG],[iverilog],[no])
+AS_IF([test "${IVERILOG}" = "no"],
+[
+  AC_MSG_ERROR([Must have iverilog installed!])
+])
+
+#-------------------------------------------------------------------------
+# pregen
+#-------------------------------------------------------------------------
+
+AC_ARG_WITH(pregen-dir,
+  AS_HELP_STRING([--with-pregen-dir],[Directory for storing pregen files]),
+  [pregen_dir_en="yes"],
+  [pregen_dir_en="no"])
+
+AS_IF([ test "${pregen_dir_en}" = "yes" ],
+[
+  pregen_dir="${with_pregen_dir}"
+  AC_MSG_NOTICE([using pregen dir at ${pregen_dir}])
+],[
+  pregen_dir="no"
+])
+
+AC_SUBST([pregen_dir_en])
+AC_SUBST([pregen_dir])
+
+AC_ARG_WITH(pregen,
+  AS_HELP_STRING([--with-pregen],[Use pregen files]),
+  [pregen_en="yes"],
+  [pregen_en="no"])
+
+AS_IF([ test "${pregen_en}" = "yes" ],
+[
+  AC_MSG_NOTICE([using pregen from ${with_pregen}])
+  cp -r ${with_pregen}/* .
+])
+
+#-------------------------------------------------------------------------
+# Output
+#-------------------------------------------------------------------------
+
+AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([problems.mk:dataset/problems.mk.in])
+AC_OUTPUT
+
