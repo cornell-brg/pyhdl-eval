@@ -47,13 +47,13 @@ sample experiment.
  % ../configure --with-pregen=../../pymtl-eval-pregen/2024-02-28-baseline-20samples
  % make -j16
  ...
- pass_rate = 43.5
+ pass_rate = 42.24
 
  % mkdir $TOPDIR/build-baseline-2samples
  % cd $TOPDIR/build-baseline-2samples
  % ../configure --with-pregen=../../pymtl-eval-pregen/2024-02-28-baseline-2samples
  % make NUM_SAMPLES=2 -j16
  ...
- pass_rate = 45.92
+ pass_rate = 41.99
 ```
 
