@@ -196,7 +196,7 @@ configure_prereq = \
   $(src_dir)/configure.ac \
 
 $(src_dir)/configure : $(configure_prereq)
-	cd $(src_dir) && autoconf && autoheader
+	cd $(src_dir) && autoconf
 
 config.status : $(src_dir)/configure
 	./config.status --recheck
