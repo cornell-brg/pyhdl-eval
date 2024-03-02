@@ -64,14 +64,15 @@ def main():
     sys.stdout.write("\n")
 
   nchars   = int(math.log(opts.nsteps, 10)) + 1
-  progress = 100 * opts.stepno / opts.nsteps
+  progress = int(100 * opts.stepno / opts.nsteps)
 
   if opts.stepno == opts.nsteps:
-    fmt_str = "[{:Xd}/{:Xd}](DONE!)".replace("X", str(nchars))
+    fmt_str = "[{:Xd}/{:Xd}](100)".replace("X", str(nchars))
   else:
-    fmt_str = "[{:Xd}/{:Xd}]({:4.1f}%)".replace("X", str(nchars))
+    fmt_str = "[{:Xd}/{:Xd}]({:2d}%)".replace("X", str(nchars))
 
   sys.stdout.write(datetime.datetime.now().strftime("%H:%M"))
+  sys.stdout.write(" ")
   sys.stdout.write(fmt_str.format(opts.stepno, opts.nsteps, progress))
   for item in opts.remainder:
     sys.stdout.write(" ")
