@@ -111,7 +111,7 @@ class Results:
         if record.passfail == ".":
           npass += 1
 
-        if idx % 5 == 0:
+        if idx != 0 and idx % 5 == 0:
           row_str += " "
 
         row_str += record.passfail
@@ -123,7 +123,7 @@ class Results:
       problem_str   = f"{problem:{problem_str_width}}"
       pass_rate_str = f"[{npass:02}/{nsamples:02}]({pass_rate:3}%)"
 
-      row_strs.append(f"{problem_str} {pass_rate_str} {ntokens/1000:4.1f} {row_str:24}")
+      row_strs.append(f"{problem_str} {pass_rate_str} {ntokens/1000:4.2f} {row_str:24}")
 
     print("")
     if not self.wide:

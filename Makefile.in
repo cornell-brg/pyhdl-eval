@@ -35,15 +35,11 @@ IVERILOG_COMPILE=@IVERILOG@ -Wall -Winfloop -Wno-timescale -g2012 -s tb
 
 VPATH = ../dataset
 include problems.mk
+include samples.mk
 
 # Define prompt files
 
 problem_prompts := $(patsubst %, %_prompt.txt, $(problems))
-
-# Define number of samples and sample strings
-
-NUM_SAMPLES      := 20
-sample_num_strs  := $(shell seq --format "%02g" 1 $(NUM_SAMPLES))
 
 #-------------------------------------------------------------------------
 # Progress indicator
@@ -94,6 +90,10 @@ endif
 #
 
 define problem_template
+
+# Figure out number of samples for this problem
+
+sample_num_strs := $$(shell seq --format "%02g" 1 $$($(1)_num_samples))
 
 # Generate verilog samples
 
@@ -181,6 +181,8 @@ pregen:
 	mkdir -p $(pregen_dir)/pregen-tmp
 	find . -name "*.sv" | cpio -pdm $(pregen_dir)/pregen-tmp
 	find . -name "*-sv-generate.log" | cpio -pdm $(pregen_dir)/pregen-tmp
+	cp problems.mk $(pregen_dir)/pregen-tmp
+	cp samples.mk  $(pregen_dir)/pregen-tmp
 	mv $(pregen_dir)/pregen-tmp $(pregen_dir)/$(shell date '+%Y-%m-%d-%H-%M')
 else
 pregen:
@@ -188,24 +190,8 @@ pregen:
 endif
 
 #-------------------------------------------------------------------------
-# Regenerate configure information
+# configure information
 #-------------------------------------------------------------------------
-
-configure_prereq = \
-  $(src_dir)/configure.ac \
-
-$(src_dir)/configure : $(configure_prereq)
-	cd $(src_dir) && autoconf
-
-config.status : $(src_dir)/configure
-	./config.status --recheck
-
-makefile_prereq := \
-  config.status \
-  $(src_dir)/Makefile.in \
-
-Makefile : $(makefile_prereq)
-	./config.status
 
 dist_junk += \
   config.status Makefile config.log \
