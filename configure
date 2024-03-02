@@ -588,7 +588,6 @@ ac_unique_file="dataset/Prob001_zero_prompt.txt"
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
 pregen_dir
-pregen_dir_en
 IVERILOG
 target_alias
 host_alias
@@ -1739,24 +1738,18 @@ fi
 
 # Check whether --with-pregen-dir was given.
 if test "${with_pregen_dir+set}" = set; then :
-  withval=$with_pregen_dir; pregen_dir_en="yes"
+  withval=$with_pregen_dir; pregen_dir="${with_pregen_dir}"
 else
-  pregen_dir_en="no"
+  pregen_dir="NOT_ENABLED"
 fi
 
 
-if  test "${pregen_dir_en}" = "yes" ; then :
+if  test "${pregen_dir}" != "NOT_ENABLED" ; then :
 
-  pregen_dir="${with_pregen_dir}"
   { $as_echo "$as_me:${as_lineno-$LINENO}: using pregen dir at ${pregen_dir}" >&5
 $as_echo "$as_me: using pregen dir at ${pregen_dir}" >&6;}
 
-else
-
-  pregen_dir="no"
-
 fi
-
 
 
 

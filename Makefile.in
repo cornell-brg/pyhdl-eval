@@ -173,10 +173,9 @@ sv-iv-analyze : $(sv_iv_test_targets)
 # Save the generated code and logs so that we can rerun experiments
 # without having to regenerate all of the generated code with an LLM.
 
-pregen_dir_en := @pregen_dir_en@
-pregen_dir    := @pregen_dir@
+pregen_dir := @pregen_dir@
 
-ifeq ($(pregen_dir_en),yes)
+ifneq ($(pregen_dir),NOT_ENABLED)
 pregen:
 	rm -rf $(pregen_dir)/pregen-tmp
 	mkdir -p $(pregen_dir)/pregen-tmp

@@ -46,18 +46,14 @@ AS_IF([test "${IVERILOG}" = "no"],
 
 AC_ARG_WITH(pregen-dir,
   AS_HELP_STRING([--with-pregen-dir],[Directory for storing pregen files]),
-  [pregen_dir_en="yes"],
-  [pregen_dir_en="no"])
+  [pregen_dir="${with_pregen_dir}"],
+  [pregen_dir="NOT_ENABLED"])
 
-AS_IF([ test "${pregen_dir_en}" = "yes" ],
+AS_IF([ test "${pregen_dir}" != "NOT_ENABLED" ],
 [
-  pregen_dir="${with_pregen_dir}"
   AC_MSG_NOTICE([using pregen dir at ${pregen_dir}])
-],[
-  pregen_dir="no"
 ])
 
-AC_SUBST([pregen_dir_en])
 AC_SUBST([pregen_dir])
 
 AC_ARG_WITH(pregen,
