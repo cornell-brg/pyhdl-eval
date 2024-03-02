@@ -163,7 +163,8 @@ sv-iv-test-clean :
 	rm -rf *~ \#* $(sv_iv_test_junk)
 
 sv-iv-analyze : $(sv_iv_test_targets)
-	$(scripts_dir)/sv-iv-analyze --csv=summary.csv $(problems) | tee summary.txt
+	@$$(ECHO) Analyzing verilog/iverilog results 
+	$$(QUIET) $(scripts_dir)/sv-iv-analyze --csv=summary.csv $(problems) | tee summary.txt
 
 #-------------------------------------------------------------------------
 # pregen
