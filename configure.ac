@@ -86,11 +86,18 @@ echo "" >> samples.mk
 AC_ARG_WITH(pregen-dir,
   AS_HELP_STRING([--with-pregen-dir],[Directory for storing pregen files]),
   [pregen_dir="${with_pregen_dir}"],
-  [pregen_dir="NOT_ENABLED"])
+  [pregen_dir="DEFAULT"])
 
-AS_IF([ test "${pregen_dir}" != "NOT_ENABLED" ],
+AS_IF([ test "${pregen_dir}" != "DEFAULT" ],
 [
   AC_MSG_NOTICE([using pregen dir at ${pregen_dir}])
+],[
+  if [[ -d "../../pymtl-eval-pregen" ]]; then
+    pregen_dir="../../pymtl-eval-pregen"
+    AC_MSG_NOTICE([using default pregen dir at ${pregen_dir}])
+  else
+    AC_MSG_NOTICE([no pregen dir specified])
+  fi
 ])
 
 AC_SUBST([pregen_dir])

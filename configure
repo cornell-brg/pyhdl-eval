@@ -1781,14 +1781,25 @@ echo "" >> samples.mk
 if test "${with_pregen_dir+set}" = set; then :
   withval=$with_pregen_dir; pregen_dir="${with_pregen_dir}"
 else
-  pregen_dir="NOT_ENABLED"
+  pregen_dir="DEFAULT"
 fi
 
 
-if  test "${pregen_dir}" != "NOT_ENABLED" ; then :
+if  test "${pregen_dir}" != "DEFAULT" ; then :
 
   { $as_echo "$as_me:${as_lineno-$LINENO}: using pregen dir at ${pregen_dir}" >&5
 $as_echo "$as_me: using pregen dir at ${pregen_dir}" >&6;}
+
+else
+
+  if [ -d "../../pymtl-eval-pregen" ]; then
+    pregen_dir="../../pymtl-eval-pregen"
+    { $as_echo "$as_me:${as_lineno-$LINENO}: using default pregen dir at ${pregen_dir}" >&5
+$as_echo "$as_me: using default pregen dir at ${pregen_dir}" >&6;}
+  else
+    { $as_echo "$as_me:${as_lineno-$LINENO}: no pregen dir specified" >&5
+$as_echo "$as_me: no pregen dir specified" >&6;}
+  fi
 
 fi
 
