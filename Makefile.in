@@ -65,13 +65,11 @@ ifndef ECHO
 # Do a dry run of make with with given targets and count number of
 # times we see HIT_MARK which shows up for every instance of ECHO
 
-HIT_TOTAL := $(shell \
-  $(MAKE) $(MAKECMDGOALS) --dry-run ECHO="HIT_MARK" | grep -c "HIT_MARK" )
+HIT_TOTAL != $(MAKE) $(MAKECMDGOALS) --dry-run ECHO="HIT_MARK" | grep -c "HIT_MARK"
 
 # Create a counter which will increment every instance of ECHO
 
-N := x
-HIT_COUNT = $(words $N)$(eval N := x $N)
+HIT_COUNT = $(eval HIT_N != expr $(HIT_N) + 1)$(HIT_N)
 
 # Create the output counter
 
@@ -93,7 +91,7 @@ define problem_template
 
 # Figure out number of samples for this problem
 
-sample_num_strs := $$(shell seq --format "%02g" 1 $$($(1)_num_samples))
+sample_num_strs != seq --format "%02g" 1 $$($(1)_num_samples)
 
 # Generate verilog samples
 
@@ -165,25 +163,33 @@ sv-iv-test-clean :
 	rm -rf *~ \#* $(sv_iv_test_junk)
 
 sv-iv-analyze : $(sv_iv_test_targets)
-	$(scripts_dir)/sv-iv-analyze --csv=summary.csv $(problems)
+	$(scripts_dir)/sv-iv-analyze --csv=summary.csv $(problems) | tee summary.txt
 
 #-------------------------------------------------------------------------
 # pregen
 #-------------------------------------------------------------------------
 # Save the generated code and logs so that we can rerun experiments
 # without having to regenerate all of the generated code with an LLM.
+# We use the special $(file make function because the number of files
+# can be so large that it might exceed the command line limit.
 
-pregen_dir := @pregen_dir@
+pregen_dir := ../../pymtl-eval-pregen
+
+extra_pregen_files = \
+  problems.mk \
+  samples.mk \
+  summary.txt \
+  summary.csv \
 
 ifneq ($(pregen_dir),NOT_ENABLED)
-pregen:
-	rm -rf $(pregen_dir)/pregen-tmp
-	mkdir -p $(pregen_dir)/pregen-tmp
-	find . -name "*.sv" | cpio -pdm $(pregen_dir)/pregen-tmp
-	find . -name "*-sv-generate.log" | cpio -pdm $(pregen_dir)/pregen-tmp
-	cp problems.mk $(pregen_dir)/pregen-tmp
-	cp samples.mk  $(pregen_dir)/pregen-tmp
-	mv $(pregen_dir)/pregen-tmp $(pregen_dir)/$(shell date '+%Y-%m-%d-%H-%M')
+pregen: $(sv_samples)
+	$(file >  files-to-copy.txt, $(sv_samples))
+	$(file >> files-to-copy.txt, $(sv_generate_logs))
+	$(file >> files-to-copy.txt, $(extra_pregen_files))
+	sed -i.bak -e 's/ \+/\n/g' files-to-copy.txt
+	rsync --files-from=files-to-copy.txt . \
+    $(pregen_dir)/$(shell date '+%Y-%m-%d-%H-%M')
+	rm files-to-copy.txt files-to-copy.txt.bak
 else
 pregen:
 	@echo "ERROR: pregen directory was not set with configure"
