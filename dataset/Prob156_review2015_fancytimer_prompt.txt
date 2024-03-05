@@ -1,5 +1,17 @@
 
-We want to create a timer with one input that:
+I would like you to implement a module named TopModule with the following
+interface. All input and output ports are one bit unless otherwise
+specified.
+
+ - input  clk
+ - input  reset
+ - input  data
+ - output count (4 bits)
+ - output counting
+ - output done
+ - input  ack
+
+The module should implement a timer with one input that:
 
   (1) is started when a particular input pattern (1101) is detected,
   (2) shifts in 4 more bits to determine the duration to delay,
@@ -27,15 +39,6 @@ waits until input ack is 1 before being reset to look for the next
 occurrence of the start sequence (1101).
 
 The circuit should reset into a state where it begins searching for the
-input sequence 1101. The reset signal is active high synchronous.
-
-module TopModule (
-  input wire clk,
-  input wire reset,
-  input wire data,
-  output wire [3:0] count,
-  output reg counting,
-  output reg done,
-  input wire ack
-);
+input sequence 1101. The reset signal is active high synchronous. Assume
+all sequential logic is triggered on the positive edge of the clock.
 

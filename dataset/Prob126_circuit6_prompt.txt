@@ -1,6 +1,13 @@
 
-This is a combinational circuit. Read the simulation waveforms to
-determine what the circuit does, then implement it.
+I would like you to implement a module named TopModule with the following
+interface. All input and output ports are one bit unless otherwise
+specified.
+
+ - input  a ( 3 bits)
+ - output q (16 bits)
+
+The module should implement a combinational circuit. Read the simulation
+waveforms to determine what the circuit does, then implement it.
 
   time  a     q
   0ns   x     x
@@ -22,9 +29,4 @@ determine what the circuit does, then implement it.
   80ns  1  aee0
   85ns  3  5a0e
   90ns  5  64ce
-
-module TopModule (
-  input [2:0] a,
-  output reg [15:0] q
-);
 

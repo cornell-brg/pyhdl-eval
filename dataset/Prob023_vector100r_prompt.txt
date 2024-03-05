@@ -1,10 +1,11 @@
 
-Given a 100-bit input vector [99:0], reverse its bit ordering.
+I would like you to implement a module named TopModule with the following
+interface. All input and output ports are one bit unless otherwise
+specified.
 
-a
+ - input in  (100 bits)
+ - input out (100 bits)
 
-module TopModule (
-  input [99:0] in,
-  output reg [99:0] out
-);
+The module should reverse the bit ordering of the input and write to the
+output.
 

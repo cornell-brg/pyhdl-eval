@@ -1,4 +1,12 @@
 
+I would like you to implement a module named TopModule with the following
+interface. All input and output ports are one bit unless otherwise
+specified.
+
+ - input  x
+ - input  y
+ - output z
+
 The module can be described by the following simulation waveform:
 
   time  x  y  z
@@ -21,10 +29,4 @@ The module can be described by the following simulation waveform:
   80ns  0  1  0
   85ns  0  1  0
   90ns  1  0  0
-
-module TopModule (
-  input x,
-  input y,
-  output z
-);
 

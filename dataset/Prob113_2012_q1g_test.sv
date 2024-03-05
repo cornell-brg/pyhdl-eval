@@ -5,7 +5,7 @@
 
 module stimulus_gen (
 	input clk,
-	output logic [4:1] x
+	output logic [3:0] x
 );
 
 	initial begin
@@ -40,7 +40,7 @@ module tb();
 	initial forever
 		#5 clk = ~clk;
 
-	logic [4:1] x;
+	logic [3:0] x;
 	logic f_ref;
 	logic f_dut;
 

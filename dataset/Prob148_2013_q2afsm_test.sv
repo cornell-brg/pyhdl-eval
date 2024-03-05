@@ -6,7 +6,7 @@
 module stimulus_gen (
 	input clk,
 	output logic resetn,
-	output logic [3:1] r,
+	output logic [2:0] r,
 	output reg[511:0] wavedrom_title,
 	output reg wavedrom_enable,
 	input tb_match
@@ -118,9 +118,9 @@ module tb();
 		#5 clk = ~clk;
 
 	logic resetn;
-	logic [3:1] r;
-	logic [3:1] g_ref;
-	logic [3:1] g_dut;
+	logic [2:0] r;
+	logic [2:0] g_ref;
+	logic [2:0] g_dut;
 
 	initial begin 
 		$dumpfile("wave.vcd");

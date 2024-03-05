@@ -6,6 +6,8 @@
 #  -v --verbose        Display the prompt
 #  -h --help           Display this message
 #  -m --model          LLM model to use (default: gpt-3.5-turbo)
+#  -t --temperature    LLM model temperature (default: 0.85)
+#  -p --topp           LLM model top_p (default: gpt-0.95)
 #  -e --explain        Let the model include an explanation
 #  -o --output         File to write verilog to (default: stdout)
 #
@@ -19,6 +21,7 @@ import argparse
 import sys
 import os
 import re
+import time
 
 from adlrchat.langchain import LLMGatewayChat
 from langchain.schema   import SystemMessage, HumanMessage
@@ -42,7 +45,9 @@ def parse_cmdline():
 
   p.add_argument( "-h", "--help",        action="store_true" )
   p.add_argument( "-v", "--verbose",     action="store_true" )
-  p.add_argument( "-m", "--model",       type=str, default="gpt-3.5-turbo" )
+  p.add_argument( "-m", "--model",       type=str,   default="gpt-3.5-turbo" )
+  p.add_argument( "-t", "--temperature", type=float, default=0.8 )
+  p.add_argument( "-p", "--topp",        type=float, default=0.95 )
   p.add_argument( "-e", "--explanation", action="store_true" )
   p.add_argument( "-o", "--output",      type=str, default="-" )
   p.add_argument( "prompt_filename" )
@@ -52,27 +57,15 @@ def parse_cmdline():
   return opts
 
 #-------------------------------------------------------------------------
-# OutputFile
+# VerboseOutput
 #-------------------------------------------------------------------------
 
-class OutputFile:
+class VerboseOutput:
 
-  def __init__( self, output, verbose ):
+  def __init__( self, verbose ):
     self.verbose = verbose
-    self.output  = output
-    self.fh = sys.stdout
-    if self.output != '-':
-      self.fh = open( self.output, 'w' )
-
-  def __del__( self ):
-    self.fh.close()
 
   def print( self, string ):
-    print( string, file=self.fh )
-    if self.output != '-' and self.verbose:
-      print( string )
-
-  def vprint( self, string ):
     if self.verbose:
       print( string )
 
@@ -80,15 +73,52 @@ class OutputFile:
 # Context
 #-------------------------------------------------------------------------
 
+# Original system msg:
+#
+# You only complete chats with syntax correct Verilog code. End the Verilog
+# module code completion with 'endmodule'. Do not include module, input and
+# output definitions
+#
+
+# Original prompt prefix:
+#
+# Implement the Verilog module based on the following description.
+# Assume that sigals are positive clock/clk triggered unless otherwise.
+
 system_msg="""
-You only complete chats with syntax correct Verilog code. End the Verilog
-module code completion with 'endmodule'. Do not include module, input and
-output definitions
+You are a Verilog RTL designer that only writes code using correct
+Verilog syntax.
 """
 
-prompt_prefix="""
-// Implement the Verilog module based on the following description.
-// Assume that sigals are positive clock/clk triggered unless otherwise.
+# Feel free to include extra descriptions and an explanation but you must
+# be sure that the Verilog module is self contained so it can be extracted
+# from your response.
+
+# user prompt suffix:
+
+# Here are some additional rules and coding conventions.
+#
+#  - declare all ports and signals as logic; do not to use wire or reg
+#
+#  - for combinational logic with an always block do not explicitly specify
+#    the sensitivity list; instead use always @(*)
+#
+#  - for combinational logic in an always @(*) only use blocking
+#    assignments with the = operator
+#
+#  - for sequential logic in an always @(posedge clk) only use non-blocking
+#    assignments with the <= operator
+#
+#  - if the interface includes a reset signal, assume that this is a level
+#    high synchronous reset; this means the reset is sampled with respect
+#    to the clock, so do not include posedge reset in the sensitivity list
+#    of any sequential always block
+#
+#  - if the interface includes a clock signal, assume that all sequential
+#    logic is triggered on the positive edge of the clock
+
+prompt_explanation_suffix="""
+Please do not include any explanations in your response.
 """
 
 #-------------------------------------------------------------------------
@@ -101,60 +131,50 @@ def main():
 
   # Check for an output file
 
-  out = OutputFile( opts.output, opts.verbose )
+  out = VerboseOutput( opts.verbose )
 
   # Log parameters
 
+  problem = "?"
+  if opts.prompt_filename.endswith("_prompt.txt"):
+    problem = os.path.basename(opts.prompt_filename[:-11])
+
   model       = opts.model
-  temperature = 0.8
-  top_p       = 0.95
+  temperature = opts.temperature
+  top_p       = opts.topp
   max_tokens  = 1024
 
-  out.vprint( "" )
-  out.vprint( f"model       = {model}"       )
-  out.vprint( f"temperature = {temperature}" )
-  out.vprint( f"top_p       = {top_p}"       )
-  out.vprint( f"max_tokens  = {max_tokens}"  )
+  out.print( "" )
+  out.print( f"problem     = {problem}"     )
+  out.print( f"model       = {model}"       )
+  out.print( f"temperature = {temperature}" )
+  out.print( f"top_p       = {top_p}"       )
+  out.print( f"max_tokens  = {max_tokens}"  )
 
   # Read the prompt file
 
   with open(opts.prompt_filename) as file:
     prompt = file.read()
 
-  # prefix each line with a comment and add the prompt prefix
+  # Add prompt suffix
 
-  prefix = True
-  prefixed_prompt = []
-
-  for line in prompt.splitlines():
-
-    if "module TopModule" in line:
-      prefixed_prompt.append("")
-      prefix = False
-
-    if prefix:
-      prefixed_prompt.append("// " + line)
-    else:
-      prefixed_prompt.append(line)
-
-  prefixed_prompt = "\n".join(prefixed_prompt)
-
-  full_prompt = prompt_prefix + prefixed_prompt
+  if not opts.explanation:
+    prompt = prompt.rstrip() + "\n" + prompt_explanation_suffix
 
   # Print system message and prompt
 
-  out.vprint("")
-  out.vprint("System Message")
-  out.vprint("-"*74)
-  out.vprint(system_msg)
+  out.print("")
+  out.print("System Message")
+  out.print("-"*74)
+  out.print(system_msg)
 
-  out.vprint("Prompt")
-  out.vprint("-"*74)
-  out.vprint(full_prompt.rstrip())
+  out.print("Prompt")
+  out.print("-"*74)
+  out.print(prompt.rstrip())
 
   # Create LLM messages
 
-  msgs = [ SystemMessage(system_msg), HumanMessage(full_prompt) ]
+  msgs = [ SystemMessage(system_msg), HumanMessage(prompt) ]
 
   # Query the LLM
 
@@ -170,35 +190,69 @@ def main():
       with get_openai_callback() as cb:
         resp = llm.invoke(msgs)
         break
-    except:
+    except Exception as e:
+      print("")
       print("ERROR: LLM query failed, retrying in 20 seconds")
+      print(f"{type(e)}")
+      print(f"{e}")
+      print("")
       time.sleep(20)
 
   # Display the response
 
-  out.vprint("")
-  out.vprint("Reponse")
-  out.vprint("-"*74)
-
-  # Remove backtick lines from response
+  out.print("")
+  out.print("Reponse")
+  out.print("-"*74)
 
   out.print("")
-  for line in iter(resp.content.splitlines()):
-    if not line.startswith("```"):
-      out.print(line)
+  print(resp.content)
   out.print("")
 
   # Display statistics
 
-  out.vprint("Statistics")
-  out.vprint("-"*74)
+  out.print("Statistics")
+  out.print("-"*74)
 
-  out.vprint("")
-  out.vprint(f"prompt_tokens = {cb.prompt_tokens}")
-  out.vprint(f"resp_tokens   = {cb.completion_tokens}")
-  out.vprint(f"total_tokens  = {cb.total_tokens}")
-  out.vprint(f"total_cost    = {cb.total_cost}")
-  out.vprint("")
+  out.print("")
+  out.print(f"prompt_tokens = {cb.prompt_tokens}")
+  out.print(f"resp_tokens   = {cb.completion_tokens}")
+  out.print(f"total_tokens  = {cb.total_tokens}")
+  out.print(f"total_cost    = {cb.total_cost}")
+  out.print("")
+
+  # Write to output file (scan for content between triple back ticks or
+  # scan for content between module/endmodule)
+
+  if opts.output != '-':
+    with open( opts.output, 'w' ) as file:
+
+      print( "", file=file )
+
+      found_first_backticks  = False
+      found_second_backticks = False
+      found_module           = False
+      found_endmodule        = False
+
+      for line in iter(resp.content.splitlines()):
+
+        if not found_first_backticks and not found_module:
+          if line.startswith("```"):
+            found_first_backticks = True
+          if line.startswith("module TopModule"):
+            found_module = True
+            print( line, file=file )
+
+        elif found_first_backticks and not found_second_backticks:
+          if line.startswith("```"):
+            found_second_backticks = True
+          else:
+            print( line, file=file )
+
+        elif found_module and not found_endmodule:
+          print( line, file=file )
+          if line.startswith("endmodule"):
+            found_endmodule = True
+
+      print( "", file=file )
 
 main()
-

@@ -1,9 +1,8 @@
 
-The following adder-subtractor with zero flag doesn't work. Fix the
-bug(s).
+Consider the following adder-subtractor with a zero flag:
 
   synthesis verilog_input_version verilog_2001
-  module top_module (
+  module TopModule (
       input do_sub,
       input [7:0] a,
       input [7:0] b,
@@ -23,11 +22,6 @@ bug(s).
 
   endmodule
 
-module TopModule (
-  input do_sub,
-  input [7:0] a,
-  input [7:0] b,
-  output reg [7:0] out,
-  output reg result_is_zero
-);
+Unfortunately, this module has a bug. Implement a new version of this
+module that fixes the bug.
 

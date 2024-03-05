@@ -1,12 +1,13 @@
 
-Fix any and all bugs in this code:
+Consider the following adder-subtractor with a zero flag:
 
-  module top_module (
+  module TopModule (
       input      cpu_overheated,
       output reg shut_off_computer,
       input      arrived,
       input      gas_tank_empty,
-      output reg keep_driving  );
+      output reg keep_driving
+  );
 
       always @(*) begin
           if (cpu_overheated)
@@ -20,11 +21,6 @@ Fix any and all bugs in this code:
 
   endmodule
 
-module TopModule (
-  input cpu_overheated,
-  output reg shut_off_computer,
-  input arrived,
-  input gas_tank_empty,
-  output reg keep_driving
-);
+Unfortunately, this module has a bug. Implement a new version of this
+module that fixes the bug.
 

@@ -1,4 +1,15 @@
 
+I would like you to implement a module named TopModule with the following
+interface. All input and output ports are one bit unless otherwise
+specified.
+
+ - input  clk
+ - input  resetn
+ - input  x
+ - input  y
+ - output f
+ - output g
+
 Consider a finite state machine that is used to control some type of
 motor. The FSM has inputs x and y, which come from the motor, and
 produces outputs f and g, which control the motor. There is also a clock
@@ -13,14 +24,6 @@ cycle. While maintaining g = 1 the FSM has to monitor the y input. If y
 has the value 1 within at most two clock cycles, then the FSM should
 maintain g = 1 permanently (that is, until reset). But if y does not
 become 1 within two clock cycles, then the FSM should set g = 0
-permanently (until reset).
-
-module TopModule (
-  input clk,
-  input resetn,
-  input x,
-  input y,
-  output f,
-  output g
-);
+permanently (until reset). Assume all sequential logic is triggered on
+the positive edge of the clock.
 

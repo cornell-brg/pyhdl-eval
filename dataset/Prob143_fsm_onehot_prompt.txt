@@ -1,4 +1,14 @@
 
+I would like you to implement a module named TopModule with the following
+interface. All input and output ports are one bit unless otherwise
+specified.
+
+ - input  in
+ - input  state (10 bits)
+ - output next_state (10 bits)
+ - output out1
+ - output out2
+
 Given the follow state machine with 1 input and 2 outputs (the outputs
 are given as "(out1, out2)"):
 
@@ -27,17 +37,9 @@ Suppose this state machine uses one-hot encoding, where state[0] through
 state[9] correspond to the states S0 though S9, respectively. The outputs
 are zero unless otherwise specified.
 
-Write Verilog implementing the state transition logic and output logic
+The module should implement the state transition logic and output logic
 portions of the state machine (but not the state flip-flops). You are
 given the current state in state[9:0] and must produce next_state[9:0]
 and the two outputs. Derive the logic equations by inspection assuming a
 one-hot encoding.
-
-module TopModule (
-  input in,
-  input [9:0] state,
-  output [9:0] next_state,
-  output out1,
-  output out2
-);
 

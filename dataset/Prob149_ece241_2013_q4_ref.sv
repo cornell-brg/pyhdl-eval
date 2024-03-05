@@ -2,10 +2,10 @@
 module RefModule (
   input clk,
   input reset,
-  input [3:1] s,
-  output reg fr3,
+  input [2:0] s,
   output reg fr2,
   output reg fr1,
+  output reg fr0,
   output reg dfr
 );
 
@@ -19,17 +19,17 @@ module RefModule (
 
   always@(*) begin
     case (state)
-      A2: next = s[1] ? B1 : A2;
-      B1: next = s[2] ? C1 : (s[1] ? B1 : A2);
-      B2: next = s[2] ? C1 : (s[1] ? B2 : A2);
-      C1: next = s[3] ? D1 : (s[2] ? C1 : B2);
-      C2: next = s[3] ? D1 : (s[2] ? C2 : B2);
-      D1: next = s[3] ? D1 : C2;
+      A2: next = s[0] ? B1 : A2;
+      B1: next = s[1] ? C1 : (s[0] ? B1 : A2);
+      B2: next = s[1] ? C1 : (s[0] ? B2 : A2);
+      C1: next = s[2] ? D1 : (s[1] ? C1 : B2);
+      C2: next = s[2] ? D1 : (s[1] ? C2 : B2);
+      D1: next = s[2] ? D1 : C2;
       default: next = 'x;
     endcase
   end
   reg [3:0] fr;
-  assign {fr3, fr2, fr1, dfr} = fr;
+  assign {fr2, fr1, fr0, dfr} = fr;
   always_comb begin
     case (state)
       A2: fr = 4'b1111;

@@ -1,7 +1,19 @@
 
-Build a 64-bit arithmetic shift register, with synchronous load. The
-shifter can shift both left and right, and by 1 or 8 bit positions,
-selected by "amount." Assume the right shit is an arithmetic right shift.
+I would like you to implement a module named TopModule with the following
+interface. All input and output ports are one bit unless otherwise
+specified.
+
+ - input  clk
+ - input  load
+ - input  ena
+ - input  amount (2 bits)
+ - input  data (64 bits)
+ - output q (64 bits)
+
+The module should implement a 64-bit arithmetic shift register, with
+synchronous load. The shifter can shift both left and right, and by 1 or
+8 bit positions, selected by "amount." Assume the right shit is an
+arithmetic right shift.
 
 Signals are defined as below:
 
@@ -14,13 +26,4 @@ Signals are defined as below:
       (c) 2'b10: shift right by 1 bit.
       (d) 2'b11: shift right by 8 bits.
   (4) q: The contents of the shifter.
-
-module TopModule (
-  input clk,
-  input load,
-  input ena,
-  input [1:0] amount,
-  input [63:0] data,
-  output reg [63:0] q
-);
 

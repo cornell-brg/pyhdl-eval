@@ -73,10 +73,10 @@ module tb();
 		#5 clk = ~clk;
 
 	logic [3:0] in;
-	logic [2:0] out_both_ref;
-	logic [2:0] out_both_dut;
-	logic [3:1] out_any_ref;
-	logic [3:1] out_any_dut;
+	logic [3:0] out_both_ref;
+	logic [3:0] out_both_dut;
+	logic [3:0] out_any_ref;
+	logic [3:0] out_any_dut;
 	logic [3:0] out_different_ref;
 	logic [3:0] out_different_dut;
 

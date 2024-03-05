@@ -1,9 +1,11 @@
 
-Implement a D latch using an always block.
+I would like you to implement a module named TopModule with the following
+interface. All input and output ports are one bit unless otherwise
+specified.
 
-module TopModule (
-  input d,
-  input ena,
-  output logic q
-);
+ - input  d
+ - input  ena
+ - output q
+
+The module should impement a D latch using an always block.
 

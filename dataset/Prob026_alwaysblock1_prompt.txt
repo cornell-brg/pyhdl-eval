@@ -1,11 +1,13 @@
 
-Build an AND gate using both an assign statement and a combinational
-always block.
+I would like you to implement a module named TopModule with the following
+interface. All input and output ports are one bit unless otherwise
+specified.
 
-module TopModule (
-  input a,
-  input b,
-  output out_assign,
-  output reg out_alwaysblock
-);
+ - input  a
+ - input  b
+ - output out_assign
+ - output out_alwaysblock
+
+The module should implement an AND gate using both an assign statement
+and a combinational always block.
 

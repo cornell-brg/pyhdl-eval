@@ -6,7 +6,7 @@
 module stimulus_gen (
 	input clk,
 	output logic reset,
-	output logic [3:1] s,
+	output logic [2:0] s,
 	output reg[511:0] wavedrom_title,
 	output reg wavedrom_enable,
 	input tb_match
@@ -91,12 +91,12 @@ module tb();
 	typedef struct packed {
 		int errors;
 		int errortime;
-		int errors_fr3;
-		int errortime_fr3;
 		int errors_fr2;
 		int errortime_fr2;
 		int errors_fr1;
 		int errortime_fr1;
+		int errors_fr0;
+		int errortime_fr0;
 		int errors_dfr;
 		int errortime_dfr;
 
@@ -115,19 +115,19 @@ module tb();
 		#5 clk = ~clk;
 
 	logic reset;
-	logic [3:1] s;
-	logic fr3_ref;
-	logic fr3_dut;
+	logic [2:0] s;
 	logic fr2_ref;
 	logic fr2_dut;
 	logic fr1_ref;
 	logic fr1_dut;
+	logic fr0_ref;
+	logic fr0_dut;
 	logic dfr_ref;
 	logic dfr_dut;
 
 	initial begin 
 		$dumpfile("wave.vcd");
-		$dumpvars(1, stim1.clk, tb_mismatch ,clk,reset,s,fr3_ref,fr3_dut,fr2_ref,fr2_dut,fr1_ref,fr1_dut,dfr_ref,dfr_dut );
+		$dumpvars(1, stim1.clk, tb_mismatch ,clk,reset,s,fr2_ref,fr2_dut,fr1_ref,fr1_dut,fr0_ref,fr0_dut,dfr_ref,dfr_dut );
 	end
 
 
@@ -143,18 +143,18 @@ module tb();
 		.clk,
 		.reset,
 		.s,
-		.fr3(fr3_ref),
 		.fr2(fr2_ref),
 		.fr1(fr1_ref),
+		.fr0(fr0_ref),
 		.dfr(dfr_ref) );
 		
 	TopModule top_module1 (
 		.clk,
 		.reset,
 		.s,
-		.fr3(fr3_dut),
 		.fr2(fr2_dut),
 		.fr1(fr1_dut),
+		.fr0(fr0_dut),
 		.dfr(dfr_dut) );
 
 	
@@ -168,12 +168,12 @@ module tb();
 
 	
 	final begin
-		if (stats1.errors_fr3) $display("Hint: Output '%s' has %0d mismatches. First mismatch occurred at time %0d.", "fr3", stats1.errors_fr3, stats1.errortime_fr3);
-		else $display("Hint: Output '%s' has no mismatches.", "fr3");
 		if (stats1.errors_fr2) $display("Hint: Output '%s' has %0d mismatches. First mismatch occurred at time %0d.", "fr2", stats1.errors_fr2, stats1.errortime_fr2);
 		else $display("Hint: Output '%s' has no mismatches.", "fr2");
 		if (stats1.errors_fr1) $display("Hint: Output '%s' has %0d mismatches. First mismatch occurred at time %0d.", "fr1", stats1.errors_fr1, stats1.errortime_fr1);
 		else $display("Hint: Output '%s' has no mismatches.", "fr1");
+		if (stats1.errors_fr0) $display("Hint: Output '%s' has %0d mismatches. First mismatch occurred at time %0d.", "fr0", stats1.errors_fr0, stats1.errortime_fr0);
+		else $display("Hint: Output '%s' has no mismatches.", "fr0");
 		if (stats1.errors_dfr) $display("Hint: Output '%s' has %0d mismatches. First mismatch occurred at time %0d.", "dfr", stats1.errors_dfr, stats1.errortime_dfr);
 		else $display("Hint: Output '%s' has no mismatches.", "dfr");
 
@@ -183,7 +183,7 @@ module tb();
 	end
 	
 	// Verification: XORs on the right makes any X in good_vector match anything, but X in dut_vector will only match X.
-	assign tb_match = ( { fr3_ref, fr2_ref, fr1_ref, dfr_ref } === ( { fr3_ref, fr2_ref, fr1_ref, dfr_ref } ^ { fr3_dut, fr2_dut, fr1_dut, dfr_dut } ^ { fr3_ref, fr2_ref, fr1_ref, dfr_ref } ) );
+	assign tb_match = ( { fr2_ref, fr1_ref, fr0_ref, dfr_ref } === ( { fr2_ref, fr1_ref, fr0_ref, dfr_ref } ^ { fr2_dut, fr1_dut, fr0_dut, dfr_dut } ^ { fr2_ref, fr1_ref, fr0_ref, dfr_ref } ) );
 	// Use explicit sensitivity list here. @(*) causes NetProc::nex_input() to be called when trying to compute
 	// the sensitivity list of the @(strobe) process, which isn't implemented.
 	always @(posedge clk, negedge clk) begin
@@ -193,15 +193,19 @@ module tb();
 			if (stats1.errors == 0) stats1.errortime = $time;
 			stats1.errors++;
 		end
-		if (fr3_ref !== ( fr3_ref ^ fr3_dut ^ fr3_ref ))
-		begin if (stats1.errors_fr3 == 0) stats1.errortime_fr3 = $time;
-			stats1.errors_fr3 = stats1.errors_fr3+1'b1; end
+
 		if (fr2_ref !== ( fr2_ref ^ fr2_dut ^ fr2_ref ))
 		begin if (stats1.errors_fr2 == 0) stats1.errortime_fr2 = $time;
 			stats1.errors_fr2 = stats1.errors_fr2+1'b1; end
+
 		if (fr1_ref !== ( fr1_ref ^ fr1_dut ^ fr1_ref ))
 		begin if (stats1.errors_fr1 == 0) stats1.errortime_fr1 = $time;
 			stats1.errors_fr1 = stats1.errors_fr1+1'b1; end
+
+		if (fr0_ref !== ( fr0_ref ^ fr0_dut ^ fr0_ref ))
+		begin if (stats1.errors_fr0 == 0) stats1.errortime_fr0 = $time;
+			stats1.errors_fr0 = stats1.errors_fr0+1'b1; end
+
 		if (dfr_ref !== ( dfr_ref ^ dfr_dut ^ dfr_ref ))
 		begin if (stats1.errors_dfr == 0) stats1.errortime_dfr = $time;
 			stats1.errors_dfr = stats1.errors_dfr+1'b1; end

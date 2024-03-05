@@ -1,12 +1,14 @@
 
-Given four unsigned numbers, find the minimum. Unsigned numbers can be
-compared with standard comparison operators (a < b).
+I would like you to implement a module named TopModule with the following
+interface. All input and output ports are one bit unless otherwise
+specified.
 
-module TopModule (
-  input [7:0] a,
-  input [7:0] b,
-  input [7:0] c,
-  input [7:0] d,
-  output reg [7:0] min
-);
+ - input  a   (8 bits)
+ - input  b   (8 bits)
+ - input  c   (8 bits)
+ - input  d   (8 bits)
+ - output min (8 bits)
+
+The module should find the minimum of the four input values. Unsigned
+numbers can be compared with standard comparison operators (a < b).
 

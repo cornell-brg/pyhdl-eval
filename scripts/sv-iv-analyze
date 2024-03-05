@@ -177,7 +177,7 @@ def analyze_result( results, problem, sample, generate_log, compile_log, verilog
 
   prompt_tokens_pattern = r"prompt_tokens\s*=\s*(\d+)"
   resp_tokens_pattern   = r"resp_tokens\s*=\s*(\d+)"
-  cost_pattern          = r"cost\s*=\s*(\d+)"
+  cost_pattern          = r"cost\s*=\s*(\d+.\d+)"
 
   with open( generate_log, 'r' ) as file:
     for line in file:

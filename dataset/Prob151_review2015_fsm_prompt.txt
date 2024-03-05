@@ -1,5 +1,18 @@
 
-We want to create a timer that:
+I would like you to implement a module named TopModule with the following
+interface. All input and output ports are one bit unless otherwise
+specified.
+
+ - input  clk
+ - input  reset
+ - input  data
+ - input  done_counting
+ - input  ack
+ - output shift_ena
+ - output counting
+ - output done
+
+The module should implement a timer that:
 
   (1) is started when a particular pattern (1101) is detected,
   (2) shifts in 4 more bits to determine the duration to delay,
@@ -19,16 +32,6 @@ assert done to notify the user the timer has timed out, and waits until
 input ack is 1 before being reset to look for the next occurrence of the
 start sequence (1101). The state machine should have a active high
 synchronous reset, setting the state to where it begins searching for the
-input sequence 1101.
-
-module TopModule (
-  input clk,
-  input reset,
-  input data,
-  output reg shift_ena,
-  output reg counting,
-  input done_counting,
-  output reg done,
-  input ack
-);
+input sequence 1101. Assume all sequential logic is triggered on the
+positive edge of the clock.
 

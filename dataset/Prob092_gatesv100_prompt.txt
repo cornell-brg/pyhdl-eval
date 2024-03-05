@@ -1,6 +1,15 @@
 
-You are given a 100-bit input vector in[99:0]. We want to know some
-relationships between each bit and its neighbour:
+I would like you to implement a module named TopModule with the following
+interface. All input and output ports are one bit unless otherwise
+specified.
+
+ - input  in            (100 bits)
+ - output out_both      ( 99 bits)
+ - output out_any       (100 bits)
+ - output out_different (100 bits)
+
+The module takes as input a 100-bit input vector in[99:0] and should
+produce the following three outputs:
 
   (1) out_both: Each bit of this output vector should indicate whether
   both the corresponding input bit and its neighbour to the left are '1'.
@@ -19,11 +28,4 @@ relationships between each bit and its neighbour:
   the left. For example, out_different[98] should indicate if in[98] is
   different from in[99]. For this part, treat the vector as wrapping
   around, so in[99]'s neighbour to the left is in[0].
-
-module TopModule (
-  input [99:0] in,
-  output [98:0] out_both,
-  output [99:1] out_any,
-  output [99:0] out_different
-);
 

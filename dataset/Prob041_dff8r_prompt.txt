@@ -1,11 +1,14 @@
 
-Create 8 D flip-flops with active high synchronous reset setting the
-output to zero. All DFFs should be triggered by the positive edge of clk.
+I would like you to implement a module named TopModule with the following
+interface. All input and output ports are one bit unless otherwise
+specified.
 
-module TopModule (
-  input clk,
-  input [7:0] d,
-  input reset,
-  output reg [7:0] q
-);
+ - input clk
+ - input reset
+ - input d     (8 bits)
+ - input q     (8 bits)
+
+The module should include 8 D flip-flops with active high synchronous
+reset setting the output to zero. All DFFs should be triggered by the
+positive edge of clk.
 

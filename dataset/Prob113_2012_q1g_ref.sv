@@ -1,6 +1,6 @@
 
 module RefModule (
-  input [4:1] x,
+  input [3:0] x,
   output logic f
 );
 

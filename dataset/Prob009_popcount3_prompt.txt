@@ -1,9 +1,11 @@
 
-A "population count" circuit counts the number of '1's in an input
-vector. Build a population count circuit for a 3-bit input vector.
+I would like you to implement a module named TopModule with the following
+interface. All input and output ports are one bit unless otherwise
+specified.
 
-module TopModule (
-  input [2:0] in,
-  output [1:0] out
-);
+ - input  in  (3 bits)
+ - output out (2 bits)
+
+The module should implement a "population count" circuit that counts the
+number of '1's in the input vector.
 

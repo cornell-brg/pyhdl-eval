@@ -1,8 +1,11 @@
 
-Given an 8-bit input vector [7:0], reverse its bit ordering.
+I would like you to implement a module named TopModule with the following
+interface. All input and output ports are one bit unless otherwise
+specified.
 
-module TopModule (
-  input [7:0] in,
-  output [7:0] out
-);
+ - input  in  (8 bits)
+ - output out (8 bits)
+
+The module should reverse the bit ordering of the input port and write
+the result to the output port.
 

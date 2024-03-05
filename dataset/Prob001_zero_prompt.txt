@@ -1,7 +1,9 @@
 
-Build a circuit that always outputs a LOW.
+I would like you to implement a module named TopModule with the following
+interface. All input and output ports are one bit unless otherwise
+specified.
 
-module TopModule (
-  output zero
-);
+ - output zero
+
+The module should always outputs a LOW.
 

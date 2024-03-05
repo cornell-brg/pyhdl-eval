@@ -24,19 +24,17 @@ Module B can be described by the following simulation waveform:
   85ns  0  1  0
   90ns  1  0  0
 
-Now consider a top-level that uses two A submodules and two B submodules.
-The first input of all four submodules is connect to input 'x', and the
+Now consider a top-level module with the following interface:
+
+ - input  x
+ - input  y
+ - output z
+
+The module is implemented with two A submodules and two B submodules. The
+first input of all four submodules is connect to input 'x', and the
 second input of all four submodules is connected to 'y'. The output of
 the first A submodule is connected to a two-input OR, along with the
 output of the first B submodule. The second pair of A and B submodules is
 similarly connected to an AND gate. The output of the OR and the AND is
 connected to an XOR, whose output is 'z'.
-
-Implement this circuit in Verilog.
-
-module TopModule (
-  input x,
-  input y,
-  output z
-);
 
