@@ -36,9 +36,12 @@ When the circuit isn't counting, the count[3:0] output is don't-care
 (whatever value is convenient for you to implement). At that point, the
 circuit must assert done to notify the user the timer has timed out, and
 waits until input ack is 1 before being reset to look for the next
-occurrence of the start sequence (1101).
+occurrence of the start sequence (1101). Assume all sequential logic is
+triggered on the positive edge of the clock.
 
-The circuit should reset into a state where it begins searching for the
-input sequence 1101. The reset signal is active high synchronous. Assume
-all sequential logic is triggered on the positive edge of the clock.
+The module includes an active-high synchronous reset signal; this means
+the reset is sampled with respect to the clock, so do not include posedge
+reset in the sensitivity list of any sequential always block. The reset
+signal should set the FSM into a state where it begins searching for the
+input sequence 1101.
 

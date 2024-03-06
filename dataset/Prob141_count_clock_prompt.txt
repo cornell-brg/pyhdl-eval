@@ -17,8 +17,12 @@ on ena whenever your clock should increment (i.e., once per second, while
 "clk" is much faster than once per second). The signal "pm" is asserted
 if the clock is PM, or is otherwise AM. hh, mm, and ss are two BCD
 (Binary- Coded Decimal) digits each for hours (01-12), minutes (00-59),
-and seconds (00-59). Reset is the active high synchronous signal that
-resets the clock to "12:00 AM." Reset has higher priority than enable and
-can occur even when not enabled. Assume all sequential logic is triggered
+and seconds (00-59). Assume all sequential logic is triggered
 on the positive edge of the clock.
+
+The module includes an active-high synchronous reset signal; this means
+the reset is sampled with respect to the clock, so do not include posedge
+reset in the sensitivity list of any sequential always block. The reset
+signal should reset the clock to "12:00 AM." Reset has higher priority
+than enable and can occur even when not enabled.
 

@@ -10,7 +10,6 @@ specified.
 
 The module should implement a Moore state machine with the following
 state transition table with one input, one output, and four states.
-Include a synchronous active high reset that resets the FSM to state A.
 Assume all sequential logic is triggered on the positive edge of the
 clock.
 
@@ -19,4 +18,9 @@ clock.
   B     | C, B                             | 0
   C     | A, D                             | 0
   D     | C, B                             | 1
+
+The module includes an active-high synchronous reset signal; this means
+the reset is sampled with respect to the clock, so do not include posedge
+reset in the sensitivity list of any sequential always block. The reset
+signal should reset the FSM to the A state.
 

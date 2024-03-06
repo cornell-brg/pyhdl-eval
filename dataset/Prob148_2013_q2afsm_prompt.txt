@@ -20,10 +20,9 @@ below:
   C (g1=1) -------r1=1-------> C
   C (g1=1) -------r1=0-------> A
 
-Resetn is an active-low synchronous reset that resets into state A. This
-FSM acts as an arbiter circuit, which controls access to some type of
-resource by three requesting devices. Each device makes its request for
-the resource by setting a signal _r[i]_ = 1, where _r[i]_ is either
+This FSM acts as an arbiter circuit, which controls access to some type
+of resource by three requesting devices. Each device makes its request
+for the resource by setting a signal _r[i]_ = 1, where _r[i]_ is either
 _r[0]_, _r[1]_, or _r[2]_. Each r[i] is an input signal to the FSM, and
 represents one of the three devices. The FSM stays in state _A_ as long
 as there are no requests. When one or more request occurs, then the FSM
@@ -42,4 +41,9 @@ Describe the FSM outputs, _g[i]_, using either continuous assignment
 statement(s) or an always block (at your discretion). Assign any state
 codes that you wish to use. Assume all sequential logic is triggered on
 the positive edge of the clock.
+
+The module includes an active-low synchronous resetn signal; this means
+the resetn is sampled with respect to the clock, so do not include
+posedge resetn in the sensitivity list of any sequential always block.
+The resetn signal resets the FSM into state A.
 

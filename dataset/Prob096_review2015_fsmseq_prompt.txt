@@ -10,7 +10,10 @@ specified.
 
 The module should implement a finite-state machine that searches for the
 sequence 1101 in an input bit stream. When the sequence is found, it
-should set start_shifting to 1, forever, until reset. Reset is active
-high synchronous. Assume all sequential logic is triggered on the
-positive edge of the clock.
+should set start_shifting to 1, forever, until reset. Assume all
+sequential logic is triggered on the positive edge of the clock.
+
+The module includes an active-high synchronous reset signal; this means
+the reset is sampled with respect to the clock, so do not include posedge
+reset in the sensitivity list of any sequential always block.
 

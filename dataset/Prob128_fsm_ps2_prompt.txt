@@ -20,6 +20,10 @@ use is to discard bytes until we see one with in[3]=1. We then assume
 that this is byte 1 of a message, and signal the receipt of a message
 once all 3 bytes have been received (done). The FSM should signal done in
 the cycle immediately after the third byte of each message was
-successfully received. Reset should be active high synchronous. Assume
+successfully received. Assume
 all sequential logic is triggered on the positive edge of the clock.
+
+The module includes an active-high synchronous reset signal; this means
+the reset is sampled with respect to the clock, so do not include posedge
+reset in the sensitivity list of any sequential always block.
 

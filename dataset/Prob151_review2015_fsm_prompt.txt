@@ -30,8 +30,12 @@ counting output to indicate it is waiting for the counters, and waits
 until input done_counting is high.At that point, the state machine must
 assert done to notify the user the timer has timed out, and waits until
 input ack is 1 before being reset to look for the next occurrence of the
-start sequence (1101). The state machine should have a active high
-synchronous reset, setting the state to where it begins searching for the
-input sequence 1101. Assume all sequential logic is triggered on the
+start sequence (1101). Assume all sequential logic is triggered on the
 positive edge of the clock.
+
+The module includes an active-high synchronous reset signal; this means
+the reset is sampled with respect to the clock, so do not include posedge
+reset in the sensitivity list of any sequential always block. The reset
+signal should set the FSM to the state to where it begins searching for
+the input sequence 1101.
 

@@ -9,9 +9,8 @@ specified.
  - output z
 
 The module should implement a finite-state machine with the
-state-assigned table shown below. Reset should synchronous active high
-reset the FSM to state 000. Assume all sequential logic is triggered on
-the positive edge of the clock.
+state-assigned table shown below. Assume all sequential logic is
+triggered on the positive edge of the clock.
 
   Present state y[2:0] | Next state y[2:0] x=0, Next state y[2:0] x=1 | Output z
   000 | 000, 001 | 0
@@ -19,4 +18,9 @@ the positive edge of the clock.
   010 | 010, 001 | 0
   011 | 001, 010 | 1
   100 | 011, 100 | 1
+
+The module includes an active-high synchronous reset signal; this means
+the reset is sampled with respect to the clock, so do not include posedge
+reset in the sensitivity list of any sequential always block. The reset
+signal should reset the FSM to the 000 state.
 

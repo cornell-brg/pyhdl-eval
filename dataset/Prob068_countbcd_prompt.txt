@@ -12,6 +12,10 @@ The module should implement a 4-digit BCD (binary-coded decimal) counter.
 Each decimal digit is encoded using 4 bits: q[3:0] is the ones digit,
 q[7:4] is the tens digit, etc. For digits [3:1], also output an enable
 signal indicating when each of the upper three digits should be
-incremented. Include a synchronous active-high reset. Assume all
-sequential logic is triggered on the positive edge of the clock.
+incremented. Assume all sequential logic is triggered on the positive
+edge of the clock.
+
+The module includes an active-high synchronous reset signal; this means
+the reset is sampled with respect to the clock, so do not include posedge
+reset in the sensitivity list of any sequential always block.
 

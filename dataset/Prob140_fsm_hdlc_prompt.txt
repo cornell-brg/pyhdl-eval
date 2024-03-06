@@ -23,9 +23,13 @@ Moore-type finite state machine to recognize these three sequences:
   (2) 01111110: Flag the beginning/end of a frame (flag).
   (3) 01111111...: Error (7 or more 1s) (err).
 
-When the FSM is reset, it should be in a state that behaves as though the
-previous input were 0. The reset signal is active high synchronous. The
-output signals should be asserted for a complete cycle beginning on the
-clock cycle after the condition occurs. Assume all sequential
-logic is triggered on the positive edge of the clock.
+The output signals should be asserted for a complete cycle beginning on
+the clock cycle after the condition occurs. Assume all sequential logic
+is triggered on the positive edge of the clock.
+
+The module includes an active-high synchronous reset signal; this means
+the reset is sampled with respect to the clock, so do not include posedge
+reset in the sensitivity list of any sequential always block. The reset
+signal should reset the FSM into a state that behaves as though the
+previous input were 0.
 

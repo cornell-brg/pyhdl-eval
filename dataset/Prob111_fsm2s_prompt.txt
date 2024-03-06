@@ -10,11 +10,16 @@ specified.
  - output out
 
 The module should implement a Moore state machine with two states, two
-inputs, and one output according to diagram described below. Reset is an
-active-high synchronous reset to state OFF.
+inputs, and one output according to diagram described below. Assume all
+sequential logic is triggered on the positive edge of the clock.
 
   OFF (out=0) --j=0--> OFF
   OFF (out=0) --j=1--> ON
   ON  (out=1) --k=0--> ON
   ON  (out=1) --k=1--> OFF
+
+The module includes an active-high synchronous reset signal; this means
+the reset is sampled with respect to the clock, so do not include posedge
+reset in the sensitivity list of any sequential always block. The reset
+signal should reset the FSM to the OFF state.
 

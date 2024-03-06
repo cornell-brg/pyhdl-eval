@@ -9,6 +9,10 @@ specified.
 
 The module should implement a decade counter that counts from 0 through
 9, inclusive, with a period of 10. Assume all sequential logic is
-triggered on the positive edge of the clock. The reset input is active
-high synchronous, and should reset the counter to 0.
+triggered on the positive edge of the clock.
+
+The module includes an active-high synchronous reset signal; this means
+the reset is sampled with respect to the clock, so do not include posedge
+reset in the sensitivity list of any sequential always block. The reset
+signal should reset the counter to 0.
 

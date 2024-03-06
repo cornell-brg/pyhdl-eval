@@ -17,7 +17,11 @@ cycles through 2**n-1 states before repeating (the all-zero state is
 never reached).
 
 The module should implement a 5-bit maximal-length Galois LFSR with taps
-at bit positions 5 and 3. The active-high synchronous reset should reset
-the LFSR output to 1. Assume all sequential logic is triggered on the
+at bit positions 5 and 3. Assume all sequential logic is triggered on the
 positive edge of the clock.
+
+The module includes an active-high synchronous reset signal; this means
+the reset is sampled with respect to the clock, so do not include posedge
+reset in the sensitivity list of any sequential always block. The reset
+signal should reset the LFSR output to 1.
 

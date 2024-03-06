@@ -48,7 +48,7 @@ def parse_cmdline():
   p.add_argument( "-m", "--model",       type=str,   default="gpt-3.5-turbo" )
   p.add_argument( "-t", "--temperature", type=float, default=0.8 )
   p.add_argument( "-p", "--topp",        type=float, default=0.95 )
-  p.add_argument( "-e", "--explanation", action="store_true" )
+  p.add_argument( "-e", "--explain",     action="store_true" )
   p.add_argument( "-o", "--output",      type=str, default="-" )
   p.add_argument( "prompt_filename" )
 
@@ -73,51 +73,28 @@ class VerboseOutput:
 # Context
 #-------------------------------------------------------------------------
 
-# Original system msg:
-#
-# You only complete chats with syntax correct Verilog code. End the Verilog
-# module code completion with 'endmodule'. Do not include module, input and
-# output definitions
-#
-
-# Original prompt prefix:
-#
-# Implement the Verilog module based on the following description.
-# Assume that sigals are positive clock/clk triggered unless otherwise.
-
 system_msg="""
 You are a Verilog RTL designer that only writes code using correct
 Verilog syntax.
 """
 
-# Feel free to include extra descriptions and an explanation but you must
-# be sure that the Verilog module is self contained so it can be extracted
-# from your response.
+prompt_rules_suffix="""
+Here are some additional rules and coding conventions.
 
-# user prompt suffix:
+ - declare all ports and signals as logic; do not to use wire or reg
 
-# Here are some additional rules and coding conventions.
-#
-#  - declare all ports and signals as logic; do not to use wire or reg
-#
-#  - for combinational logic with an always block do not explicitly specify
-#    the sensitivity list; instead use always @(*)
-#
-#  - for combinational logic in an always @(*) only use blocking
-#    assignments with the = operator
-#
-#  - for sequential logic in an always @(posedge clk) only use non-blocking
-#    assignments with the <= operator
-#
-#  - if the interface includes a reset signal, assume that this is a level
-#    high synchronous reset; this means the reset is sampled with respect
-#    to the clock, so do not include posedge reset in the sensitivity list
-#    of any sequential always block
-#
-#  - if the interface includes a clock signal, assume that all sequential
-#    logic is triggered on the positive edge of the clock
+ - for combinational logic with an always block do not explicitly specify
+   the sensitivity list; instead use always @(*)
 
-prompt_explanation_suffix="""
+ - all sized numeric constants must have a size greater than zero
+   (e.g, 0'b0 is not a valid expression)
+
+ - an always block must read at least one signal otherwise it will never
+   be executed; use an assign statement instead of an always block in
+   situations where there is no need to read any signals
+"""
+
+prompt_no_explain_suffix="""
 Please do not include any explanations in your response.
 """
 
@@ -158,8 +135,10 @@ def main():
 
   # Add prompt suffix
 
-  if not opts.explanation:
-    prompt = prompt.rstrip() + "\n" + prompt_explanation_suffix
+  prompt = prompt.rstrip() + "\n" + prompt_rules_suffix
+
+  if not opts.explain:
+    prompt = prompt.rstrip() + "\n" + prompt_no_explain_suffix
 
   # Print system message and prompt
 

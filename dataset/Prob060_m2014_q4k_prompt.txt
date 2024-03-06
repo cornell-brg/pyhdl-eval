@@ -8,7 +8,9 @@ specified.
  - input  in
  - output out
 
-The module should implement a shift register with four D flops. Assume
-all sequential logic is triggered on the positive edge of the clock.
-Reset is active-low synchronous resettable.
+The module should implement a shift register with four D flops.
+
+The module includes an active-low synchronous resetn signal; this means
+the resetn is sampled with respect to the clock, so do not include
+posedge resetn in the sensitivity list of any sequential always block.
 

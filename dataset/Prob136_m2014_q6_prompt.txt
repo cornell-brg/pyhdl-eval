@@ -26,3 +26,7 @@ The module should implement the state machine shown below:
 Assume all sequential logic is triggered on the positive edge of the
 clock.
 
+The module includes an active-high synchronous reset signal; this means
+the reset is sampled with respect to the clock, so do not include posedge
+reset in the sensitivity list of any sequential always block.
+

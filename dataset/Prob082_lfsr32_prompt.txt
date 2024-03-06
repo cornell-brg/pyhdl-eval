@@ -14,7 +14,11 @@ with the output bit to produce each bit's next value, while bit positions
 without a tap shift.
 
 The module should implement a 32-bit Galois LFSR with taps at bit
-positions 32, 22, 2, and 1. Reset should be active high synchronous, and
-should reset the output q to 32'h1. Assume all sequential logic is
-triggered on the positive edge of the clock.
+positions 32, 22, 2, and 1. Assume all sequential logic is triggered on
+the positive edge of the clock.
+
+The module includes an active-high synchronous reset signal; this means
+the reset is sampled with respect to the clock, so do not include posedge
+reset in the sensitivity list of any sequential always block. The reset
+signal should reset the output q to 32'h1.
 

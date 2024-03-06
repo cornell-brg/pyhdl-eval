@@ -19,9 +19,12 @@ correctly received when given a stream of bits. It needs to identify the
 start bit, wait for all 8 data bits, then verify that the stop bit was
 correct. If the stop bit does not appear when expected, the FSM must wait
 until it finds a stop bit before attempting to receive the next byte.
-Include a active-high synchronous reset. Note that the serial protocol
-sends the least significant bit first.
+Note that the serial protocol sends the least significant bit first.
 
 Assume all sequential logic is triggered on the positive edge of the
 clock.
+
+The module includes an active-high synchronous reset signal; this means
+the reset is sampled with respect to the clock, so do not include posedge
+reset in the sensitivity list of any sequential always block.
 

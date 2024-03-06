@@ -23,11 +23,14 @@ The module should implement the state machine shown below:
   F (1) --1--> C
   F (1) --0--> D
 
-Reset resets into state A and is synchronous active-high. Assume all
-sequential logic is triggered on the positive edge of the clock.
-
 Use separate always blocks for the state table and the state flip-flops.
 Describe the FSM output, which is called _z_, using either continuous
 assignment statement(s) or an always block (at your discretion). Assign
-any state codes that you wish to use.
+any state codes that you wish to use. Assume all sequential logic is
+triggered on the positive edge of the clock.
+
+The module includes an active-high synchronous reset signal; this means
+the reset is sampled with respect to the clock, so do not include posedge
+reset in the sensitivity list of any sequential always block. The reset
+signal should reset the FSM to state A.
 

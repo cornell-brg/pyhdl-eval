@@ -30,7 +30,10 @@ Supplemental flow valve (controlled by dfr).
   Between s[1] and s[0] | s[0]             | fr0, fr1
   Below s[0]            | None             | fr0, fr1, fr2
 
-Also include an active-high synchronous reset that resets the state
-machine to a state equivalent to if the water level had been low for a
-long time (no sensors asserted, and all four outputs asserted).
+The module includes an active-high synchronous reset signal; this means
+the reset is sampled with respect to the clock, so do not include posedge
+reset in the sensitivity list of any sequential always block. The reset
+signal should reset the state machine to a state equivalent to if the
+water level had been low for a long time (no sensors asserted, and all
+four outputs asserted).
 
