@@ -9,7 +9,9 @@
 #  -c --csv            Write CSV file
 #     problemdirs      List of problems to analyze
 #
-# Analyze the results from testing problems with iverilog
+# Analyze the results from testing problems with iverilog. If no
+# problemdirs are given then just searches for all directories in the
+# current directory that start with Prob.
 #
 # Author : Christopher Batten
 # Date   : Feb 22, 2024
@@ -46,7 +48,7 @@ def parse_cmdline():
   p.add_argument( "-v", "--verbose",  action="store_true" )
   p.add_argument( "-w", "--wide",     action="store_true" )
   p.add_argument( "-c", "--csv",      type=str )
-  p.add_argument( "problems", type=str, nargs="+" )
+  p.add_argument( "problems", type=str, nargs="*" )
 
   opts = p.parse_args()
   if opts.help: p.error()
@@ -211,6 +213,18 @@ def analyze_result( results, problem, sample, generate_log, compile_log, verilog
       if "error" in line:
         error_C = True
 
+      if "error: Sized numeric constant must have a size greater than zero" in line:
+        result_record.passfail = '0'
+        break
+
+      if "warning: always_comb process has no sensitivities" in line:
+        result_record.passfail = 'n'
+        break
+
+      if "found no sensitivities so it will never trigger" in line:
+        result_record.passfail = 'n'
+        break
+
       if "is declared here as wire" in line:
         result_record.passfail = 'w'
         break
@@ -273,11 +287,17 @@ def main():
 
   opts = parse_cmdline()
 
+  # If no problems are given search for directories starting with Prob
+
+  problems = opts.problems
+  if not problems:
+    problems = glob.glob(f"Prob*")
+
   # Iterate through problem result directories
 
   results = Results( opts.wide )
 
-  for problem in opts.problems:
+  for problem in problems:
 
     problem = problem.rstrip("/")
     for filename in glob.glob(f"{problem}/{problem}_sample*-sv-iv-test.log"):

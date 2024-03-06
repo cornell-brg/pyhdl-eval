@@ -107,6 +107,9 @@ $$($(1)_sv_samples) : %.sv : $(1)_prompt.txt
 
 $(1)-sv-generate : $$($(1)_sv_samples)
 
+pregen_files += $$($(1)_sv_samples)
+pregen_files += $$($(1)_sv_generate_logs)
+
 sv_generate_targets += $$($(1)_sv_samples)
 
 $(1)-sv-generate-clean :
@@ -191,8 +194,7 @@ extra_pregen_files = \
 
 ifneq ($(pregen_dir),NOT_ENABLED)
 pregen: $(sv_samples)
-	$(file >  files-to-copy.txt, $(sv_samples))
-	$(file >> files-to-copy.txt, $(sv_generate_logs))
+	$(file >  files-to-copy.txt, $(pregen_files))
 	$(file >> files-to-copy.txt, $(extra_pregen_files))
 	sed -i.bak -e 's/ \+/\n/g' files-to-copy.txt
 	rsync --files-from=files-to-copy.txt . \
