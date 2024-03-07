@@ -213,6 +213,10 @@ def analyze_result( results, problem, sample, generate_log, compile_log, verilog
       if "error" in line:
         error_C = True
 
+      if "error: This assignment requires an explicit cast" in line:
+        result_record.passfail = 'e'
+        break
+
       if "error: Sized numeric constant must have a size greater than zero" in line:
         result_record.passfail = '0'
         break

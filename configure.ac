@@ -40,6 +40,19 @@ AS_IF([test "${IVERILOG}" = "no"],
   AC_MSG_ERROR([Must have iverilog installed!])
 ])
 
+
+#-------------------------------------------------------------------------
+# dataset
+#-------------------------------------------------------------------------
+
+AC_ARG_WITH(dataset,
+  AS_HELP_STRING([--with-dataset],[Directory with dataset files]),
+  [dataset_dir="${with_dataset}"],
+  [dataset_dir="${srcdir}/dataset"])
+
+AC_SUBST([dataset_dir])
+AC_MSG_NOTICE([using dataset: ${dataset_dir}])
+
 #-------------------------------------------------------------------------
 # create prompt.mk file
 #-------------------------------------------------------------------------
@@ -56,7 +69,8 @@ cat > problems.mk \
 problems = \
 END
 
-sed -e 's/^\(.*\)$/  \1 \\/' ${srcdir}/dataset/problems.txt >> problems.mk
+sed -e '/^\s*$/d' -e 's/^\(.*\)$/  \1 \\/' \
+    ${dataset_dir}/problems.txt >> problems.mk
 
 echo "" >> problems.mk
 
@@ -75,7 +89,8 @@ cat > samples.mk \
 
 END
 
-sed -e 's/^\(.*\)$/\1_num_samples = 2/' ${srcdir}/dataset/problems.txt | column -t >> samples.mk
+sed -e '/^\s*$/d' -e 's/^\(.*\)$/\1_num_samples = 2/' \
+    ${dataset_dir}/problems.txt >> samples.mk
 
 echo "" >> samples.mk
 
@@ -90,11 +105,11 @@ AC_ARG_WITH(pregen-dir,
 
 AS_IF([ test "${pregen_dir}" != "DEFAULT" ],
 [
-  AC_MSG_NOTICE([using pregen dir at ${pregen_dir}])
+  AC_MSG_NOTICE([using pregen dir: ${pregen_dir}])
 ],[
   if [[ -d "../../pymtl-eval-pregen" ]]; then
     pregen_dir="../../pymtl-eval-pregen"
-    AC_MSG_NOTICE([using default pregen dir at ${pregen_dir}])
+    AC_MSG_NOTICE([using pregen dir: ${pregen_dir}])
   else
     AC_MSG_NOTICE([no pregen dir specified])
   fi
@@ -109,7 +124,7 @@ AC_ARG_WITH(pregen,
 
 AS_IF([ test "${pregen_en}" = "yes" ],
 [
-  AC_MSG_NOTICE([using pregen from ${with_pregen}])
+  AC_MSG_NOTICE([using pregen: ${with_pregen}])
   cp -r ${with_pregen}/* .
 ])
 

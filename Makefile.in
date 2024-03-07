@@ -33,7 +33,8 @@ IVERILOG_COMPILE=@IVERILOG@ -Wall -Winfloop -Wno-timescale -g2012 -s tb
 # Dataset
 #-------------------------------------------------------------------------
 
-VPATH = ../dataset
+dataset_dir = @dataset_dir@
+VPATH = ${dataset_dir}
 include problems.mk
 include samples.mk
 

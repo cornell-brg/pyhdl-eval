@@ -588,6 +588,7 @@ ac_unique_file="dataset/problems.txt"
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
 pregen_dir
+dataset_dir
 IVERILOG
 target_alias
 host_alias
@@ -630,6 +631,7 @@ SHELL'
 ac_subst_files=''
 ac_user_opts='
 enable_option_checking
+with_dataset
 with_pregen_dir
 with_pregen
 '
@@ -1245,6 +1247,7 @@ if test -n "$ac_init_help"; then
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+  --with-dataset          Directory with dataset files
   --with-pregen-dir       Directory for storing pregen files
   --with-pregen           Use pregen files
 
@@ -1731,6 +1734,24 @@ if test "${IVERILOG}" = "no"; then :
 
 fi
 
+
+#-------------------------------------------------------------------------
+# dataset
+#-------------------------------------------------------------------------
+
+
+# Check whether --with-dataset was given.
+if test "${with_dataset+set}" = set; then :
+  withval=$with_dataset; dataset_dir="${with_dataset}"
+else
+  dataset_dir="${srcdir}/dataset"
+fi
+
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: using dataset: ${dataset_dir}" >&5
+$as_echo "$as_me: using dataset: ${dataset_dir}" >&6;}
+
 #-------------------------------------------------------------------------
 # create prompt.mk file
 #-------------------------------------------------------------------------
@@ -1748,7 +1769,8 @@ cat > problems.mk \
 problems = \
 END
 
-sed -e 's/^\(.*\)$/  \1 \\/' ${srcdir}/dataset/problems.txt >> problems.mk
+sed -e '/^\s*$/d' -e 's/^\(.*\)$/  \1 \\/' \
+    ${dataset_dir}/problems.txt >> problems.mk
 
 echo "" >> problems.mk
 
@@ -1768,7 +1790,8 @@ cat > samples.mk \
 
 END
 
-sed -e 's/^\(.*\)$/\1_num_samples = 2/' ${srcdir}/dataset/problems.txt | column -t >> samples.mk
+sed -e '/^\s*$/d' -e 's/^\(.*\)$/\1_num_samples = 2/' \
+    ${dataset_dir}/problems.txt >> samples.mk
 
 echo "" >> samples.mk
 
@@ -1787,15 +1810,15 @@ fi
 
 if  test "${pregen_dir}" != "DEFAULT" ; then :
 
-  { $as_echo "$as_me:${as_lineno-$LINENO}: using pregen dir at ${pregen_dir}" >&5
-$as_echo "$as_me: using pregen dir at ${pregen_dir}" >&6;}
+  { $as_echo "$as_me:${as_lineno-$LINENO}: using pregen dir: ${pregen_dir}" >&5
+$as_echo "$as_me: using pregen dir: ${pregen_dir}" >&6;}
 
 else
 
   if [ -d "../../pymtl-eval-pregen" ]; then
     pregen_dir="../../pymtl-eval-pregen"
-    { $as_echo "$as_me:${as_lineno-$LINENO}: using default pregen dir at ${pregen_dir}" >&5
-$as_echo "$as_me: using default pregen dir at ${pregen_dir}" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: using pregen dir: ${pregen_dir}" >&5
+$as_echo "$as_me: using pregen dir: ${pregen_dir}" >&6;}
   else
     { $as_echo "$as_me:${as_lineno-$LINENO}: no pregen dir specified" >&5
 $as_echo "$as_me: no pregen dir specified" >&6;}
@@ -1816,8 +1839,8 @@ fi
 
 if  test "${pregen_en}" = "yes" ; then :
 
-  { $as_echo "$as_me:${as_lineno-$LINENO}: using pregen from ${with_pregen}" >&5
-$as_echo "$as_me: using pregen from ${with_pregen}" >&6;}
+  { $as_echo "$as_me:${as_lineno-$LINENO}: using pregen: ${with_pregen}" >&5
+$as_echo "$as_me: using pregen: ${with_pregen}" >&6;}
   cp -r ${with_pregen}/* .
 
 fi
