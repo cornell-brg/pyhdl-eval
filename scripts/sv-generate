@@ -23,6 +23,7 @@ import os
 import re
 import time
 
+from adlrchat.langchain import ADLRChat
 from adlrchat.langchain import LLMGatewayChat
 from langchain.schema   import SystemMessage, HumanMessage
 from langchain.callbacks import get_openai_callback
@@ -157,12 +158,20 @@ def main():
 
   # Query the LLM
 
-  llm = LLMGatewayChat(
-    model       = model,
-    temperature = temperature,
-    top_p       = top_p,
-    max_tokens  = max_tokens,
-  )
+  if model == "chipllama_70b_steer_delta":
+    llm = ADLRChat(
+      model       = model,
+      temperature = temperature,
+      top_p       = top_p,
+      max_tokens  = max_tokens,
+    )
+  else:
+    llm = LLMGatewayChat(
+      model       = model,
+      temperature = temperature,
+      top_p       = top_p,
+      max_tokens  = max_tokens,
+    )
 
   for _ in range(10):
     try:
