@@ -1790,8 +1790,8 @@ cat > samples.mk \
 
 END
 
-sed -e '/^\s*$/d' -e 's/^\(.*\)$/\1_num_samples = 2/' \
-    ${dataset_dir}/problems.txt >> samples.mk
+sed -e '/^\s*$/d' -e 's/^\(.*\)$/\1_num_samples = 20/' \
+    ${dataset_dir}/problems.txt | column -t >> samples.mk
 
 echo "" >> samples.mk
 
