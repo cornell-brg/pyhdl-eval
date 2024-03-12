@@ -8,6 +8,7 @@
 #  -m --model          LLM model to use (default: gpt-3.5-turbo)
 #  -t --temperature    LLM model temperature (default: 0.85)
 #  -p --topp           LLM model top_p (default: gpt-0.95)
+#  -n --maxtokens      LLM model max_tokens (default: 1024)
 #  -e --explain        Let the model include an explanation
 #  -o --output         File to write verilog to (default: stdout)
 #
@@ -48,6 +49,7 @@ def parse_cmdline():
   p.add_argument( "-v", "--verbose",     action="store_true" )
   p.add_argument( "-m", "--model",       type=str,   default="gpt-3.5-turbo" )
   p.add_argument( "-t", "--temperature", type=float, default=0.8 )
+  p.add_argument( "-n", "--maxtokens",   type=int,   default=1024 )
   p.add_argument( "-p", "--topp",        type=float, default=0.95 )
   p.add_argument( "-e", "--explain",     action="store_true" )
   p.add_argument( "-o", "--output",      type=str, default="-" )
@@ -120,7 +122,7 @@ def main():
   model       = opts.model
   temperature = opts.temperature
   top_p       = opts.topp
-  max_tokens  = 1024
+  max_tokens  = opts.maxtokens
 
   out.print( "" )
   out.print( f"problem     = {problem}"     )
