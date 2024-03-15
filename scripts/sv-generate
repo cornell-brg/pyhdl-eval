@@ -5,10 +5,11 @@
 #
 #  -v --verbose        Display the prompt
 #  -h --help           Display this message
+#  -l --list-models    List supported models
 #  -m --model          LLM model to use (default: gpt-3.5-turbo)
 #  -t --temperature    LLM model temperature (default: 0.85)
-#  -p --topp           LLM model top_p (default: gpt-0.95)
-#  -n --maxtokens      LLM model max_tokens (default: 1024)
+#  -p --top-p          LLM model top_p (default: 0.95)
+#  -n --max-tokens     LLM model max_tokens (default: 1024)
 #  -e --explain        Let the model include an explanation
 #  -o --output         File to write verilog to (default: stdout)
 #
@@ -47,10 +48,11 @@ def parse_cmdline():
 
   p.add_argument( "-h", "--help",        action="store_true" )
   p.add_argument( "-v", "--verbose",     action="store_true" )
+  p.add_argument( "-l", "--list-models", action="store_true" )
   p.add_argument( "-m", "--model",       type=str,   default="gpt-3.5-turbo" )
   p.add_argument( "-t", "--temperature", type=float, default=0.8 )
-  p.add_argument( "-n", "--maxtokens",   type=int,   default=1024 )
-  p.add_argument( "-p", "--topp",        type=float, default=0.95 )
+  p.add_argument( "-n", "--max-tokens",  type=int,   default=1024 )
+  p.add_argument( "-p", "--top-p",       type=float, default=0.95 )
   p.add_argument( "-e", "--explain",     action="store_true" )
   p.add_argument( "-o", "--output",      type=str, default="-" )
   p.add_argument( "prompt_filename" )
@@ -58,6 +60,20 @@ def parse_cmdline():
   opts = p.parse_args()
   if opts.help: p.error()
   return opts
+
+#-------------------------------------------------------------------------
+# Models
+#-------------------------------------------------------------------------
+
+adlr_chat_models = [
+  "chipllama_70b_steer_delta",
+  "mixtral-chat",
+]
+
+llm_gateway_chat_models = [
+  "gpt-3.5-turbo",
+  "gpt-4",
+]
 
 #-------------------------------------------------------------------------
 # VerboseOutput
@@ -109,6 +125,30 @@ def main():
 
   opts = parse_cmdline()
 
+  # Check models
+
+  if opts.list_models:
+    print( "" )
+    print( "ADLRChat Models" )
+
+    for model in adlr_chat_models:
+      print( f" - {model}" )
+
+    print( "" )
+    print( "LLMGatewayChat Models" )
+
+    for model in llm_gateway_chat_models:
+      print( f" - {model}" )
+
+    print( "" )
+    return
+
+  if opts.model not in adlr_chat_models + llm_gateway_chat_models:
+    print("")
+    print(f"ERROR: Unknown model {opts.model}")
+    print("")
+    return
+
   # Check for an output file
 
   out = VerboseOutput( opts.verbose )
@@ -121,8 +161,8 @@ def main():
 
   model       = opts.model
   temperature = opts.temperature
-  top_p       = opts.topp
-  max_tokens  = opts.maxtokens
+  top_p       = opts.top_p
+  max_tokens  = opts.max_tokens
 
   out.print( "" )
   out.print( f"problem     = {problem}"     )
@@ -160,20 +200,23 @@ def main():
 
   # Query the LLM
 
-  if model == "chipllama_70b_steer_delta":
+  if model in adlr_chat_models:
     llm = ADLRChat(
       model       = model,
       temperature = temperature,
       top_p       = top_p,
       max_tokens  = max_tokens,
     )
-  else:
+  elif model in llm_gateway_chat_models:
     llm = LLMGatewayChat(
       model       = model,
       temperature = temperature,
       top_p       = top_p,
       max_tokens  = max_tokens,
     )
+  else:
+    # should never reach here
+    return
 
   for _ in range(10):
     try:
