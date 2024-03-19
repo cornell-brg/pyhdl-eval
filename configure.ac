@@ -40,7 +40,6 @@ AS_IF([test "${IVERILOG}" = "no"],
   AC_MSG_ERROR([Must have iverilog installed!])
 ])
 
-
 #-------------------------------------------------------------------------
 # dataset
 #-------------------------------------------------------------------------
@@ -48,10 +47,22 @@ AS_IF([test "${IVERILOG}" = "no"],
 AC_ARG_WITH(dataset,
   AS_HELP_STRING([--with-dataset],[Directory with dataset files]),
   [dataset_dir="${with_dataset}"],
-  [dataset_dir="${srcdir}/dataset"])
+  [dataset_dir="${dataset_dir}/dataset"])
 
 AC_SUBST([dataset_dir])
 AC_MSG_NOTICE([using dataset: ${dataset_dir}])
+
+#-------------------------------------------------------------------------
+# problems
+#-------------------------------------------------------------------------
+
+AC_ARG_WITH(problems,
+  AS_HELP_STRING([--with-problems],[File with list of problems]),
+  [problems_file="${with_problems}"],
+  [problems_file="${srcdir}/problems.txt"])
+
+AC_SUBST([problems_file])
+AC_MSG_NOTICE([using problems: ${problems_file}])
 
 #-------------------------------------------------------------------------
 # create prompt.mk file
@@ -70,7 +81,7 @@ problems = \
 END
 
 sed -e '/^\s*$/d' -e 's/^\(.*\)$/  \1 \\/' \
-    ${dataset_dir}/problems.txt >> problems.mk
+    ${problems_file} >> problems.mk
 
 echo "" >> problems.mk
 
@@ -90,7 +101,7 @@ cat > samples.mk \
 END
 
 sed -e '/^\s*$/d' -e 's/^\(.*\)$/\1_num_samples = 20/' \
-    ${dataset_dir}/problems.txt | column -t >> samples.mk
+    ${problems_file} | column -t >> samples.mk
 
 echo "" >> samples.mk
 
