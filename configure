@@ -1746,7 +1746,7 @@ fi
 if test "${with_dataset+set}" = set; then :
   withval=$with_dataset; dataset_dir="${with_dataset}"
 else
-  dataset_dir="${dataset_dir}/dataset"
+  dataset_dir="${srcdir}/dataset"
 fi
 
 
@@ -1763,7 +1763,7 @@ $as_echo "$as_me: using dataset: ${dataset_dir}" >&6;}
 if test "${with_problems+set}" = set; then :
   withval=$with_problems; problems_file="${with_problems}"
 else
-  problems_file="${srcdir}/problems.txt"
+  problems_file="${dataset_dir}/problems.txt"
 fi
 
 

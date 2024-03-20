@@ -47,7 +47,7 @@ AS_IF([test "${IVERILOG}" = "no"],
 AC_ARG_WITH(dataset,
   AS_HELP_STRING([--with-dataset],[Directory with dataset files]),
   [dataset_dir="${with_dataset}"],
-  [dataset_dir="${dataset_dir}/dataset"])
+  [dataset_dir="${srcdir}/dataset"])
 
 AC_SUBST([dataset_dir])
 AC_MSG_NOTICE([using dataset: ${dataset_dir}])
@@ -59,7 +59,7 @@ AC_MSG_NOTICE([using dataset: ${dataset_dir}])
 AC_ARG_WITH(problems,
   AS_HELP_STRING([--with-problems],[File with list of problems]),
   [problems_file="${with_problems}"],
-  [problems_file="${srcdir}/problems.txt"])
+  [problems_file="${dataset_dir}/problems.txt"])
 
 AC_SUBST([problems_file])
 AC_MSG_NOTICE([using problems: ${problems_file}])
