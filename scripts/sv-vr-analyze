@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #=========================================================================
-# sv-iv-analyze [options] problems
+# sv-vr-analyze [options] problems
 #=========================================================================
 #
 #  -v --verbose        Display the prompt
@@ -9,9 +9,9 @@
 #  -c --csv            Write CSV file
 #     problemdirs      List of problems to analyze
 #
-# Analyze the results from testing Verilog generation with iverilog. If
-# no problemdirs are given then just searches for all directories in the
-# current directory that start with Prob.
+# Analyze the results from testing Verilog generation with
+# PyMTL/Verilator. If no problemdirs are given then just searches for all
+# directories in the current directory that start with Prob.
 #
 # Author : Christopher Batten
 # Date   : Feb 22, 2024
@@ -198,66 +198,25 @@ def analyze_result( results, problem, sample, generate_log, compile_log, verilog
 
   # process compile log
 
-  result_record.passfail = '.'
+  result_record.passfail = '?'
   with open( compile_log, 'r' ) as file:
 
-    error_C = False
-    error_p = False
-    error_R = False
+    one_pass = False
+    error_R  = False
 
     for line in file:
 
-      if "syntax error" in line:
-        result_record.passfail = 'S'
-        break
+      # will need to add in more compile error checks here eventually
 
-      if "error" in line:
-        error_C = True
+      if "PASSED" in line:
+        one_pass = True
 
-      if "error: This assignment requires an explicit cast" in line:
-        result_record.passfail = 'e'
-        break
-
-      if "error: Sized numeric constant must have a size greater than zero" in line:
-        result_record.passfail = '0'
-        break
-
-      if "warning: always_comb process has no sensitivities" in line:
-        result_record.passfail = 'n'
-        break
-
-      if "found no sensitivities so it will never trigger" in line:
-        result_record.passfail = 'n'
-        break
-
-      if "is declared here as wire" in line:
-        result_record.passfail = 'w'
-        break
-
-      if "Unknown module type" in line:
-        result_record.passfail = 'm'
-        break
-
-      if "Unable to bind wire/reg" in line:
-        error_p = True
-
-      if "Unable to bind wire/reg/memory `clk'" in line:
-        result_record.passfail = 'c'
-        break
-
-      if "timeout!" in line:
-        result_record.passfail = 'T'
-        break
-
-      if "ERROR" in line:
+      if "FAILED" in line:
         error_R = True
         break
 
-    if result_record.passfail == '?' and error_p:
-      result_record.passfail = 'p'
-
-    if result_record.passfail == '?' and error_C:
-      result_record.passfail = 'C'
+    if one_pass and not error_R:
+      result_record.passfail = '.'
 
   # process verilog to identify possible runtime issues
 
@@ -279,7 +238,7 @@ def analyze_result( results, problem, sample, generate_log, compile_log, verilog
           result_record.passfail = 'r'
           break
 
-      if result_record.passfail == '.':
+      if result_record.passfail == '?':
         result_record.passfail = 'R'
 
   results.add_result( problem, sample, result_record )
@@ -305,7 +264,7 @@ def main():
   for problem in problems:
 
     problem = problem.rstrip("/")
-    for filename in glob.glob(f"{problem}/{problem}_sample*-sv-iv-test.log"):
+    for filename in glob.glob(f"{problem}/{problem}_sample*-sv-vr-test.log"):
 
       # Extract the sample number
 
@@ -314,7 +273,7 @@ def main():
       # Process logs and verilog for each sample
 
       generate_log = f"{problem}/{problem}_sample{nsample:02}-sv-generate.log"
-      compile_log  = f"{problem}/{problem}_sample{nsample:02}-sv-iv-test.log"
+      compile_log  = f"{problem}/{problem}_sample{nsample:02}-sv-vr-test.log"
       verilog      = f"{problem}/{problem}_sample{nsample:02}.v"
       analyze_result( results, problem, nsample, generate_log, compile_log, verilog )
 

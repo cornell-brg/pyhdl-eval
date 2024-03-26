@@ -1,19 +1,20 @@
 #!/usr/bin/env python
 #=========================================================================
-# sv-verilog [options] prompt-filename
+# generage [options] prompt-filename
 #=========================================================================
 #
 #  -v --verbose        Display the prompt
 #  -h --help           Display this message
 #  -l --list-models    List supported models
-#  -m --model          LLM model to use (default: gpt-3.5-turbo)
-#  -t --temperature    LLM model temperature (default: 0.85)
-#  -p --top-p          LLM model top_p (default: 0.95)
-#  -n --max-tokens     LLM model max_tokens (default: 1024)
+#     --model          LLM model to use (default: gpt-3.5-turbo)
+#     --temperature    LLM model temperature (default: 0.85)
+#     --top-p          LLM model top_p (default: 0.95)
+#     --max-tokens     LLM model max_tokens (default: 1024)
 #  -e --explain        Let the model include an explanation
-#  -o --output         File to write verilog to (default: stdout)
+#     --lang           What language to generate (default: verilog)
+#     --output         File to write to (default: stdout)
 #
-# Use GPT to generate verilog from the given prompt.
+# Use GPT to generate verilog or PyMTL from the given prompt.
 #
 # Author : Christopher Batten
 # Date   : Feb 22, 2024
@@ -49,12 +50,13 @@ def parse_cmdline():
   p.add_argument( "-h", "--help",        action="store_true" )
   p.add_argument( "-v", "--verbose",     action="store_true" )
   p.add_argument( "-l", "--list-models", action="store_true" )
-  p.add_argument( "-m", "--model",       type=str,   default="gpt-3.5-turbo" )
-  p.add_argument( "-t", "--temperature", type=float, default=0.8 )
-  p.add_argument( "-n", "--max-tokens",  type=int,   default=1024 )
-  p.add_argument( "-p", "--top-p",       type=float, default=0.95 )
+  p.add_argument(       "--model",       type=str,   default="gpt-3.5-turbo" )
+  p.add_argument(       "--temperature", type=float, default=0.8 )
+  p.add_argument(       "--max-tokens",  type=int,   default=1024 )
+  p.add_argument(       "--top-p",       type=float, default=0.95 )
   p.add_argument( "-e", "--explain",     action="store_true" )
-  p.add_argument( "-o", "--output",      type=str, default="-" )
+  p.add_argument(       "--lang",        type=str,   default="verilog" )
+  p.add_argument(       "--output",      type=str,   default="-" )
   p.add_argument( "prompt_filename" )
 
   opts = p.parse_args()
@@ -92,12 +94,12 @@ class VerboseOutput:
 # Context
 #-------------------------------------------------------------------------
 
-system_msg="""
+verilog_system_msg="""
 You are a Verilog RTL designer that only writes code using correct
 Verilog syntax.
 """
 
-prompt_rules_suffix="""
+verilog_prompt_rules_suffix="""
 Here are some additional rules and coding conventions.
 
  - declare all ports and signals as logic; do not to use wire or reg
@@ -111,6 +113,18 @@ Here are some additional rules and coding conventions.
  - an always block must read at least one signal otherwise it will never
    be executed; use an assign statement instead of an always block in
    situations where there is no need to read any signals
+"""
+
+pymtl_system_msg="""
+You are a PyMTL3 RTL designer that only writes code using correct
+PyMTL syntax.
+"""
+
+pymtl_prompt_rules_suffix="""
+Here are some additional rules and coding conventions.
+
+ - The only Python decorators you can use are @update and @update_ff. Do
+   not use any other kind of Python decorator in your solution.
 """
 
 prompt_no_explain_suffix="""
@@ -148,6 +162,18 @@ def main():
     print(f"ERROR: Unknown model {opts.model}")
     print("")
     return
+
+  # Check output language
+
+  system_msg          = ""
+  prompt_rules_suffix = ""
+
+  if opts.lang == "verilog":
+    system_msg          = verilog_system_msg
+    prompt_rules_suffix = verilog_prompt_rules_suffix
+  elif opts.lang == "pymtl":
+    system_msg          = pymtl_system_msg
+    prompt_rules_suffix = pymtl_prompt_rules_suffix
 
   # Check for an output file
 
@@ -272,6 +298,9 @@ def main():
           if line.startswith("```"):
             found_first_backticks = True
           if line.startswith("module TopModule"):
+            found_module = True
+            print( line, file=file )
+          if line.startswith("class TopModule"):
             found_module = True
             print( line, file=file )
 

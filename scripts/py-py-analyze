@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #=========================================================================
-# sv-iv-analyze [options] problems
+# py-py-analyze [options] problems
 #=========================================================================
 #
 #  -v --verbose        Display the prompt
@@ -9,7 +9,7 @@
 #  -c --csv            Write CSV file
 #     problemdirs      List of problems to analyze
 #
-# Analyze the results from testing Verilog generation with iverilog. If
+# Analyze the results from testing PyMTL generation with PyMTL. If
 # no problemdirs are given then just searches for all directories in the
 # current directory that start with Prob.
 #
@@ -169,7 +169,7 @@ class Results:
 # analyze_result
 #-------------------------------------------------------------------------
 
-def analyze_result( results, problem, sample, generate_log, compile_log, verilog ):
+def analyze_result( results, problem, sample, generate_log, compile_log, pymtl ):
 
   # record to store result information
 
@@ -198,89 +198,39 @@ def analyze_result( results, problem, sample, generate_log, compile_log, verilog
 
   # process compile log
 
-  result_record.passfail = '.'
+  result_record.passfail = '?'
   with open( compile_log, 'r' ) as file:
 
-    error_C = False
-    error_p = False
-    error_R = False
+    one_pass = False
+    one_fail = False
 
     for line in file:
 
-      if "syntax error" in line:
-        result_record.passfail = 'S'
+      # will need to add in more compile error checks here eventually
+
+      if "AttributeError: 'TopModule' object has no attribute 'update'" in line:
+        result_record.passfail = 'u'
         break
 
-      if "error" in line:
-        error_C = True
-
-      if "error: This assignment requires an explicit cast" in line:
-        result_record.passfail = 'e'
-        break
-
-      if "error: Sized numeric constant must have a size greater than zero" in line:
-        result_record.passfail = '0'
-        break
-
-      if "warning: always_comb process has no sensitivities" in line:
-        result_record.passfail = 'n'
-        break
-
-      if "found no sensitivities so it will never trigger" in line:
-        result_record.passfail = 'n'
-        break
-
-      if "is declared here as wire" in line:
-        result_record.passfail = 'w'
-        break
-
-      if "Unknown module type" in line:
-        result_record.passfail = 'm'
-        break
-
-      if "Unable to bind wire/reg" in line:
-        error_p = True
-
-      if "Unable to bind wire/reg/memory `clk'" in line:
+      if "s.connect method has been deprecated" in line:
         result_record.passfail = 'c'
         break
 
-      if "timeout!" in line:
-        result_record.passfail = 'T'
+      if "TypeError: " in line:
+        result_record.passfail = 't'
         break
 
-      if "ERROR" in line:
-        error_R = True
-        break
+      if "PASSED" in line:
+        one_pass = True
 
-    if result_record.passfail == '?' and error_p:
-      result_record.passfail = 'p'
+      if "FAILED" in line:
+        one_fail = True
 
-    if result_record.passfail == '?' and error_C:
-      result_record.passfail = 'C'
+    if one_pass and not one_fail:
+      result_record.passfail = '.'
 
-  # process verilog to identify possible runtime issues
-
-  if error_R:
-
-    with open( verilog, 'r' ) as file:
-
-      for line in file:
-
-        if "posedge reset" in line:
-          result_record.passfail = 'r'
-          break
-
-        if "negedge reset" in line:
-          result_record.passfail = 'r'
-          break
-
-        if "posedge r)" in line:
-          result_record.passfail = 'r'
-          break
-
-      if result_record.passfail == '.':
-        result_record.passfail = 'R'
+    if one_fail and result_record.passfail == '?':
+      result_record.passfail = 'R'
 
   results.add_result( problem, sample, result_record )
 
@@ -305,18 +255,18 @@ def main():
   for problem in problems:
 
     problem = problem.rstrip("/")
-    for filename in glob.glob(f"{problem}/{problem}_sample*-sv-iv-test.log"):
+    for filename in glob.glob(f"{problem}/{problem}_sample*-py-py-test.log"):
 
       # Extract the sample number
 
       nsample = re.search( r"sample(\d{2})", filename ).group(1)
 
-      # Process logs and verilog for each sample
+      # Process logs and pymtl for each sample
 
-      generate_log = f"{problem}/{problem}_sample{nsample:02}-sv-generate.log"
-      compile_log  = f"{problem}/{problem}_sample{nsample:02}-sv-iv-test.log"
-      verilog      = f"{problem}/{problem}_sample{nsample:02}.v"
-      analyze_result( results, problem, nsample, generate_log, compile_log, verilog )
+      generate_log = f"{problem}/{problem}_sample{nsample:02}-py-generate.log"
+      compile_log  = f"{problem}/{problem}_sample{nsample:02}-py-py-test.log"
+      pymtl         = f"{problem}/{problem}_sample{nsample:02}.py"
+      analyze_result( results, problem, nsample, generate_log, compile_log, pymtl )
 
   # Print summary
 
