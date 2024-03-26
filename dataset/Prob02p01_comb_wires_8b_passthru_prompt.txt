@@ -1,0 +1,13 @@
+
+In this problem, you will be implementing a hardware module named
+TopModule that combinationally wires input ports to output ports.
+
+The module should provide the following interface. All input and output
+ports are one bit unless otherwise specified.
+
+ - input  in_ (8 bits)
+ - output out (8 bits)
+
+The module implementation should directly connect the input port to the
+output port.
+
