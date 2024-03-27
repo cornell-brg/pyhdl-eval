@@ -86,25 +86,56 @@ option.
 ### Reproduce Baseline Results
 
 Let's first reproduce the VerilogEval experiment using iverilog for the
-testing. We reproduce the full 20 sample experiment as well as just the 2
-sample experiment.
+testing with just two samples.
 
 ```
  % cd $TOPDIR
  % git checkout 2024-02-28-baseline
 
- % mkdir $TOPDIR/build-baseline-20samples
- % cd $TOPDIR/build-baseline-20samples
- % ../configure --with-pregen=../../pymtl-eval-pregen/2024-02-28-baseline
- % make -j16
- ...
- pass_rate = 42.24
-
- % mkdir $TOPDIR/build-baseline-2samples
- % cd $TOPDIR/build-baseline-2samples
+ % mkdir $TOPDIR/build-baseline-tiny
+ % cd $TOPDIR/build-baseline-tiny
  % ../configure --with-pregen=../../pymtl-eval-pregen/2024-02-28-baseline-tiny
  % make -j16
  ...
  pass_rate = 41.99
+```
+
+Now we can reproduce the full 20 sample experiment although this will
+take 10-15 minutes.
+
+```
+ % cd $TOPDIR
+ % git checkout 2024-02-28-baseline
+
+ % mkdir $TOPDIR/build-baseline
+ % cd $TOPDIR/build-baseline
+ % ../configure --with-pregen=../../pymtl-eval-pregen/2024-02-28-baseline
+ % make -j16
+ ...
+ pass_rate = 42.24
+```
+
+### Reproduce Other Results
+
+Here are all of the reproducible experiments.
+
+| tag                             | comment                                               |
+|---------------------------------|-------------------------------------------------------|
+| 2024-02-28-baseline             | VerilogEval baseline with my scripts                  |
+| 2024-03-04-prompt-ifc           | Reframed prompt with cleaner interface                |
+| 2024-03-10-prompt-ifc-chipnemo  | Reframed prompt with cleaner interface using ChipNemo |
+| 2024-03-05-const-logic-reset    | Reframed prompt with in-context rules                 |
+| 2024-03-26-pymtl-eval-initial   | Initial PyMTL eval experiment with three problems     |
+
+You can reproduce these experiments as follows.
+
+```
+ % cd $TOPDIR
+ % git checkout tag
+
+ % mkdir $TOPDIR/build-tag
+ % cd $TOPDIR/build-tag
+ % ../configure --with-pregen=../../pymtl-eval-pregen/tag
+ % make -j16
 ```
 
