@@ -119,13 +119,15 @@ take 10-15 minutes.
 
 Here are all of the reproducible experiments.
 
-| tag                             | comment                                               |
-|---------------------------------|-------------------------------------------------------|
-| 2024-02-28-baseline             | VerilogEval baseline with my scripts                  |
-| 2024-03-04-prompt-ifc           | Reframed prompt with cleaner interface                |
-| 2024-03-10-prompt-ifc-chipnemo  | Reframed prompt with cleaner interface using ChipNemo |
-| 2024-03-05-const-logic-reset    | Reframed prompt with in-context rules                 |
-| 2024-03-26-pymtl-eval-initial   | Initial PyMTL eval experiment with three problems     |
+| tag                                       | comment                                                 |
+|-------------------------------------------|---------------------------------------------------------|
+| 2024-02-28-baseline                       | VerilogEval baseline with my scripts                    |
+| 2024-03-04-prompt-ifc                     | Reframed prompt with cleaner interface                  |
+| 2024-03-10-prompt-ifc-chipnemo            | Reframed prompt with cleaner interface using ChipNemo   |
+| 2024-04-26-prompt-ifc-gpt4-turbo          | Reframed prompt with cleaner interface using gpt4-turbo |
+| 2024-03-05-const-logic-reset              | Reframed prompt with in-context rules                   |
+| 2024-04-27-const-logic-reset--gpt4-turbo  | Reframed prompt with in-context rules using gpt4-turbo  |
+| 2024-03-26-pymtl-eval-initial             | Initial PyMTL eval experiment with three problems       |
 
 You can reproduce these experiments as follows.
 
