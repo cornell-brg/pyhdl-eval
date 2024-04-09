@@ -212,6 +212,14 @@ def analyze_result( results, problem, sample, generate_log, compile_log, pymtl )
         result_record.passfail = 'u'
         break
 
+      if "ModuleNotFoundError: No module named 'pymtl3.stdlib.ifcs'" in line:
+        result_record.passfail = 'i'
+        break
+
+      if "ModuleNotFoundError: No module named 'pymtl3.stdlib.basic_rtl'" in line:
+        result_record.passfail = 'b'
+        break
+
       if "s.connect method has been deprecated" in line:
         result_record.passfail = 'c'
         break
