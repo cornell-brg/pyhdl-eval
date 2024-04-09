@@ -9,7 +9,7 @@
 module TestUtils
 (
   output logic clk,
-  output logic rst
+  output logic reset
 );
 
   initial clk = 1'b1;
@@ -43,7 +43,7 @@ module TestUtils
 
   always @( posedge clk ) begin
 
-    if ( rst )
+    if ( reset )
       cycles <= 0;
     else
       cycles <= cycles + 1;
@@ -57,12 +57,12 @@ module TestUtils
 
   // reset
 
-  task reset();
+  task reset_sequence();
     seed = 32'hdeadbeef;
 
-    rst = 1;
+    reset = 1;
     #30;
-    rst = 0;
+    reset = 0;
   endtask
 
 endmodule

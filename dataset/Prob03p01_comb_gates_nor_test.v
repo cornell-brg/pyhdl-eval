@@ -11,7 +11,7 @@ module Top();
   //----------------------------------------------------------------------
 
   logic clk;
-  logic rst;
+  logic reset;
 
   TestUtils t( .* );
 
@@ -78,8 +78,8 @@ module Top();
 
   task test_case_1_directed();
     $display( "\ntest_case_1_directed" );
+    t.reset_sequence();
 
-    t.reset();
     compare( 1'b0, 1'b0 );
     compare( 1'b0, 1'b1 );
     compare( 1'b1, 1'b0 );

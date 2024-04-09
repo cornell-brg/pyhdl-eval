@@ -11,7 +11,7 @@ module Top();
   //----------------------------------------------------------------------
 
   logic clk;
-  logic rst;
+  logic reset;
 
   TestUtils t( .* );
 
@@ -69,8 +69,8 @@ module Top();
 
   task test_case_1_directed();
     $display( "\ntest_case_1_directed" );
+    t.reset_sequence();
 
-    t.reset();
     compare( 8'b0000_0000 );
     compare( 8'b0000_0001 );
     compare( 8'b0000_0010 );
@@ -93,8 +93,8 @@ module Top();
   logic [7:0] test_case_2_random_data;
   task test_case_2_random();
     $display( "\ntest_case_2_random" );
+    t.reset_sequence();
 
-    t.reset();
     for ( int i = 0; i < 20; i = i+1 )
       compare( $urandom(t.seed) );
 
