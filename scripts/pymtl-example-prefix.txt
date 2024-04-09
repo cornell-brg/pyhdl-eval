@@ -1,0 +1,38 @@
+
+Here is an example of a simple PyMTL module which implements an eight bit
+registered incrementer. This example may be useful when completing the
+problem below.
+
+from pymtl3 import *
+
+class RegIncr( Component ):
+
+  def construct( s ):
+
+    # Port-based interface
+
+    s.in_ = InPort ( Bits8 )
+    s.out = OutPort( Bits8 )
+
+    # Sequential logic
+
+    s.reg_out = Wire( 8 )
+
+    @update_ff
+    def block1():
+      if s.reset:
+        s.reg_out <<= 0
+      else:
+        s.reg_out <<= s.in_
+
+    # Combinational logic
+
+    s.temp_wire = Wire( 8 )
+
+    @update
+    def block2():
+      s.temp_wire @= s.reg_out + 1
+
+    # Structural connections
+
+    s.out //= s.temp_wire
