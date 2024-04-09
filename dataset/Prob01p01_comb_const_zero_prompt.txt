@@ -1,5 +1,5 @@
 
-In this problem you will be implementing a hardware module named
+In this problem, you will be implementing a hardware module named
 TopModule which outputs a constant value.
 
 The module should provide the following interface. All input and output
