@@ -119,15 +119,25 @@ take 10-15 minutes.
 
 Here are all of the reproducible experiments.
 
-| tag                                       | comment                                                 |
-|-------------------------------------------|---------------------------------------------------------|
-| 2024-02-28-baseline                       | VerilogEval baseline with my scripts                    |
-| 2024-03-04-prompt-ifc                     | Reframed prompt with cleaner interface                  |
-| 2024-03-10-prompt-ifc-chipnemo            | Reframed prompt with cleaner interface using ChipNemo   |
-| 2024-04-26-prompt-ifc-gpt4-turbo          | Reframed prompt with cleaner interface using gpt4-turbo |
-| 2024-03-05-const-logic-reset              | Reframed prompt with in-context rules                   |
-| 2024-04-27-const-logic-reset--gpt4-turbo  | Reframed prompt with in-context rules using gpt4-turbo  |
-| 2024-03-26-pymtl-eval-initial             | Initial PyMTL eval experiment with three problems       |
+| tag                                       | comment                                                       |
+|-------------------------------------------|---------------------------------------------------------------|
+| 2024-02-28-baseline                       | VerilogEval baseline with my scripts using gpt4               |
+| 2024-03-04-prompt-ifc-gpt4                | Reframed prompt with cleaner interface using gpt4             |
+| 2024-03-10-prompt-ifc-chipnemo            | Reframed prompt with cleaner interface using ChipNemo         |
+| 2024-04-11-prompt-ifc-gpt4-turbo          | Reframed prompt with cleaner interface using gpt4-turbo       |
+| 2024-04-11-icl-rules-gpt4                 | Reframed prompt w/ ICL rules using gpt4                       |
+| YYYY-XX-ZZ-icl-rules-gpt4-turbo           | Reframed prompt w/ ICL rules using gpt4-turbo                 |
+| YYYY-XX-ZZ-icl-ex-gpt4                    | Reframed prompt w/ ICL examples using gpt4                    |
+| YYYY-XX-ZZ-icl-ex-gpt4-turbo              | Reframed prompt w/ ICL examples using gpt4-turbo              |
+
+Here are some older ones that are purely here for archival purposes.
+
+| tag                                       | comment                                                       |
+|-------------------------------------------|---------------------------------------------------------------|
+| 2024-03-05-const-logic-reset              | Reframed prompt with in-context rules                         |
+| 2024-04-27-const-logic-reset-gpt4-turbo   | Reframed prompt with in-context rules using gpt4-turbo        |
+| 2024-03-26-pymtl-eval-initial             | Initial PyMTL eval experiment with three problems             |
+| 2024-03-26-prompt-ifc-gpt4-turbo-mistake  | No ICL rules but accidently includes reset updates gpt4-turbo |
 
 You can reproduce these experiments as follows.
 
