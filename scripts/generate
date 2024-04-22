@@ -14,7 +14,7 @@
 #  -x --examples       Include the in-context examples
 #  -r --rules          Include the in-context rules
 #     --lang           What language to generate (default: verilog)
-#     --output         File to write to (default: stdout)
+#     --output         File to write extracted code
 #
 # Use GPT to generate verilog or PyMTL from the given prompt.
 #
@@ -85,6 +85,7 @@ llm_gateway_chat_models = [
 
 nim_chat_models = [
   "ai-llama2-70b",
+  "ai-llama3-70b",
   "ai-codellama-70b",
   "ai-gemma-7b",
   "ai-codegemma-7b",
@@ -248,7 +249,7 @@ def main():
   if opts.examples:
     full_prompt += prompt_example_prefix
 
-  full_prompt += "Question:\n"
+  full_prompt += "\nQuestion:\n"
   full_prompt += prompt.strip() + "\n"
 
   if opts.rules:
@@ -336,29 +337,77 @@ def main():
   out.print(f"total_cost    = {cb.total_cost}")
   out.print("")
 
-  # Write to output file (scan for content between triple back ticks or
-  # scan for content between module/endmodule)
+  # Extract code from response
 
-  if opts.output != '-':
-    with open( opts.output, 'w' ) as file:
+  file = open( opts.output, 'w' )
+
+  print( "", file=file )
+
+  # Scan response for code using <CODE></CODE>
+
+  found_code_lines = []
+  found_code_start = False
+  found_code_end   = False
+
+  for line in iter(resp.content.splitlines()):
+
+    if not found_code_start:
+      if line.strip() == "<CODE>":
+        found_code_start = True
+      elif line.lstrip().startswith("<CODE>"):
+        found_code_lines.append( line.lstrip().replace("<CODE>","") )
+        found_code_start = True
+
+    elif found_code_start and not found_code_end:
+      if line.strip() == "</CODE>":
+        found_code_end = True
+      elif line.rstrip().endswith("</CODE>"):
+        found_code_lines.append( line.rstrip().replace("</CODE>","") )
+        found_code_end = True
+      else:
+        found_code_lines.append( line )
+
+  if found_code_start and found_code_end:
+    for line in found_code_lines:
+      print( line, file=file )
+
+  # If did not find code by looking for <CODE></CODE>, then scan response
+  # for code using backticks
+
+  if not found_code_start and not found_code_end:
+
+    found_code_lines = []
+    found_code_start = False
+    found_code_end   = False
+
+    for line in iter(resp.content.splitlines()):
+
+      if not found_code_start:
+        if line.lstrip().startswith("```"):
+          found_code_start = True
+
+      elif found_code_start and not found_code_end:
+        if line.rstrip().endswith("```"):
+          found_code_end = True
+        else:
+          found_code_lines.append( line )
+
+    if found_code_start and found_code_end:
+      for line in found_code_lines:
+        print(line, file=file )
+
+      # Print comment so we can track responses that did not use
+      # <CODE></CODE> correctly
 
       print( "", file=file )
+      if opts.lang == "verilog":
+        comment_delim = "//"
+      elif opts.lang == "pymtl":
+        comment_delim = "#"
+      print( comment_delim + " PYHDL-EVAL: response did not use <CODE></CODE> correctly", file=file )
 
-      found_code_start = False
-      found_code_end   = False
+  print( "", file=file )
 
-      for line in iter(resp.content.splitlines()):
-
-        if not found_code_start:
-          if line.strip() == "<CODE>":
-            found_code_start = True
-
-        elif found_code_start and not found_code_end:
-          if line.strip() == "</CODE>":
-            found_code_end = True
-          else:
-            print( line, file=file )
-
-      print( "", file=file )
+  file.close()
 
 main()
