@@ -1,5 +1,16 @@
 
-# PyMTL Auto-Evaluation for Hardware Design and Verification
+# PyHDL-Eval: LLM Evaluation for Python-Based Hardware Design Languages
+
+This repo contains our LLM evaluation framework for Python-based hardware
+design languages. Currently this just includes PyMTL but could eventually
+include PyRTL, MyHDL, and Amaranth. The framework also supports
+evaluating Verilog HDL which can serve as a baseline for the Python-based
+HDLs. The repo includes a dataset as plain text files and also includes
+generation and analysis scripts and a Makefile to drive the workflow. The
+generation script includes support for easily changing the LLM model and
+including/excluding in-context learning rules and in-context learning
+examples. The analysis script includes support for categorizing common
+errors and outputing the results in both plain text and CSV files.
 
 This README provides step-by-step instructions on how to reproduce
 various results in the project.
@@ -34,7 +45,7 @@ If you use the following module collection, then your environment
 what I use.
 
 ```
- % module restore ${CBATTEN_INSTALL}/collections/pymtl-eval
+ % module restore ${CBATTEN_INSTALL}/collections/pyhdl-eval
 ```
 
 You can also recreate this environment with just a minimal set of
@@ -44,25 +55,36 @@ environment modules like this:
  % module purge
  % module load iverilog/12.0
  % module load gtkwave/3.3.117
+ % module load verilator/5.016
  % module load python3/3.11.0
 
  % mkdir ${HOME}/venvs
  % cd ${HOME}/venvs
- % python3 -m venv py3.11.0-pymtl-eval
- % source py3.11.0-pymtl-eval/bin/activate
+ % python3 -m venv py3.11.0-pyhdl-eval
+ % source py3.11.0-pyhdl-eval/bin/activate
+ % pip install --upgrade pip
+
+ % mkdir -p ${HOME}/vc/git-hub/pymtl
+ % cd ${HOME}/vc/git-hub/pymtl
+ % git clone git@github.com:pymtl/pymtl3
+ % cd ${HOME}/vc/git-hub/pymtl/pymtl3
+ % git checkout pymtl4.0-dev
+ % pip install -r requirements.txt
+ % pip install -e .
 
  % pip config --site set global.index-url \
      https://urm.nvidia.com/artifactory/api/pypi/nv-shared-pypi/simple
 
- % pip install --upgrade pip
  % pip install adlrchat
+ % pip install langchain-nvidia-ai-endpoints
 ```
 
 In order to use the LLM gateway you need to log-in to the server.
 
 ```
  % export FASTCHAT_HEADLESS="True"
- % adlrchat-login --servername llm_gateway --role adlrchat-chipnemo-llmgateway
+ % adlrchat-login --servername llm_gateway     --role adlrchat-chipnemo-llmgateway
+ % adlrchat-login --servername amazing-rooster --role fastchat-chipnemo
 ```
 
 ### Clone the Repos
@@ -77,16 +99,16 @@ option.
 ```
  % mkdir -p $HOME/vc/git-nvidia/cbatten
  % cd $HOME/vc/git-nvidia/cbatten
- % git clone ssh://git@gitlab-master.nvidia.com:12051/cbatten/pymtl-eval-pregen.git
- % git clone ssh://git@gitlab-master.nvidia.com:12051/cbatten/pymtl-eval.git
- % cd pymtl-eval
+ % git clone ssh://git@gitlab-master.nvidia.com:12051/cbatten/pyhdl-eval-pregen.git
+ % git clone ssh://git@gitlab-master.nvidia.com:12051/cbatten/pyhdl-eval.git
+ % cd pyhdl-eval
  % TOPDIR=$PWD
 ```
 
-### Reproduce Baseline Results
+### Reproduce Initial Results
 
-Let's first reproduce the VerilogEval experiment using iverilog for the
-testing with just two samples.
+Here is how to reproduce a very simple initial experiment using GPT4
+Turbo on seven problems.
 
 ```
  % cd $TOPDIR
@@ -94,60 +116,9 @@ testing with just two samples.
 
  % mkdir $TOPDIR/build-baseline-tiny
  % cd $TOPDIR/build-baseline-tiny
- % ../configure --with-pregen=../../pymtl-eval-pregen/2024-02-28-baseline-tiny
+ % ../configure --with-pregen=../../pyhdl-eval-pregen/2024-02-28-baseline-tiny
  % make -j16
  ...
  pass_rate = 41.99
-```
-
-Now we can reproduce the full 20 sample experiment although this will
-take 10-15 minutes.
-
-```
- % cd $TOPDIR
- % git checkout 2024-02-28-baseline
-
- % mkdir $TOPDIR/build-baseline
- % cd $TOPDIR/build-baseline
- % ../configure --with-pregen=../../pymtl-eval-pregen/2024-02-28-baseline
- % make -j16
- ...
- pass_rate = 42.24
-```
-
-### Reproduce Other Results
-
-Here are all of the reproducible experiments.
-
-| tag                                       | comment                                                       |
-|-------------------------------------------|---------------------------------------------------------------|
-| 2024-02-28-baseline                       | VerilogEval baseline with my scripts using gpt4               |
-| 2024-03-04-prompt-ifc-gpt4                | Reframed prompt with cleaner interface using gpt4             |
-| 2024-03-10-prompt-ifc-chipnemo            | Reframed prompt with cleaner interface using ChipNemo         |
-| 2024-04-11-prompt-ifc-gpt4-turbo          | Reframed prompt with cleaner interface using gpt4-turbo       |
-| 2024-04-11-icl-rules-gpt4                 | Reframed prompt w/ ICL rules using gpt4                       |
-| YYYY-XX-ZZ-icl-rules-gpt4-turbo           | Reframed prompt w/ ICL rules using gpt4-turbo                 |
-| YYYY-XX-ZZ-icl-ex-gpt4                    | Reframed prompt w/ ICL examples using gpt4                    |
-| YYYY-XX-ZZ-icl-ex-gpt4-turbo              | Reframed prompt w/ ICL examples using gpt4-turbo              |
-
-Here are some older ones that are purely here for archival purposes.
-
-| tag                                       | comment                                                       |
-|-------------------------------------------|---------------------------------------------------------------|
-| 2024-03-05-const-logic-reset              | Reframed prompt with in-context rules                         |
-| 2024-04-27-const-logic-reset-gpt4-turbo   | Reframed prompt with in-context rules using gpt4-turbo        |
-| 2024-03-26-pymtl-eval-initial             | Initial PyMTL eval experiment with three problems             |
-| 2024-03-26-prompt-ifc-gpt4-turbo-mistake  | No ICL rules but accidently includes reset updates gpt4-turbo |
-
-You can reproduce these experiments as follows.
-
-```
- % cd $TOPDIR
- % git checkout tag
-
- % mkdir $TOPDIR/build-tag
- % cd $TOPDIR/build-tag
- % ../configure --with-pregen=../../pymtl-eval-pregen/tag
- % make -j16
 ```
 
