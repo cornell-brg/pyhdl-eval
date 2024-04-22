@@ -1,0 +1,12 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - output lo
+ - output hi
+
+The module implementation should always output a logic LOW and a logic
+HIGH on the appropriate output ports. A logic LOW should always be output
+on output port lo and a logic HIGH should always be output on output port
+hi.
+

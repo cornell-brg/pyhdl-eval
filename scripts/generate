@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #=========================================================================
-# generage [options] prompt-filename
+# generate [options] prompt-filename
 #=========================================================================
 #
 #  -v --verbose        Display the prompt
@@ -11,13 +11,15 @@
 #     --top-p          LLM model top_p (default: 0.95)
 #     --max-tokens     LLM model max_tokens (default: 1024)
 #  -e --explain        Let the model include an explanation
+#  -x --examples       Include the in-context examples
+#  -r --rules          Include the in-context rules
 #     --lang           What language to generate (default: verilog)
 #     --output         File to write to (default: stdout)
 #
 # Use GPT to generate verilog or PyMTL from the given prompt.
 #
 # Author : Christopher Batten
-# Date   : Feb 22, 2024
+# Date   : Mar 15, 2024
 #
 
 import argparse
@@ -28,6 +30,7 @@ import time
 
 from adlrchat.langchain import ADLRChat
 from adlrchat.langchain import LLMGatewayChat
+from langchain_nvidia_ai_endpoints import ChatNVIDIA
 from langchain.schema   import SystemMessage, HumanMessage
 from langchain.callbacks import get_openai_callback
 
@@ -55,6 +58,8 @@ def parse_cmdline():
   p.add_argument(       "--max-tokens",  type=int,   default=1024 )
   p.add_argument(       "--top-p",       type=float, default=0.95 )
   p.add_argument( "-e", "--explain",     action="store_true" )
+  p.add_argument( "-x", "--examples",    action="store_true" )
+  p.add_argument( "-r", "--rules",       action="store_true" )
   p.add_argument(       "--lang",        type=str,   default="verilog" )
   p.add_argument(       "--output",      type=str,   default="-" )
   p.add_argument( "prompt_filename" )
@@ -76,6 +81,15 @@ llm_gateway_chat_models = [
   "gpt-3.5-turbo",
   "gpt-4",
   "gpt-4-turbo",
+]
+
+nim_chat_models = [
+  "ai-llama2-70b",
+  "ai-codellama-70b",
+  "ai-gemma-7b",
+  "ai-codegemma-7b",
+  "ai-mistral-7b-instruct-v2",
+  "ai-mixtral-8x7b-instruct",
 ]
 
 #-------------------------------------------------------------------------
@@ -104,23 +118,26 @@ verilog_prompt_example_prefix_filename=os.path.dirname(__file__) + "/verilog-exa
 with open(verilog_prompt_example_prefix_filename) as f:
   verilog_prompt_example_prefix = f.read()
 
-verilog_prompt_rules_suffix=""
+verilog_prompt_rules_suffix="""
+Here are some additional rules and coding conventions.
 
-# verilog_prompt_rules_suffix="""
-# Here are some additional rules and coding conventions.
-#
-#  - declare all ports and signals as logic; do not to use wire or reg
-#
-#  - for combinational logic with an always block do not explicitly specify
-#    the sensitivity list; instead use always @(*)
-#
-#  - all sized numeric constants must have a size greater than zero
-#    (e.g, 0'b0 is not a valid expression)
-#
-#  - an always block must read at least one signal otherwise it will never
-#    be executed; use an assign statement instead of an always block in
-#    situations where there is no need to read any signals
-# """
+ - declare all ports and signals as logic; do not to use wire or reg
+
+ - for combinational logic with an always block do not explicitly specify
+   the sensitivity list; instead use always @(*)
+
+ - all sized numeric constants must have a size greater than zero
+   (e.g, 0'b0 is not a valid expression)
+
+ - an always block must read at least one signal otherwise it will never
+   be executed; use an assign statement instead of an always block in
+   situations where there is no need to read any signals
+
+ - if the module uses a synchronous reset signal, this means the reset
+   signal is sampled with respect to the clock. When implementing a
+   synchronous reset signal, do not include posedge reset in the
+   sensitivity list of any sequential always block.
+"""
 
 pymtl_system_msg="""
 You are a PyMTL3 RTL designer that only writes code using correct
@@ -133,15 +150,16 @@ with open(pymtl_prompt_example_prefix_filename) as f:
 
 pymtl_prompt_rules_suffix=""
 
-# pymtl_prompt_rules_suffix="""
-# Here are some additional rules and coding conventions.
-#
-#  - The only Python decorators you can use are @update and @update_ff. Do
-#    not use any other kind of Python decorator in your solution.
-# """
+pymtl_prompt_rules_suffix="""
+Here are some additional rules and coding conventions.
+
+ - The only Python decorators you can use are @update and @update_ff. Do
+   not use any other kind of Python decorator in your solution.
+"""
 
 prompt_no_explain_suffix="""
-Please do not include any explanations in your response.
+Enclose your code with <CODE> and </CODE>. Only output the code snippet
+and do NOT output anything else.
 """
 
 #-------------------------------------------------------------------------
@@ -168,9 +186,15 @@ def main():
       print( f" - {model}" )
 
     print( "" )
+    print( "NIM Models" )
+
+    for model in nim_chat_models:
+      print( f" - {model}" )
+
+    print( "" )
     return
 
-  if opts.model not in adlr_chat_models + llm_gateway_chat_models:
+  if opts.model not in adlr_chat_models + llm_gateway_chat_models + nim_chat_models:
     print("")
     print(f"ERROR: Unknown model {opts.model}")
     print("")
@@ -218,14 +242,22 @@ def main():
   with open(opts.prompt_filename) as file:
     prompt = file.read()
 
-  # Add prompt suffix
+  # Create full prompt
 
-  full_prompt =  prompt_example_prefix
-  full_prompt += prompt.rstrip() + "\n"
-  full_prompt += prompt_rules_suffix
+  full_prompt = ""
+  if opts.examples:
+    full_prompt += prompt_example_prefix
+
+  full_prompt += "Question:\n"
+  full_prompt += prompt.strip() + "\n"
+
+  if opts.rules:
+    full_prompt += prompt_rules_suffix
 
   if not opts.explain:
     full_prompt = full_prompt.rstrip() + "\n" + prompt_no_explain_suffix
+
+  full_prompt += "\nAnswer:\n"
 
   # Print system message and prompt
 
@@ -253,6 +285,13 @@ def main():
     )
   elif model in llm_gateway_chat_models:
     llm = LLMGatewayChat(
+      model       = model,
+      temperature = temperature,
+      top_p       = top_p,
+      max_tokens  = max_tokens,
+    )
+  elif model in nim_chat_models:
+    llm = ChatNVIDIA(
       model       = model,
       temperature = temperature,
       top_p       = top_p,
@@ -305,33 +344,20 @@ def main():
 
       print( "", file=file )
 
-      found_first_backticks  = False
-      found_second_backticks = False
-      found_module           = False
-      found_endmodule        = False
+      found_code_start = False
+      found_code_end   = False
 
       for line in iter(resp.content.splitlines()):
 
-        if not found_first_backticks and not found_module:
-          if line.startswith("```"):
-            found_first_backticks = True
-          if line.startswith("module TopModule"):
-            found_module = True
-            print( line, file=file )
-          if line.startswith("class TopModule"):
-            found_module = True
-            print( line, file=file )
+        if not found_code_start:
+          if line.strip() == "<CODE>":
+            found_code_start = True
 
-        elif found_first_backticks and not found_second_backticks:
-          if line.startswith("```"):
-            found_second_backticks = True
+        elif found_code_start and not found_code_end:
+          if line.strip() == "</CODE>":
+            found_code_end = True
           else:
             print( line, file=file )
-
-        elif found_module and not found_endmodule:
-          print( line, file=file )
-          if line.startswith("endmodule"):
-            found_endmodule = True
 
       print( "", file=file )
 

@@ -203,6 +203,7 @@ def analyze_result( results, problem, sample, generate_log, compile_log, verilog
 
     one_pass = False
     error_R  = False
+    error_C  = False
 
     for line in file:
 
@@ -213,14 +214,19 @@ def analyze_result( results, problem, sample, generate_log, compile_log, verilog
 
       if "FAILED" in line:
         error_R = True
-        break
+
+      if "Fail to verilate model" in line:
+        error_C = True
 
     if one_pass and not error_R:
       result_record.passfail = '.'
 
+    if error_C:
+      result_record.passfail = 'C'
+
   # process verilog to identify possible runtime issues
 
-  if error_R:
+  if error_R and not error_C:
 
     with open( verilog, 'r' ) as file:
 
@@ -240,6 +246,25 @@ def analyze_result( results, problem, sample, generate_log, compile_log, verilog
 
       if result_record.passfail == '?':
         result_record.passfail = 'R'
+
+  # final checks of the verilog file
+  #  - check that there are no initial blocks
+  #  - check that the verilog file is not empty
+
+  verilog_file_is_empty = True
+  with open( verilog, 'r' ) as file:
+
+    for line in file:
+
+      if line.strip() != "":
+        verilog_file_is_empty = False
+
+      if "initial" in line:
+        result_record.passfail = 'i'
+        break
+
+  if verilog_file_is_empty:
+    result_record.passfail = 'X'
 
   results.add_result( problem, sample, result_record )
 

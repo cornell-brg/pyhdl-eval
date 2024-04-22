@@ -1,11 +1,8 @@
 
-In this problem, you will be implementing a hardware module named
-TopModule which outputs a constant value.
-
-The module should provide the following interface. All input and output
-ports are one bit unless otherwise specified.
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
 
  - output zero
 
-The module implementation should always output a logic LOW.
+The module implementation should always output a logic zero.
 

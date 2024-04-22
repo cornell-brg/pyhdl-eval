@@ -1,5 +1,9 @@
 
 Prob01p01_comb_const_zero
+Prob01p02_comb_const_one
+Prob01p03_comb_const_lohi
+Prob01p04_comb_const_32b_value
+Prob01p05_comb_const_param
 
 Prob02p01_comb_wires_8b_passthru
 

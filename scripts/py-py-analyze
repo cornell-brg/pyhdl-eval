@@ -240,6 +240,29 @@ def analyze_result( results, problem, sample, generate_log, compile_log, pymtl )
     if one_fail and result_record.passfail == '?':
       result_record.passfail = 'R'
 
+  # final checks of the PyMTL file
+  #  - check if pymtl3 import is correct
+  #  - check that the PyMTL file is not empty
+
+  proper_import = False
+  pymtl_file_is_empty = True
+  with open( pymtl, 'r' ) as file:
+
+    for line in file:
+      if "module TopModule" in line:
+        result_record.passfail = 'v'
+
+      if "from pymtl3 import *" in line:
+        proper_import = True
+
+      if line.strip() != "":
+        pymtl_file_is_empty = False
+
+  if pymtl_file_is_empty:
+    result_record.passfail = 'X'
+  elif result_record.passfail == 'R' and not proper_import:
+    result_record.passfail = 'p'
+
   results.add_result( problem, sample, result_record )
 
 #-------------------------------------------------------------------------

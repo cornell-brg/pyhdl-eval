@@ -1,0 +1,11 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - parameter nbits
+ - parameter value
+ - output out (nbits)
+
+The module implementation should always output the constant given by the
+parameter value.
+

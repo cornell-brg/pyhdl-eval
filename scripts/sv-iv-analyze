@@ -253,10 +253,10 @@ def analyze_result( results, problem, sample, generate_log, compile_log, verilog
         error_R = True
         break
 
-    if result_record.passfail == '?' and error_p:
+    if result_record.passfail == '.' and error_p:
       result_record.passfail = 'p'
 
-    if result_record.passfail == '?' and error_C:
+    if result_record.passfail == '.' and error_C:
       result_record.passfail = 'C'
 
   # process verilog to identify possible runtime issues
@@ -281,6 +281,25 @@ def analyze_result( results, problem, sample, generate_log, compile_log, verilog
 
       if result_record.passfail == '.':
         result_record.passfail = 'R'
+
+  # final checks of the verilog file
+  #  - check that there are no initial blocks
+  #  - check that the verilog file is not empty
+
+  verilog_file_is_empty = True
+  with open( verilog, 'r' ) as file:
+
+    for line in file:
+
+      if line.strip() != "":
+        verilog_file_is_empty = False
+
+      if "initial" in line:
+        result_record.passfail = 'i'
+        break
+
+  if verilog_file_is_empty:
+    result_record.passfail = 'X'
 
   results.add_result( problem, sample, result_record )
 
