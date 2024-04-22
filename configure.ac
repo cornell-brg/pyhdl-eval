@@ -41,7 +41,43 @@ AS_IF([test "${IVERILOG}" = "no"],
 ])
 
 #-------------------------------------------------------------------------
-# dataset
+# --with-model
+#-------------------------------------------------------------------------
+
+AC_ARG_WITH(model,
+  AS_HELP_STRING([--with-model],[Large language model to use]),
+  [model="${with_model}"],
+  [model="gpt4-turbo"])
+
+AC_SUBST([model])
+AC_MSG_NOTICE([using model: ${model}])
+
+#-------------------------------------------------------------------------
+# --with-examples
+#-------------------------------------------------------------------------
+
+AC_ARG_WITH(examples,
+  AS_HELP_STRING([--with-examples],[Include in-context learning examples]),
+  [examples="yes"],
+  [examples="no"])
+
+AC_SUBST([examples])
+AC_MSG_NOTICE([using in-context learning examples: ${examples}])
+
+#-------------------------------------------------------------------------
+# --with-rules
+#-------------------------------------------------------------------------
+
+AC_ARG_WITH(rules,
+  AS_HELP_STRING([--with-rules],[Include in-context learning rules]),
+  [rules="yes"],
+  [rules="no"])
+
+AC_SUBST([rules])
+AC_MSG_NOTICE([using in-context learning rules: ${rules}])
+
+#-------------------------------------------------------------------------
+# --with-dataset
 #-------------------------------------------------------------------------
 
 AC_ARG_WITH(dataset,
@@ -53,7 +89,7 @@ AC_SUBST([dataset_dir])
 AC_MSG_NOTICE([using dataset: ${dataset_dir}])
 
 #-------------------------------------------------------------------------
-# problems
+# --with-problems
 #-------------------------------------------------------------------------
 
 AC_ARG_WITH(problems,

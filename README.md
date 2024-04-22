@@ -105,6 +105,17 @@ option.
  % TOPDIR=$PWD
 ```
 
+### Test the Verilog Reference Solutions
+
+You can use pytest to verify that the PyMTL reference models match the
+Verilog reference models like this:
+
+```
+ % mkdir $TOPDIR/build-test-ref
+ % cd $TOPDIR/build-test-ref
+ % pytest ../dataset
+```
+
 ### Reproduce Initial Results
 
 Here is how to reproduce a very simple initial experiment using GPT4

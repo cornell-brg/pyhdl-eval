@@ -590,6 +590,9 @@ LIBOBJS
 pregen_dir
 problems_file
 dataset_dir
+rules
+examples
+model
 IVERILOG
 target_alias
 host_alias
@@ -632,6 +635,9 @@ SHELL'
 ac_subst_files=''
 ac_user_opts='
 enable_option_checking
+with_model
+with_examples
+with_rules
 with_dataset
 with_problems
 with_pregen_dir
@@ -1249,6 +1255,9 @@ if test -n "$ac_init_help"; then
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+  --with-model            Large language model to use
+  --with-examples         Include in-context learning examples
+  --with-rules            Include in-context learning rules
   --with-dataset          Directory with dataset files
   --with-problems         File with list of problems
   --with-pregen-dir       Directory for storing pregen files
@@ -1738,7 +1747,58 @@ if test "${IVERILOG}" = "no"; then :
 fi
 
 #-------------------------------------------------------------------------
-# dataset
+# --with-model
+#-------------------------------------------------------------------------
+
+
+# Check whether --with-model was given.
+if test "${with_model+set}" = set; then :
+  withval=$with_model; model="${with_model}"
+else
+  model="gpt4-turbo"
+fi
+
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: using model: ${model}" >&5
+$as_echo "$as_me: using model: ${model}" >&6;}
+
+#-------------------------------------------------------------------------
+# --with-examples
+#-------------------------------------------------------------------------
+
+
+# Check whether --with-examples was given.
+if test "${with_examples+set}" = set; then :
+  withval=$with_examples; examples="yes"
+else
+  examples="no"
+fi
+
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: using in-context learning examples: ${examples}" >&5
+$as_echo "$as_me: using in-context learning examples: ${examples}" >&6;}
+
+#-------------------------------------------------------------------------
+# --with-rules
+#-------------------------------------------------------------------------
+
+
+# Check whether --with-rules was given.
+if test "${with_rules+set}" = set; then :
+  withval=$with_rules; rules="yes"
+else
+  rules="no"
+fi
+
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: using in-context learning rules: ${rules}" >&5
+$as_echo "$as_me: using in-context learning rules: ${rules}" >&6;}
+
+#-------------------------------------------------------------------------
+# --with-dataset
 #-------------------------------------------------------------------------
 
 
@@ -1755,7 +1815,7 @@ fi
 $as_echo "$as_me: using dataset: ${dataset_dir}" >&6;}
 
 #-------------------------------------------------------------------------
-# problems
+# --with-problems
 #-------------------------------------------------------------------------
 
 

@@ -28,6 +28,18 @@ scripts_dir  := $(src_dir)/scripts
 
 GENERATE=$(scripts_dir)/generate
 
+GENERATE_FLAGS = "--model=@model@"
+
+examples=@examples@
+ifeq ($(examples),yes)
+  GENERATE_FLAGS += "--examples"
+endif
+
+rules=@rules@
+ifeq ($(rules),yes)
+  GENERATE_FLAGS += "--rules"
+endif
+
 IVERILOG_FLAGS=-Wall -Winfloop -Wno-timescale -g2012
 IVERILOG_COMPILE=@IVERILOG@ $(IVERILOG_FLAGS)
 
@@ -106,7 +118,7 @@ $(1)_sv_generate_logs := $$(patsubst %, $(1)/$(1)_sample%-sv-generate.log, $$(sa
 $$($(1)_sv_samples) : %.v : $(1)_prompt.txt
 	@$$(ECHO) Generating $$(notdir $$@) verilog
 	$$(QUIET) mkdir -p $(1)
-	$$(QUIET) $$(GENERATE) --lang=verilog --model=gpt-4-turbo --verbose \
+	$$(QUIET) $$(GENERATE) $$(GENERATE_FLAGS) --lang=verilog --verbose \
               --output $$@ $$< \
               $(REDIRECT_LOG) $$*-sv-generate.log
 
@@ -184,7 +196,7 @@ $(1)_py_generate_logs := $$(patsubst %, $(1)/$(1)_sample%-py-generate.log, $$(sa
 $$($(1)_py_samples) : %.py : $(1)_prompt.txt
 	@$$(ECHO) Generating $$(notdir $$@) pymtl
 	$$(QUIET) mkdir -p $(1)
-	$$(QUIET) $$(GENERATE) --lang=pymtl --model=gpt-4-turbo --verbose \
+	$$(QUIET) $$(GENERATE) $$(GENERATE_FLAGS) --lang=pymtl --verbose \
               --output $$@ $$< \
               $(REDIRECT_LOG) $$*-py-generate.log
 

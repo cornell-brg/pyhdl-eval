@@ -60,15 +60,13 @@ def parse_lines(lines):
   pass_rate = None
   for line in lines:
     if 'Prob' in line:
+      line = line.replace("(100%)","(  %)")
       parts = line.split()
       problem_name = parts[0]
 
       # Extract just the sequence of characters,
       # skipping the number and percentages
-      if len(parts) == 8:
-        sequence = ' '.join(parts[4:])
-      else:
-        sequence = ' '.join(parts[3:])
+      sequence = ' '.join(parts[4:])
       results[problem_name] = sequence
 
     elif 'pass_rate' in line:
