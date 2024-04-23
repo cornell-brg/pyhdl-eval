@@ -116,20 +116,19 @@ Verilog reference models like this:
  % pytest ../dataset
 ```
 
-### Reproduce Initial Results
+### Reproduce Initial Results with GPT4 Turbo
 
 Here is how to reproduce a very simple initial experiment using GPT4
 Turbo on seven problems.
 
 ```
  % cd $TOPDIR
- % git checkout 2024-02-28-baseline
+ % git checkout 2024-04-22
 
- % mkdir $TOPDIR/build-baseline-tiny
- % cd $TOPDIR/build-baseline-tiny
- % ../configure --with-pregen=../../pyhdl-eval-pregen/2024-02-28-baseline-tiny
+ % mkdir $TOPDIR/build-gpt4-turbo
+ % cd $TOPDIR/build-gpt4-turbo
+ % ../configure --with-model=gpt4-turbo --with-examples \
+     --with-pregen=../../pyhdl-eval-pregen/2024-04-22/gpt4-turbo
  % make -j16
- ...
- pass_rate = 41.99
 ```
 
