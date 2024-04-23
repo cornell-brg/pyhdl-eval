@@ -294,6 +294,11 @@ def analyze_result( results, problem, sample, generate_log, compile_log, pymtl )
       if line.strip() != "":
         pymtl_file_is_empty = False
 
+      if "PYHDL-EVAL: response did not use <CODE></CODE> correctly" in line:
+        if result_record.passfail == '.':
+          result_record.passfail = ';'
+        break
+
   if pymtl_file_is_empty:
     result_record.passfail = 'X'
   elif result_record.passfail == 'R' and not proper_import:

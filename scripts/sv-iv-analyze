@@ -285,6 +285,7 @@ def analyze_result( results, problem, sample, generate_log, compile_log, verilog
   # final checks of the verilog file
   #  - check that there are no initial blocks
   #  - check that the verilog file is not empty
+  #  - check for not using <CODE></CODE> correctly
 
   verilog_file_is_empty = True
   with open( verilog, 'r' ) as file:
@@ -296,6 +297,11 @@ def analyze_result( results, problem, sample, generate_log, compile_log, verilog
 
       if "initial" in line:
         result_record.passfail = 'i'
+        break
+
+      if "PYHDL-EVAL: response did not use <CODE></CODE> correctly" in line:
+        if result_record.passfail == '.':
+          result_record.passfail = ';'
         break
 
   if verilog_file_is_empty:
