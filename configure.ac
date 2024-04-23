@@ -8,7 +8,7 @@
 
 m4_define( proj_name,         [LLM Code Generation Experiments])
 m4_define( proj_maintainer,   [Christopher Batten])
-m4_define( proj_abbreviation, [pymtl-verilog-eval])
+m4_define( proj_abbreviation, [pyhdl-eval])
 
 #-------------------------------------------------------------------------
 # Project version information
@@ -154,8 +154,8 @@ AS_IF([ test "${pregen_dir}" != "DEFAULT" ],
 [
   AC_MSG_NOTICE([using pregen dir: ${pregen_dir}])
 ],[
-  if [[ -d "../../pymtl-eval-pregen" ]]; then
-    pregen_dir="../../pymtl-eval-pregen"
+  if [[ -d "../../pyhdl-eval-pregen" ]]; then
+    pregen_dir="../../pyhdl-eval-pregen"
     AC_MSG_NOTICE([using pregen dir: ${pregen_dir}])
   else
     AC_MSG_NOTICE([no pregen dir specified])

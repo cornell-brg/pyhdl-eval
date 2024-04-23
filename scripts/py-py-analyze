@@ -220,12 +220,44 @@ def analyze_result( results, problem, sample, generate_log, compile_log, pymtl )
         result_record.passfail = 'b'
         break
 
+      if "ModuleNotFoundError: " in line:
+        result_record.passfail = 'm'
+        break
+
       if "s.connect method has been deprecated" in line:
         result_record.passfail = 'c'
         break
 
       if "TypeError: " in line:
         result_record.passfail = 't'
+        break
+
+      if "AttributeError: " in line:
+        result_record.passfail = 'a'
+        break
+
+      if "NameError: " in line:
+        result_record.passfail = 'n'
+        break
+
+      if "NotImplementedError: " in line:
+        result_record.passfail = 'n'
+        break
+
+      if "UpdateBlockWriteError" in line:
+        result_record.passfail = '@'
+        break
+
+      if "NoWriterError" in line:
+        result_record.passfail = 'w'
+        break
+
+      if "SyntaxError: " in line:
+        result_record.passfail = 'S'
+        break
+
+      if "ValueError: " in line:
+        result_record.passfail = 'v'
         break
 
       if "PASSED" in line:
@@ -243,6 +275,7 @@ def analyze_result( results, problem, sample, generate_log, compile_log, pymtl )
   # final checks of the PyMTL file
   #  - check if pymtl3 import is correct
   #  - check that the PyMTL file is not empty
+  #  - check if tick() method which means incorrect
 
   proper_import = False
   pymtl_file_is_empty = True
@@ -250,7 +283,10 @@ def analyze_result( results, problem, sample, generate_log, compile_log, pymtl )
 
     for line in file:
       if "module TopModule" in line:
-        result_record.passfail = 'v'
+        result_record.passfail = 'V'
+
+      if "def tick(" in line:
+        result_record.passfail = 'k'
 
       if "from pymtl3 import *" in line:
         proper_import = True

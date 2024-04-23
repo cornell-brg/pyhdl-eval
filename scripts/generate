@@ -93,6 +93,12 @@ nim_chat_models = [
   "ai-mixtral-8x7b-instruct",
 ]
 
+model_aliases = {
+  "gpt3.5-turbo" : "gpt-3.5-turbo",
+  "gpt4"         : "gpt-4",
+  "gpt4-turbo"   : "gpt-4-turbo",
+}
+
 #-------------------------------------------------------------------------
 # VerboseOutput
 #-------------------------------------------------------------------------
@@ -193,11 +199,21 @@ def main():
       print( f" - {model}" )
 
     print( "" )
+    print( "Model Aliases" )
+
+    for key,value in model_aliases.items():
+      print( f" - {key} : {value}" )
+
+    print( "" )
     return
 
-  if opts.model not in adlr_chat_models + llm_gateway_chat_models + nim_chat_models:
+  model = opts.model
+  if opts.model in model_aliases:
+    model = model_aliases[opts.model]
+
+  if model not in adlr_chat_models + llm_gateway_chat_models + nim_chat_models:
     print("")
-    print(f"ERROR: Unknown model {opts.model}")
+    print(f"ERROR: Unknown model {model}")
     print("")
     return
 
@@ -226,7 +242,6 @@ def main():
   if opts.prompt_filename.endswith("_prompt.txt"):
     problem = os.path.basename(opts.prompt_filename[:-11])
 
-  model       = opts.model
   temperature = opts.temperature
   top_p       = opts.top_p
   max_tokens  = opts.max_tokens

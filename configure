@@ -578,7 +578,7 @@ MAKEFLAGS=
 
 # Identity of this package.
 PACKAGE_NAME='LLM Code Generation Experiments'
-PACKAGE_TARNAME='pymtl-verilog-eval'
+PACKAGE_TARNAME='pyhdl-eval'
 PACKAGE_VERSION='?'
 PACKAGE_STRING='LLM Code Generation Experiments ?'
 PACKAGE_BUGREPORT='Christopher Batten'
@@ -1234,8 +1234,7 @@ Fine tuning of the installation directories:
   --infodir=DIR           info documentation [DATAROOTDIR/info]
   --localedir=DIR         locale-dependent data [DATAROOTDIR/locale]
   --mandir=DIR            man documentation [DATAROOTDIR/man]
-  --docdir=DIR            documentation root
-                          [DATAROOTDIR/doc/pymtl-verilog-eval]
+  --docdir=DIR            documentation root [DATAROOTDIR/doc/pyhdl-eval]
   --htmldir=DIR           html documentation [DOCDIR]
   --dvidir=DIR            dvi documentation [DOCDIR]
   --pdfdir=DIR            pdf documentation [DOCDIR]
@@ -1894,8 +1893,8 @@ $as_echo "$as_me: using pregen dir: ${pregen_dir}" >&6;}
 
 else
 
-  if [ -d "../../pymtl-eval-pregen" ]; then
-    pregen_dir="../../pymtl-eval-pregen"
+  if [ -d "../../pyhdl-eval-pregen" ]; then
+    pregen_dir="../../pyhdl-eval-pregen"
     { $as_echo "$as_me:${as_lineno-$LINENO}: using pregen dir: ${pregen_dir}" >&5
 $as_echo "$as_me: using pregen dir: ${pregen_dir}" >&6;}
   else
