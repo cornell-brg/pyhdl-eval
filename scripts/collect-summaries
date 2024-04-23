@@ -109,6 +109,7 @@ def print_results(all_results, pass_rates):
         header_line += f"{headers[i]} ({pass_rates[i]:.0f}%)".ljust(25)
         separator_line += "-----------------------".center(25)
 
+    print("")
     print(header_line)
     print(separator_line)
     for problem_name, results in sorted(all_results.items()):
@@ -116,6 +117,7 @@ def print_results(all_results, pass_rates):
         for result in results:
             print(f"{result:25s}", end="")
         print()
+    print("")
 
 #-------------------------------------------------------------------------
 # Main
