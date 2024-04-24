@@ -1,0 +1,12 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  in_ (array of four ports, each port is 2 bits)
+ - output out (array of four ports, each port is 2 bits)
+
+The module implementation should directly connect each the input port to
+the corresponding output port. So input port in[0] should be connected to
+output port out[0], input port in[1] should be connected to output port
+out[1], and so on.
+

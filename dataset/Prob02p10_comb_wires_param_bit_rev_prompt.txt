@@ -1,0 +1,13 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - parameter nbits
+ - input  in_ (nbits)
+ - output out (nbits)
+
+The module implementation should connect the input port to the output
+port but with the bits in reversed order. The module is pararmeterized by
+bitwidth of each port (nbits). In other words, in_[0] should be connected
+to out[nbits-1], in_[1] should be connected to out[nbits-2], and so on.
+

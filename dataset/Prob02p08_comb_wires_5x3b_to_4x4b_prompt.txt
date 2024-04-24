@@ -1,0 +1,25 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  in0  (3 bits)
+ - input  in1  (3 bits)
+ - input  in2  (3 bits)
+ - input  in3  (3 bits)
+ - input  in4  (3 bits)
+ - output out0 (4 bits)
+ - output out1 (4 bits)
+ - output out2 (4 bits)
+ - output out3 (4 bits)
+
+The module implementation should concatenate the input ports together
+into a single wide signal, and then split this wide signal across the
+output ports. The input port in0 should be connected to the
+least-significant three bits of output port out0, the input port in1
+should be split across output ports out0 and out1, the input port in2
+should be split across output ports out1 and out2, and so on. There are
+five 3-bit input ports for a total of 15 bits, and there are four 4-bit
+output ports for a total of 16 bits. So there is one more bit in the
+output compared to the input. Wire the most significant bit of output
+port out3 to be a constant logic one.
+

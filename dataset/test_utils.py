@@ -59,8 +59,6 @@ def construct( pytestconfig, python_file_name, RefModule, TopModule, **kwargs ):
       vout_prob_name += "_" + key + "_" + str(value)
 
     vout_file_name = vout_prob_name + "_translated.v"
-    print(vout_prob_name)
-    print(vout_file_name)
 
     dut.set_metadata( VerilogPlaceholderPass.src_file, vin_file_name )
     dut.set_metadata( VerilogTranslationImportPass.enable, True )

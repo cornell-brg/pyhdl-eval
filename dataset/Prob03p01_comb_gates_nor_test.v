@@ -63,7 +63,7 @@ module Top();
     #8;
 
     if ( t.n != 0 )
-      $display( "%3d: %x %x %x", t.cycles,
+      $display( "%3d: %x %x > %x", t.cycles,
                 top_module_in0, top_module_in1, top_module_out );
 
     `TEST_UTILS_CHECK_EQ( top_module_out, ref_module_out );

@@ -1,5 +1,5 @@
 //========================================================================
-// Prob02p01_comb_wires_8b_passthru_test
+// Prob02p06_comb_wires_4x2b_passthru_test
 //========================================================================
 
 `include "test_utils.v"
@@ -19,22 +19,46 @@ module Top();
   // Instantiate reference and top modules
   //----------------------------------------------------------------------
 
-  logic [7:0] ref_module_in_;
-  logic [7:0] ref_module_out;
+  logic [1:0] ref_module_in0;
+  logic [1:0] ref_module_in1;
+  logic [1:0] ref_module_in2;
+  logic [1:0] ref_module_in3;
+  logic [1:0] ref_module_out0;
+  logic [1:0] ref_module_out1;
+  logic [1:0] ref_module_out2;
+  logic [1:0] ref_module_out3;
 
   RefModule ref_module
   (
-    .in_ (ref_module_in_),
-    .out (ref_module_out)
+    .in0  (ref_module_in0),
+    .in1  (ref_module_in1),
+    .in2  (ref_module_in2),
+    .in3  (ref_module_in3),
+    .out0 (ref_module_out0),
+    .out1 (ref_module_out1),
+    .out2 (ref_module_out2),
+    .out3 (ref_module_out3)
   );
 
-  logic [7:0] top_module_in_;
-  logic [7:0] top_module_out;
+  logic [1:0] top_module_in0;
+  logic [1:0] top_module_in1;
+  logic [1:0] top_module_in2;
+  logic [1:0] top_module_in3;
+  logic [1:0] top_module_out0;
+  logic [1:0] top_module_out1;
+  logic [1:0] top_module_out2;
+  logic [1:0] top_module_out3;
 
   TopModule top_module
   (
-    .in_ (top_module_in_),
-    .out (top_module_out)
+    .in0  (top_module_in0),
+    .in1  (top_module_in1),
+    .in2  (top_module_in2),
+    .in3  (top_module_in3),
+    .out0 (top_module_out0),
+    .out1 (top_module_out1),
+    .out2 (top_module_out2),
+    .out3 (top_module_out3)
   );
 
   //----------------------------------------------------------------------
@@ -46,18 +70,35 @@ module Top();
 
   task compare
   (
-    input logic [7:0] in_
+    input logic [1:0] in0,
+    input logic [1:0] in1,
+    input logic [1:0] in2,
+    input logic [1:0] in3
   );
 
-    ref_module_in_ = in_;
-    top_module_in_ = in_;
+    ref_module_in0 = in0;
+    ref_module_in1 = in1;
+    ref_module_in2 = in2;
+    ref_module_in3 = in3;
+
+    top_module_in0 = in0;
+    top_module_in1 = in1;
+    top_module_in2 = in2;
+    top_module_in3 = in3;
 
     #8;
 
     if ( t.n != 0 )
-      $display( "%3d: %x > %x", t.cycles, top_module_in_, top_module_out );
+      $display( "%3d: %x %x %x %x > %x %x %x %x", t.cycles,
+                top_module_in0,  top_module_in1,
+                top_module_in2,  top_module_in3,
+                top_module_out0, top_module_out1,
+                top_module_out2, top_module_out3 );
 
-    `TEST_UTILS_CHECK_EQ( top_module_out, ref_module_out );
+    `TEST_UTILS_CHECK_EQ( top_module_out0, ref_module_out0 );
+    `TEST_UTILS_CHECK_EQ( top_module_out1, ref_module_out1 );
+    `TEST_UTILS_CHECK_EQ( top_module_out2, ref_module_out2 );
+    `TEST_UTILS_CHECK_EQ( top_module_out3, ref_module_out3 );
 
     #2;
 
@@ -71,15 +112,14 @@ module Top();
     $display( "\ntest_case_1_directed" );
     t.reset_sequence();
 
-    compare( 8'b0000_0000 );
-    compare( 8'b0000_0001 );
-    compare( 8'b0000_0010 );
-    compare( 8'b0000_0100 );
-    compare( 8'b0000_0100 );
-    compare( 8'b0001_0001 );
-    compare( 8'b0010_0010 );
-    compare( 8'b0100_0100 );
-    compare( 8'b1000_1000 );
+    compare( 0, 0, 0, 0 );
+    compare( 0, 1, 2, 3 );
+    compare( 3, 0, 1, 2 );
+    compare( 2, 3, 0, 1 );
+    compare( 1, 2, 3, 0 );
+    compare( 0, 0, 1, 1 );
+    compare( 0, 1, 1, 0 );
+    compare( 1, 1, 0, 0 );
 
   endtask
 
@@ -95,7 +135,8 @@ module Top();
     t.reset_sequence();
 
     for ( int i = 0; i < 20; i = i+1 )
-      compare( $urandom(t.seed) );
+      compare( $urandom(t.seed), $urandom(t.seed),
+               $urandom(t.seed), $urandom(t.seed) );
 
   endtask
 

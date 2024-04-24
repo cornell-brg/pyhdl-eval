@@ -1,5 +1,5 @@
 //========================================================================
-// Prob02p01_comb_wires_8b_passthru_test
+// Prob02p02_comb_wires_16b_split_test
 //========================================================================
 
 `include "test_utils.v"
@@ -20,21 +20,25 @@ module Top();
   //----------------------------------------------------------------------
 
   logic [7:0] ref_module_in_;
-  logic [7:0] ref_module_out;
+  logic [3:0] ref_module_lo;
+  logic [3:0] ref_module_hi;
 
   RefModule ref_module
   (
     .in_ (ref_module_in_),
-    .out (ref_module_out)
+    .lo  (ref_module_lo),
+    .hi  (ref_module_hi)
   );
 
   logic [7:0] top_module_in_;
-  logic [7:0] top_module_out;
+  logic [3:0] top_module_lo;
+  logic [3:0] top_module_hi;
 
   TopModule top_module
   (
     .in_ (top_module_in_),
-    .out (top_module_out)
+    .lo  (top_module_lo),
+    .hi  (top_module_hi)
   );
 
   //----------------------------------------------------------------------
@@ -55,9 +59,11 @@ module Top();
     #8;
 
     if ( t.n != 0 )
-      $display( "%3d: %x > %x", t.cycles, top_module_in_, top_module_out );
+      $display( "%3d: %x > %x %x", t.cycles, top_module_in_,
+                top_module_lo, top_module_hi );
 
-    `TEST_UTILS_CHECK_EQ( top_module_out, ref_module_out );
+    `TEST_UTILS_CHECK_EQ( top_module_lo, ref_module_lo );
+    `TEST_UTILS_CHECK_EQ( top_module_hi, ref_module_hi );
 
     #2;
 
@@ -71,15 +77,16 @@ module Top();
     $display( "\ntest_case_1_directed" );
     t.reset_sequence();
 
-    compare( 8'b0000_0000 );
-    compare( 8'b0000_0001 );
-    compare( 8'b0000_0010 );
-    compare( 8'b0000_0100 );
-    compare( 8'b0000_0100 );
-    compare( 8'b0001_0001 );
-    compare( 8'b0010_0010 );
-    compare( 8'b0100_0100 );
-    compare( 8'b1000_1000 );
+    compare( 8'h00 );
+    compare( 8'h01 );
+    compare( 8'h10 );
+    compare( 8'h23 );
+    compare( 8'h45 );
+    compare( 8'h67 );
+    compare( 8'h89 );
+    compare( 8'hab );
+    compare( 8'hcd );
+    compare( 8'hef );
 
   endtask
 

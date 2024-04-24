@@ -1,0 +1,13 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  in_ (64 bits)
+ - output out (64 bits)
+
+The module implementation should connect the input port to the output
+port but with the bytes in reversed order. In other words, the least
+significant byte of the input should be written to the most significant
+byte of the output, the most significant byte of the input should be
+written to the least significant byte of the output, and so on.
+

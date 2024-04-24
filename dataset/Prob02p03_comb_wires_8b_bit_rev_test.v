@@ -1,5 +1,5 @@
 //========================================================================
-// Prob02p01_comb_wires_8b_passthru_test
+// Prob02p03_comb_wires_8b_bit_rev_test
 //========================================================================
 
 `include "test_utils.v"
@@ -75,11 +75,13 @@ module Top();
     compare( 8'b0000_0001 );
     compare( 8'b0000_0010 );
     compare( 8'b0000_0100 );
-    compare( 8'b0000_0100 );
+    compare( 8'b0000_1000 );
     compare( 8'b0001_0001 );
     compare( 8'b0010_0010 );
     compare( 8'b0100_0100 );
     compare( 8'b1000_1000 );
+    compare( 8'b0101_0101 );
+    compare( 8'b1010_1010 );
 
   endtask
 

@@ -1,5 +1,5 @@
 //========================================================================
-// Prob02p01_comb_wires_8b_passthru_test
+// Prob02p04_comb_wires_100b_bit_rev_test
 //========================================================================
 
 `include "test_utils.v"
@@ -19,8 +19,8 @@ module Top();
   // Instantiate reference and top modules
   //----------------------------------------------------------------------
 
-  logic [7:0] ref_module_in_;
-  logic [7:0] ref_module_out;
+  logic [99:0] ref_module_in_;
+  logic [99:0] ref_module_out;
 
   RefModule ref_module
   (
@@ -28,8 +28,8 @@ module Top();
     .out (ref_module_out)
   );
 
-  logic [7:0] top_module_in_;
-  logic [7:0] top_module_out;
+  logic [99:0] top_module_in_;
+  logic [99:0] top_module_out;
 
   TopModule top_module
   (
@@ -46,7 +46,7 @@ module Top();
 
   task compare
   (
-    input logic [7:0] in_
+    input logic [99:0] in_
   );
 
     ref_module_in_ = in_;
@@ -71,15 +71,12 @@ module Top();
     $display( "\ntest_case_1_directed" );
     t.reset_sequence();
 
-    compare( 8'b0000_0000 );
-    compare( 8'b0000_0001 );
-    compare( 8'b0000_0010 );
-    compare( 8'b0000_0100 );
-    compare( 8'b0000_0100 );
-    compare( 8'b0001_0001 );
-    compare( 8'b0010_0010 );
-    compare( 8'b0100_0100 );
-    compare( 8'b1000_1000 );
+    compare( 100'h0_0000_0000_0000_0000_0000_0000 );
+    compare( 100'h0_1234_1234_1234_1234_1234_1234 );
+    compare( 100'h1_89ab_cdef_89ab_cdef_89ab_cdef );
+    compare( 100'h2_4567_89ab_cdef_4567_89ab_cdef );
+    compare( 100'h4_0123_4567_89ab_cdef_0123_4567 );
+    compare( 100'h8_dead_beef_dead_beef_dead_beef );
 
   endtask
 
@@ -94,8 +91,10 @@ module Top();
     $display( "\ntest_case_2_random" );
     t.reset_sequence();
 
-    for ( int i = 0; i < 20; i = i+1 )
-      compare( $urandom(t.seed) );
+    for ( int i = 0; i < 20; i = i+1 ) begin
+      compare( { $urandom(t.seed), $urandom(t.seed),
+                 $urandom(t.seed), $urandom(t.seed) } );
+    end
 
   endtask
 

@@ -1,5 +1,5 @@
 //========================================================================
-// Prob02p01_comb_wires_8b_passthru_test
+// Prob02p09_comb_wires_sext_test
 //========================================================================
 
 `include "test_utils.v"
@@ -19,8 +19,8 @@ module Top();
   // Instantiate reference and top modules
   //----------------------------------------------------------------------
 
-  logic [7:0] ref_module_in_;
-  logic [7:0] ref_module_out;
+  logic [ 7:0] ref_module_in_;
+  logic [31:0] ref_module_out;
 
   RefModule ref_module
   (
@@ -28,8 +28,8 @@ module Top();
     .out (ref_module_out)
   );
 
-  logic [7:0] top_module_in_;
-  logic [7:0] top_module_out;
+  logic [ 7:0] top_module_in_;
+  logic [31:0] top_module_out;
 
   TopModule top_module
   (
@@ -73,13 +73,10 @@ module Top();
 
     compare( 8'b0000_0000 );
     compare( 8'b0000_0001 );
-    compare( 8'b0000_0010 );
-    compare( 8'b0000_0100 );
-    compare( 8'b0000_0100 );
-    compare( 8'b0001_0001 );
-    compare( 8'b0010_0010 );
-    compare( 8'b0100_0100 );
-    compare( 8'b1000_1000 );
+    compare( 8'b0101_0101 );
+    compare( 8'b1010_1010 );
+    compare( 8'b1011_1011 );
+    compare( 8'b1111_1111 );
 
   endtask
 
