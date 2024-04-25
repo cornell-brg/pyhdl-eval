@@ -103,7 +103,7 @@ module Top();
   endtask
 
   //----------------------------------------------------------------------
-  // nports2_nbits8: test_case_2_nbits13_random
+  // nports2_nbits8: test_case_2_nports2_nbits13_random
   //----------------------------------------------------------------------
   // svt.seed is set to a known value in the reset() task, so when use
   // $urandom(t.seed) we will get reproducible random numbers no matter

@@ -61,7 +61,7 @@ def run_sim( pytestconfig, test_vectors, nports, nbits ):
 # test_case_nports2_nbits8_directed
 #-------------------------------------------------------------------------
 
-def test_case_nbits8_directed( pytestconfig ):
+def test_case_nports2_nbits8_directed( pytestconfig ):
   run_sim( pytestconfig, [
     ( 0x00, 0x00 ),
     ( 0x00, 0x01 ),
