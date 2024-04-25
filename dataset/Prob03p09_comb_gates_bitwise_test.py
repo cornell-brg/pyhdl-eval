@@ -1,5 +1,5 @@
 #=========================================================================
-# Prob02p04_comb_wires_100b_bit_rev_test
+# Prob03p09_comb_gates_bitwise_test
 #=========================================================================
 
 from pymtl3 import *
@@ -17,13 +17,19 @@ from hypothesis import strategies as st
 
 class RefModule( Component ):
   def construct( s ):
-    s.in_ = InPort (100)
-    s.out = OutPort(100)
+    s.in0      = InPort(4)
+    s.in1      = InPort(4)
+    s.out_and  = OutPort(4)
+    s.out_nand = OutPort(4)
+    s.out_or   = OutPort(4)
+    s.out_nor  = OutPort(4)
 
     @update
     def up():
-      for i in range(0,100):
-        s.out[i] @= s.in_[99-i]
+      s.out_and  @=    s.in0 & s.in1
+      s.out_nand @= ~( s.in0 & s.in1 )
+      s.out_or   @=    s.in0 | s.in1
+      s.out_nor  @= ~( s.in0 | s.in1 )
 
 #-------------------------------------------------------------------------
 # Verilog Wrapper
@@ -31,8 +37,12 @@ class RefModule( Component ):
 
 class TopModule( VerilogPlaceholder, Component ):
   def construct( s ):
-    s.in_ = InPort (100)
-    s.out = OutPort(100)
+    s.in0      = InPort(4)
+    s.in1      = InPort(4)
+    s.out_and  = OutPort(4)
+    s.out_nand = OutPort(4)
+    s.out_or   = OutPort(4)
+    s.out_nor  = OutPort(4)
 
 #-------------------------------------------------------------------------
 # run_sim
@@ -44,15 +54,21 @@ def run_sim( pytestconfig, test_vectors ):
 
   for test_vector in test_vectors:
 
-    in_ = test_vector
+    in0,in1 = test_vector
 
-    ref.in_ @= in_
-    dut.in_ @= in_
+    ref.in0 @= in0
+    ref.in1 @= in1
+
+    dut.in0 @= in0
+    dut.in1 @= in1
 
     ref.sim_tick()
     dut.sim_tick()
 
-    assert ref.out == dut.out
+    assert ref.out_and  == dut.out_and
+    assert ref.out_nand == dut.out_nand
+    assert ref.out_or   == dut.out_or
+    assert ref.out_nor  == dut.out_nor
 
 #-------------------------------------------------------------------------
 # test_case_directed
@@ -60,21 +76,25 @@ def run_sim( pytestconfig, test_vectors ):
 
 def test_case_directed( pytestconfig ):
   run_sim( pytestconfig, [
-    0x0_0000_0000_0000_0000_0000_0000,
-    0x0_1234_1234_1234_1234_1234_1234,
-    0x1_89ab_cdef_89ab_cdef_89ab_cdef,
-    0x2_4567_89ab_cdef_4567_89ab_cdef,
-    0x4_0123_4567_89ab_cdef_0123_4567,
-    0x8_dead_beef_dead_beef_dead_beef,
-    0xf_ffff_ffff_ffff_ffff_ffff_ffff,
-  ])
+    ( 0b0000, 0b0000 ),
+    ( 0b0000, 0b1111 ),
+    ( 0b1111, 0b0000 ),
+    ( 0b1111, 0b1111 ),
+    ( 0b1100, 0b1010 ),
+    ( 0b0011, 0b0101 ),
+  ] )
 
 #-------------------------------------------------------------------------
 # test_case_random
 #-------------------------------------------------------------------------
 
 @settings(deadline=1000,max_examples=20)
-@given( st.lists(pst.bits(100)) )
+@given(
+  st.lists(
+    st.tuples(
+      pst.bits(4), pst.bits(4)
+    )
+  ))
 def test_case_random( pytestconfig, test_vectors ):
   run_sim( pytestconfig, test_vectors )
 

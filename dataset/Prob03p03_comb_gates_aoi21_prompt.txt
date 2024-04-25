@@ -1,0 +1,13 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  in0
+ - input  in1
+ - input  in2
+ - output out
+
+The module should implement a 2-1 AND-OR-inverting (AOI) compound gate.
+Inputs in0 and in1 should connect to the AND gate and input in2 should
+connect to the remaining input of the OR gate.
+

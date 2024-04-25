@@ -16,7 +16,7 @@
 #     --lang           What language to generate (default: verilog)
 #     --output         File to write extracted code
 #
-# Use GPT to generate verilog or PyMTL from the given prompt.
+# Use a LLM to generate verilog or PyMTL from the given prompt.
 #
 # Author : Christopher Batten
 # Date   : Mar 15, 2024

@@ -1,5 +1,5 @@
 //========================================================================
-// Prob02p04_comb_wires_100b_bit_rev_test
+// Prob03p06_comb_gates_fadd_test
 //========================================================================
 
 `include "test_utils.v"
@@ -19,22 +19,34 @@ module Top();
   // Instantiate reference and top modules
   //----------------------------------------------------------------------
 
-  logic [99:0] ref_module_in_;
-  logic [99:0] ref_module_out;
+  logic ref_module_a;
+  logic ref_module_b;
+  logic ref_module_cin;
+  logic ref_module_cout;
+  logic ref_module_sum;
 
   RefModule ref_module
   (
-    .in_ (ref_module_in_),
-    .out (ref_module_out)
+    .a    (ref_module_a),
+    .b    (ref_module_b),
+    .cin  (ref_module_cin),
+    .cout (ref_module_cout),
+    .sum  (ref_module_sum)
   );
 
-  logic [99:0] top_module_in_;
-  logic [99:0] top_module_out;
+  logic top_module_a;
+  logic top_module_b;
+  logic top_module_cin;
+  logic top_module_cout;
+  logic top_module_sum;
 
   TopModule top_module
   (
-    .in_ (top_module_in_),
-    .out (top_module_out)
+    .a    (top_module_a),
+    .b    (top_module_b),
+    .cin  (top_module_cin),
+    .cout (top_module_cout),
+    .sum  (top_module_sum)
   );
 
   //----------------------------------------------------------------------
@@ -46,18 +58,28 @@ module Top();
 
   task compare
   (
-    input logic [99:0] in_
+    input logic a,
+    input logic b,
+    input logic cin
   );
 
-    ref_module_in_ = in_;
-    top_module_in_ = in_;
+    ref_module_a   = a;
+    ref_module_b   = b;
+    ref_module_cin = cin;
+
+    top_module_a   = a;
+    top_module_b   = b;
+    top_module_cin = cin;
 
     #8;
 
     if ( t.n != 0 )
-      $display( "%3d: %x > %x", t.cycles, top_module_in_, top_module_out );
+      $display( "%3d: %x %x %x > %x %x", t.cycles,
+                top_module_a,   top_module_b,   top_module_cin,
+                top_module_sum, top_module_cout );
 
-    `TEST_UTILS_CHECK_EQ( top_module_out, ref_module_out );
+    `TEST_UTILS_CHECK_EQ( top_module_sum,  ref_module_sum  );
+    `TEST_UTILS_CHECK_EQ( top_module_cout, ref_module_cout );
 
     #2;
 
@@ -71,31 +93,14 @@ module Top();
     $display( "\ntest_case_1_directed" );
     t.reset_sequence();
 
-    compare( 100'h0_0000_0000_0000_0000_0000_0000 );
-    compare( 100'h0_1234_1234_1234_1234_1234_1234 );
-    compare( 100'h1_89ab_cdef_89ab_cdef_89ab_cdef );
-    compare( 100'h2_4567_89ab_cdef_4567_89ab_cdef );
-    compare( 100'h4_0123_4567_89ab_cdef_0123_4567 );
-    compare( 100'h8_dead_beef_dead_beef_dead_beef );
-    compare( 100'hf_ffff_ffff_ffff_ffff_ffff_ffff );
-
-  endtask
-
-  //----------------------------------------------------------------------
-  // test_case_2_random
-  //----------------------------------------------------------------------
-  // svt.seed is set to a known value in the reset() task, so when use
-  // $urandom(t.seed) we will get reproducible random numbers no matter
-  // the order that test cases are executed.
-
-  task test_case_2_random();
-    $display( "\ntest_case_2_random" );
-    t.reset_sequence();
-
-    for ( int i = 0; i < 20; i = i+1 ) begin
-      compare( { $urandom(t.seed), $urandom(t.seed),
-                 $urandom(t.seed), $urandom(t.seed) } );
-    end
+    compare( 1'b0, 1'b0, 1'b0 );
+    compare( 1'b0, 1'b0, 1'b1 );
+    compare( 1'b0, 1'b1, 1'b0 );
+    compare( 1'b0, 1'b1, 1'b1 );
+    compare( 1'b1, 1'b0, 1'b0 );
+    compare( 1'b1, 1'b0, 1'b1 );
+    compare( 1'b1, 1'b1, 1'b0 );
+    compare( 1'b1, 1'b1, 1'b1 );
 
   endtask
 
@@ -109,7 +114,6 @@ module Top();
     #1;
 
     if ((t.n <= 0) || (t.n == 1)) test_case_1_directed();
-    if ((t.n <= 0) || (t.n == 2)) test_case_2_random();
 
     $write("\n");
     $finish;

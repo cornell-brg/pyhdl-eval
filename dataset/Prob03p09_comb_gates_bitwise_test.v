@@ -1,5 +1,5 @@
 //========================================================================
-// Prob02p04_comb_wires_100b_bit_rev_test
+// Prob03p09_comb_gates_bitwise_test
 //========================================================================
 
 `include "test_utils.v"
@@ -19,22 +19,38 @@ module Top();
   // Instantiate reference and top modules
   //----------------------------------------------------------------------
 
-  logic [99:0] ref_module_in_;
-  logic [99:0] ref_module_out;
+  logic [3:0] ref_module_in0;
+  logic [3:0] ref_module_in1;
+  logic [3:0] ref_module_out_and;
+  logic [3:0] ref_module_out_nand;
+  logic [3:0] ref_module_out_or;
+  logic [3:0] ref_module_out_nor;
 
   RefModule ref_module
   (
-    .in_ (ref_module_in_),
-    .out (ref_module_out)
+    .in0      (ref_module_in0),
+    .in1      (ref_module_in1),
+    .out_and  (ref_module_out_and),
+    .out_nand (ref_module_out_nand),
+    .out_or   (ref_module_out_or),
+    .out_nor  (ref_module_out_nor)
   );
 
-  logic [99:0] top_module_in_;
-  logic [99:0] top_module_out;
+  logic [3:0] top_module_in0;
+  logic [3:0] top_module_in1;
+  logic [3:0] top_module_out_and;
+  logic [3:0] top_module_out_nand;
+  logic [3:0] top_module_out_or;
+  logic [3:0] top_module_out_nor;
 
   TopModule top_module
   (
-    .in_ (top_module_in_),
-    .out (top_module_out)
+    .in0      (top_module_in0),
+    .in1      (top_module_in1),
+    .out_and  (top_module_out_and),
+    .out_nand (top_module_out_nand),
+    .out_or   (top_module_out_or),
+    .out_nor  (top_module_out_nor)
   );
 
   //----------------------------------------------------------------------
@@ -46,18 +62,28 @@ module Top();
 
   task compare
   (
-    input logic [99:0] in_
+    input logic [3:0] in0,
+    input logic [3:0] in1
   );
 
-    ref_module_in_ = in_;
-    top_module_in_ = in_;
+    ref_module_in0 = in0;
+    ref_module_in1 = in1;
+
+    top_module_in0 = in0;
+    top_module_in1 = in1;
 
     #8;
 
     if ( t.n != 0 )
-      $display( "%3d: %x > %x", t.cycles, top_module_in_, top_module_out );
+      $display( "%3d: %x %x > %x %x %x %x", t.cycles,
+                top_module_in0,     top_module_in1,
+                top_module_out_and, top_module_out_nand,
+                top_module_out_or,  top_module_out_nor );
 
-    `TEST_UTILS_CHECK_EQ( top_module_out, ref_module_out );
+    `TEST_UTILS_CHECK_EQ( top_module_out_and,  ref_module_out_and  );
+    `TEST_UTILS_CHECK_EQ( top_module_out_nand, ref_module_out_nand );
+    `TEST_UTILS_CHECK_EQ( top_module_out_or,   ref_module_out_or   );
+    `TEST_UTILS_CHECK_EQ( top_module_out_nor,  ref_module_out_nor  );
 
     #2;
 
@@ -71,13 +97,12 @@ module Top();
     $display( "\ntest_case_1_directed" );
     t.reset_sequence();
 
-    compare( 100'h0_0000_0000_0000_0000_0000_0000 );
-    compare( 100'h0_1234_1234_1234_1234_1234_1234 );
-    compare( 100'h1_89ab_cdef_89ab_cdef_89ab_cdef );
-    compare( 100'h2_4567_89ab_cdef_4567_89ab_cdef );
-    compare( 100'h4_0123_4567_89ab_cdef_0123_4567 );
-    compare( 100'h8_dead_beef_dead_beef_dead_beef );
-    compare( 100'hf_ffff_ffff_ffff_ffff_ffff_ffff );
+    compare( 4'b0000, 4'b0000 );
+    compare( 4'b0000, 4'b1111 );
+    compare( 4'b1111, 4'b0000 );
+    compare( 4'b1111, 4'b1111 );
+    compare( 4'b1100, 4'b1010 );
+    compare( 4'b0011, 4'b0101 );
 
   endtask
 
@@ -92,10 +117,8 @@ module Top();
     $display( "\ntest_case_2_random" );
     t.reset_sequence();
 
-    for ( int i = 0; i < 20; i = i+1 ) begin
-      compare( { $urandom(t.seed), $urandom(t.seed),
-                 $urandom(t.seed), $urandom(t.seed) } );
-    end
+    for ( int i = 0; i < 20; i = i+1 )
+      compare( $urandom(t.seed), $urandom(t.seed) );
 
   endtask
 

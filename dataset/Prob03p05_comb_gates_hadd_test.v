@@ -1,5 +1,5 @@
 //========================================================================
-// Prob03p01_comb_gates_nor_test
+// Prob03p05_comb_gates_hadd_test
 //========================================================================
 
 `include "test_utils.v"
@@ -19,26 +19,30 @@ module Top();
   // Instantiate reference and top modules
   //----------------------------------------------------------------------
 
-  logic ref_module_in0;
-  logic ref_module_in1;
-  logic ref_module_out;
+  logic ref_module_a;
+  logic ref_module_b;
+  logic ref_module_cout;
+  logic ref_module_sum;
 
   RefModule ref_module
   (
-    .in0 (ref_module_in0),
-    .in1 (ref_module_in1),
-    .out (ref_module_out)
+    .a    (ref_module_a),
+    .b    (ref_module_b),
+    .cout (ref_module_cout),
+    .sum  (ref_module_sum)
   );
 
-  logic top_module_in0;
-  logic top_module_in1;
-  logic top_module_out;
+  logic top_module_a;
+  logic top_module_b;
+  logic top_module_cout;
+  logic top_module_sum;
 
   TopModule top_module
   (
-    .in0 (top_module_in0),
-    .in1 (top_module_in1),
-    .out (top_module_out)
+    .a    (top_module_a),
+    .b    (top_module_b),
+    .cout (top_module_cout),
+    .sum  (top_module_sum)
   );
 
   //----------------------------------------------------------------------
@@ -50,23 +54,25 @@ module Top();
 
   task compare
   (
-    input logic in0,
-    input logic in1
+    input logic a,
+    input logic b
   );
 
-    ref_module_in0 = in0;
-    ref_module_in1 = in1;
+    ref_module_a = a;
+    ref_module_b = b;
 
-    top_module_in0 = in0;
-    top_module_in1 = in1;
+    top_module_a = a;
+    top_module_b = b;
 
     #8;
 
     if ( t.n != 0 )
-      $display( "%3d: %x %x > %x", t.cycles,
-                top_module_in0, top_module_in1, top_module_out );
+      $display( "%3d: %x %x > %x %x", t.cycles,
+                top_module_a,   top_module_b,
+                top_module_sum, top_module_cout );
 
-    `TEST_UTILS_CHECK_EQ( top_module_out, ref_module_out );
+    `TEST_UTILS_CHECK_EQ( top_module_sum,  ref_module_sum  );
+    `TEST_UTILS_CHECK_EQ( top_module_cout, ref_module_cout );
 
     #2;
 

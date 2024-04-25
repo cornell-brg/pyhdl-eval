@@ -1,0 +1,18 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  in0      (4 bits)
+ - input  in1      (4 bits)
+ - output out_and  (4 bits)
+ - output out_nand (4 bits)
+ - output out_or   (4 bits)
+ - output out_nor  (4 bits)
+
+The module should implement a total of 16 logic gates. It should
+implement four two-input AND gates that calculate the bitwise AND of the
+two inputs and connect the output of these four AND gates to the four
+bits of the out_and output port. It should similarly calculate the
+bitwise NAND, OR, and NOR and connect the outputs to the appropriate
+output port.
+

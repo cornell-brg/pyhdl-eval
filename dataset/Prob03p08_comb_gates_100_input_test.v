@@ -1,5 +1,5 @@
 //========================================================================
-// Prob02p04_comb_wires_100b_bit_rev_test
+// Prob03p08_comb_gates_100_input_test
 //========================================================================
 
 `include "test_utils.v"
@@ -20,21 +20,33 @@ module Top();
   //----------------------------------------------------------------------
 
   logic [99:0] ref_module_in_;
-  logic [99:0] ref_module_out;
+  logic        ref_module_out_and;
+  logic        ref_module_out_nand;
+  logic        ref_module_out_or;
+  logic        ref_module_out_nor;
 
   RefModule ref_module
   (
-    .in_ (ref_module_in_),
-    .out (ref_module_out)
+    .in_      (ref_module_in_),
+    .out_and  (ref_module_out_and),
+    .out_nand (ref_module_out_nand),
+    .out_or   (ref_module_out_or),
+    .out_nor  (ref_module_out_nor)
   );
 
   logic [99:0] top_module_in_;
-  logic [99:0] top_module_out;
+  logic        top_module_out_and;
+  logic        top_module_out_nand;
+  logic        top_module_out_or;
+  logic        top_module_out_nor;
 
   TopModule top_module
   (
-    .in_ (top_module_in_),
-    .out (top_module_out)
+    .in_      (top_module_in_),
+    .out_and  (top_module_out_and),
+    .out_nand (top_module_out_nand),
+    .out_or   (top_module_out_or),
+    .out_nor  (top_module_out_nor)
   );
 
   //----------------------------------------------------------------------
@@ -55,9 +67,15 @@ module Top();
     #8;
 
     if ( t.n != 0 )
-      $display( "%3d: %x > %x", t.cycles, top_module_in_, top_module_out );
+      $display( "%3d: %x > %x %x %x %x", t.cycles,
+                top_module_in_,
+                top_module_out_and, top_module_out_nand,
+                top_module_out_or,  top_module_out_nor );
 
-    `TEST_UTILS_CHECK_EQ( top_module_out, ref_module_out );
+    `TEST_UTILS_CHECK_EQ( top_module_out_and,  ref_module_out_and  );
+    `TEST_UTILS_CHECK_EQ( top_module_out_nand, ref_module_out_nand );
+    `TEST_UTILS_CHECK_EQ( top_module_out_or,   ref_module_out_or   );
+    `TEST_UTILS_CHECK_EQ( top_module_out_nor,  ref_module_out_nor  );
 
     #2;
 

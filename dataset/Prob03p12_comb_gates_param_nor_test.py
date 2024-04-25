@@ -1,5 +1,5 @@
 #=========================================================================
-# Prob02p10_comb_wires_param_bit_rev_test
+# Prob03p12_comb_gates_param_nor_test
 #=========================================================================
 
 from pymtl3 import *
@@ -17,13 +17,12 @@ from hypothesis import strategies as st
 
 class RefModule( Component ):
   def construct( s, nbits ):
-    s.in_ = InPort (nbits)
-    s.out = OutPort(nbits)
+    s.in_ = InPort(nbits)
+    s.out = OutPort()
 
     @update
     def up():
-      for i in range(0,nbits):
-        s.out[i] @= s.in_[nbits-1-i]
+      s.out @= ~reduce_or ( s.in_ )
 
 #-------------------------------------------------------------------------
 # Verilog Wrapper
@@ -31,8 +30,8 @@ class RefModule( Component ):
 
 class TopModule( VerilogPlaceholder, Component ):
   def construct( s, nbits ):
-    s.in_ = InPort (nbits)
-    s.out = OutPort(nbits)
+    s.in_ = InPort(nbits)
+    s.out = OutPort()
 
 #-------------------------------------------------------------------------
 # run_sim
@@ -56,31 +55,31 @@ def run_sim( pytestconfig, test_vectors, nbits ):
     assert ref.out == dut.out
 
 #-------------------------------------------------------------------------
-# test_case_nbits8_directed
+# test_case_nbits4_directed
 #-------------------------------------------------------------------------
 
-def test_case_nbits8_directed( pytestconfig ):
+def test_case_nbits4_directed( pytestconfig ):
   run_sim( pytestconfig, [
-    0b0000_0000,
-    0b0000_0001,
-    0b0000_0010,
-    0b0000_0100,
-    0b0000_0100,
-    0b0001_0001,
-    0b0010_0010,
-    0b0100_0100,
-    0b1000_1000,
-    0b1111_1111,
-  ], 8 )
 
-#-------------------------------------------------------------------------
-# test_case_nbits8_random
-#-------------------------------------------------------------------------
+    0b0000,
+    0b0001,
+    0b0010,
+    0b0011,
+    0b0100,
+    0b0101,
+    0b0110,
+    0b0111,
 
-@settings(deadline=1000,max_examples=20)
-@given( st.lists(pst.bits(8)) )
-def test_case_nbits8_random( pytestconfig, test_vectors ):
-  run_sim( pytestconfig, test_vectors, 8 )
+    0b1000,
+    0b1001,
+    0b1010,
+    0b1011,
+    0b1100,
+    0b1101,
+    0b1110,
+    0b1111,
+
+  ], 4 )
 
 #-------------------------------------------------------------------------
 # test_case_nbits13_directed

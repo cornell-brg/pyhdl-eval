@@ -1,5 +1,5 @@
 #=========================================================================
-# Prob02p04_comb_wires_100b_bit_rev_test
+# Prob03p08_comb_gates_100_input_test
 #=========================================================================
 
 from pymtl3 import *
@@ -17,13 +17,18 @@ from hypothesis import strategies as st
 
 class RefModule( Component ):
   def construct( s ):
-    s.in_ = InPort (100)
-    s.out = OutPort(100)
+    s.in_      = InPort(100)
+    s.out_and  = OutPort()
+    s.out_nand = OutPort()
+    s.out_or   = OutPort()
+    s.out_nor  = OutPort()
 
     @update
     def up():
-      for i in range(0,100):
-        s.out[i] @= s.in_[99-i]
+      s.out_and  @=  reduce_and( s.in_ )
+      s.out_nand @= ~reduce_and( s.in_ )
+      s.out_or   @=  reduce_or ( s.in_ )
+      s.out_nor  @= ~reduce_or ( s.in_ )
 
 #-------------------------------------------------------------------------
 # Verilog Wrapper
@@ -31,8 +36,11 @@ class RefModule( Component ):
 
 class TopModule( VerilogPlaceholder, Component ):
   def construct( s ):
-    s.in_ = InPort (100)
-    s.out = OutPort(100)
+    s.in_      = InPort(100)
+    s.out_and  = OutPort()
+    s.out_nand = OutPort()
+    s.out_or   = OutPort()
+    s.out_nor  = OutPort()
 
 #-------------------------------------------------------------------------
 # run_sim
@@ -52,7 +60,10 @@ def run_sim( pytestconfig, test_vectors ):
     ref.sim_tick()
     dut.sim_tick()
 
-    assert ref.out == dut.out
+    assert ref.out_and  == dut.out_and
+    assert ref.out_nand == dut.out_nand
+    assert ref.out_or   == dut.out_or
+    assert ref.out_nor  == dut.out_nor
 
 #-------------------------------------------------------------------------
 # test_case_directed
@@ -67,7 +78,7 @@ def test_case_directed( pytestconfig ):
     0x4_0123_4567_89ab_cdef_0123_4567,
     0x8_dead_beef_dead_beef_dead_beef,
     0xf_ffff_ffff_ffff_ffff_ffff_ffff,
-  ])
+  ] )
 
 #-------------------------------------------------------------------------
 # test_case_random
