@@ -1,5 +1,5 @@
 //========================================================================
-// Prob03p10_comb_gates_nl0_test
+// Prob03p13_comb_gates_nl1_test
 //========================================================================
 
 `include "test_utils.v"
@@ -22,6 +22,7 @@ module Top();
   logic ref_module_in0;
   logic ref_module_in1;
   logic ref_module_in2;
+  logic ref_module_in3;
   logic ref_module_out;
 
   RefModule ref_module
@@ -29,12 +30,14 @@ module Top();
     .in0 (ref_module_in0),
     .in1 (ref_module_in1),
     .in2 (ref_module_in2),
+    .in3 (ref_module_in3),
     .out (ref_module_out)
   );
 
   logic top_module_in0;
   logic top_module_in1;
   logic top_module_in2;
+  logic top_module_in3;
   logic top_module_out;
 
   TopModule top_module
@@ -42,6 +45,7 @@ module Top();
     .in0 (top_module_in0),
     .in1 (top_module_in1),
     .in2 (top_module_in2),
+    .in3 (top_module_in3),
     .out (top_module_out)
   );
 
@@ -56,23 +60,26 @@ module Top();
   (
     input logic in0,
     input logic in1,
-    input logic in2
+    input logic in2,
+    input logic in3
   );
 
     ref_module_in0 = in0;
     ref_module_in1 = in1;
     ref_module_in2 = in2;
+    ref_module_in3 = in3;
 
     top_module_in0 = in0;
     top_module_in1 = in1;
     top_module_in2 = in2;
+    top_module_in3 = in3;
 
     #8;
 
     if ( t.n != 0 )
-      $display( "%3d: %x %x %x > %x", t.cycles,
+      $display( "%3d: %x %x %x %x > %x", t.cycles,
                 top_module_in0, top_module_in1,
-                top_module_in2, top_module_out );
+                top_module_in2, top_module_in3, top_module_out );
 
     `TEST_UTILS_CHECK_EQ( top_module_out, ref_module_out );
 
@@ -88,14 +95,23 @@ module Top();
     $display( "\ntest_case_1_directed" );
     t.reset_sequence();
 
-    compare( 1'b0, 1'b0, 1'b0 );
-    compare( 1'b0, 1'b0, 1'b1 );
-    compare( 1'b0, 1'b1, 1'b0 );
-    compare( 1'b0, 1'b1, 1'b1 );
-    compare( 1'b1, 1'b0, 1'b0 );
-    compare( 1'b1, 1'b0, 1'b1 );
-    compare( 1'b1, 1'b1, 1'b0 );
-    compare( 1'b1, 1'b1, 1'b1 );
+    compare( 1'b0, 1'b0, 1'b0, 1'b0 );
+    compare( 1'b0, 1'b0, 1'b0, 1'b1 );
+    compare( 1'b0, 1'b0, 1'b1, 1'b0 );
+    compare( 1'b0, 1'b0, 1'b1, 1'b1 );
+    compare( 1'b0, 1'b1, 1'b0, 1'b0 );
+    compare( 1'b0, 1'b1, 1'b0, 1'b1 );
+    compare( 1'b0, 1'b1, 1'b1, 1'b0 );
+    compare( 1'b0, 1'b1, 1'b1, 1'b1 );
+
+    compare( 1'b1, 1'b0, 1'b0, 1'b0 );
+    compare( 1'b1, 1'b0, 1'b0, 1'b1 );
+    compare( 1'b1, 1'b0, 1'b1, 1'b0 );
+    compare( 1'b1, 1'b0, 1'b1, 1'b1 );
+    compare( 1'b1, 1'b1, 1'b0, 1'b0 );
+    compare( 1'b1, 1'b1, 1'b0, 1'b1 );
+    compare( 1'b1, 1'b1, 1'b1, 1'b0 );
+    compare( 1'b1, 1'b1, 1'b1, 1'b1 );
 
   endtask
 

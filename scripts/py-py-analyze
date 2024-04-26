@@ -25,9 +25,6 @@ import glob
 
 from dataclasses import dataclass
 
-from adlrchat.langchain import LLMGatewayChat
-from langchain.schema   import SystemMessage, HumanMessage
-
 #-------------------------------------------------------------------------
 # Command line processing
 #-------------------------------------------------------------------------

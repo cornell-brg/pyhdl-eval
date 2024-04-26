@@ -1,5 +1,5 @@
 //========================================================================
-// Prob03p11_comb_gates_nl1_test
+// Prob03p10_comb_gates_4b_pairwise_test
 //========================================================================
 
 `include "test_utils.v"
@@ -19,34 +19,30 @@ module Top();
   // Instantiate reference and top modules
   //----------------------------------------------------------------------
 
-  logic ref_module_in0;
-  logic ref_module_in1;
-  logic ref_module_in2;
-  logic ref_module_in3;
-  logic ref_module_out;
+  logic [3:0] ref_module_in_;
+  logic [2:0] ref_module_out_and;
+  logic [2:0] ref_module_out_or;
+  logic [2:0] ref_module_out_xnor;
 
   RefModule ref_module
   (
-    .in0 (ref_module_in0),
-    .in1 (ref_module_in1),
-    .in2 (ref_module_in2),
-    .in3 (ref_module_in3),
-    .out (ref_module_out)
+    .in_      (ref_module_in_),
+    .out_and  (ref_module_out_and),
+    .out_or   (ref_module_out_or),
+    .out_xnor (ref_module_out_xnor)
   );
 
-  logic top_module_in0;
-  logic top_module_in1;
-  logic top_module_in2;
-  logic top_module_in3;
-  logic top_module_out;
+  logic [3:0] top_module_in_;
+  logic [2:0] top_module_out_and;
+  logic [2:0] top_module_out_or;
+  logic [2:0] top_module_out_xnor;
 
   TopModule top_module
   (
-    .in0 (top_module_in0),
-    .in1 (top_module_in1),
-    .in2 (top_module_in2),
-    .in3 (top_module_in3),
-    .out (top_module_out)
+    .in_      (top_module_in_),
+    .out_and  (top_module_out_and),
+    .out_or   (top_module_out_or),
+    .out_xnor (top_module_out_xnor)
   );
 
   //----------------------------------------------------------------------
@@ -58,30 +54,23 @@ module Top();
 
   task compare
   (
-    input logic in0,
-    input logic in1,
-    input logic in2,
-    input logic in3
+    input logic [3:0] in_
   );
 
-    ref_module_in0 = in0;
-    ref_module_in1 = in1;
-    ref_module_in2 = in2;
-    ref_module_in3 = in3;
-
-    top_module_in0 = in0;
-    top_module_in1 = in1;
-    top_module_in2 = in2;
-    top_module_in3 = in3;
+    ref_module_in_ = in_;
+    top_module_in_ = in_;
 
     #8;
 
     if ( t.n != 0 )
-      $display( "%3d: %x %x %x %x > %x", t.cycles,
-                top_module_in0, top_module_in1,
-                top_module_in2, top_module_in3, top_module_out );
+      $display( "%3d: %x > %x %x %x", t.cycles,
+                top_module_in_,
+                top_module_out_and, top_module_out_or,
+                top_module_out_xnor );
 
-    `TEST_UTILS_CHECK_EQ( top_module_out, ref_module_out );
+    `TEST_UTILS_CHECK_EQ( top_module_out_and,  ref_module_out_and  );
+    `TEST_UTILS_CHECK_EQ( top_module_out_or,   ref_module_out_or   );
+    `TEST_UTILS_CHECK_EQ( top_module_out_xnor, ref_module_out_xnor );
 
     #2;
 
@@ -95,23 +84,23 @@ module Top();
     $display( "\ntest_case_1_directed" );
     t.reset_sequence();
 
-    compare( 1'b0, 1'b0, 1'b0, 1'b0 );
-    compare( 1'b0, 1'b0, 1'b0, 1'b1 );
-    compare( 1'b0, 1'b0, 1'b1, 1'b0 );
-    compare( 1'b0, 1'b0, 1'b1, 1'b1 );
-    compare( 1'b0, 1'b1, 1'b0, 1'b0 );
-    compare( 1'b0, 1'b1, 1'b0, 1'b1 );
-    compare( 1'b0, 1'b1, 1'b1, 1'b0 );
-    compare( 1'b0, 1'b1, 1'b1, 1'b1 );
+    compare( 4'b0000 );
+    compare( 4'b0001 );
+    compare( 4'b0010 );
+    compare( 4'b0011 );
+    compare( 4'b0100 );
+    compare( 4'b0101 );
+    compare( 4'b0110 );
+    compare( 4'b0111 );
 
-    compare( 1'b1, 1'b0, 1'b0, 1'b0 );
-    compare( 1'b1, 1'b0, 1'b0, 1'b1 );
-    compare( 1'b1, 1'b0, 1'b1, 1'b0 );
-    compare( 1'b1, 1'b0, 1'b1, 1'b1 );
-    compare( 1'b1, 1'b1, 1'b0, 1'b0 );
-    compare( 1'b1, 1'b1, 1'b0, 1'b1 );
-    compare( 1'b1, 1'b1, 1'b1, 1'b0 );
-    compare( 1'b1, 1'b1, 1'b1, 1'b1 );
+    compare( 4'b1000 );
+    compare( 4'b1001 );
+    compare( 4'b1010 );
+    compare( 4'b1011 );
+    compare( 4'b1100 );
+    compare( 4'b1101 );
+    compare( 4'b1110 );
+    compare( 4'b1111 );
 
   endtask
 
