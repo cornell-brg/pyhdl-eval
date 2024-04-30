@@ -1,0 +1,19 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  dark
+ - input  movement
+ - input  force_on
+ - output turn_on_lights
+
+The module should implement a controller for a home lighting system.
+There are three inputs: input dark is one if it is dark outside and zero
+if it is light outside; input movement is one if the security system has
+detected movement and is otherwise zero; and input force_on is one if a
+manual override switch is activated. The lights should be turned on if it
+is dark outside and the security system has detected movement. The lights
+should always be turned off if it is light outside regardless of whether
+the security system has detected movement. The lights should always be
+turned on if the manual override switch is activated.
+

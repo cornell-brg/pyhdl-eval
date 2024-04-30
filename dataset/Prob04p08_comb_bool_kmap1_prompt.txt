@@ -1,0 +1,18 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  a
+ - input  b
+ - input  c
+ - output f
+
+The module should implement a combinational circuit described by the
+following Karnaugh map. Note that a and b are column variables, and c is
+the row variable.
+
+   c\ab | 00 01 11 10
+  ------+-------------
+    0   | 1  1  0  1
+    1   | 1  0  1  0
+

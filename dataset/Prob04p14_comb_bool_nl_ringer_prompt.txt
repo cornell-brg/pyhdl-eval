@@ -1,0 +1,17 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  vibrate_mode
+ - input  ring
+ - output turn_on_ringer
+ - output turn_on_motor
+
+The module should implement a circuit to control a cellphone's ringer and
+vibration motor. Whenever the phone needs to ring from an incoming call
+(i.e., input ring is one), the circuit must either turn on the ringer
+(i.e., set the turn_on_ringer output to one) or the vibration motor
+(i.e., set the turn_on_motor output to one), but not both. If the phone
+is in vibrate mode (i.e., input vibrate_mode is one), turn on the motor.
+Otherwise, turn on the ringer.
+

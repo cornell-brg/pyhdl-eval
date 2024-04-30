@@ -1,0 +1,18 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  a
+ - input  b
+ - output f
+
+The module should implement a combinational circuit described by the
+following truth table.
+
+   a b | f
+  -----+---
+   0 0 | 1
+   0 1 | 1
+   1 0 | 1
+   1 1 | 0
+

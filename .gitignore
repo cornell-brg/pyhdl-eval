@@ -10,3 +10,6 @@ autom4te.cache/
 
 .pytest_cache/
 __pycache__/
+
+run.sh
+dataset/copy.sh
