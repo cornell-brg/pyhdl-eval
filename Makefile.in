@@ -149,7 +149,7 @@ $$($(1)_sv_iv_test_logs) : %-sv-iv-test.log : %.v $(1)_test.v $(1)_ref.v
 	@$$(ECHO)  Testing $$(notdir $$*) with iverilog
 	-$$(QUIET) $(IVERILOG_COMPILE) -s Top -I $(dataset_dir) -o $$* $$^ \
                $(REDIRECT_LOG) $$*-sv-iv-test.log
-	-$$(QUIET) timeout 30 ./$$* $(REDIRECT_APPEND_LOG) $$@; \
+	-$$(QUIET) timeout 30 ./$$* +test-case=-1 $(REDIRECT_APPEND_LOG) $$@; \
              if [[ $$$${PIPESTATUS[0]} == 124 ]]; then    \
                echo "TIMEOUT" $(REDIRECT_APPEND_LOG) $$@; \
              fi

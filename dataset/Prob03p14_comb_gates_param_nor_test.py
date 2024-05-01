@@ -59,8 +59,8 @@ def run_sim( pytestconfig, test_vectors, nbits ):
 #-------------------------------------------------------------------------
 
 def test_case_nbits4_directed( pytestconfig ):
-  run_sim( pytestconfig, [
-
+  run_sim( pytestconfig,
+  [
     0b0000,
     0b0001,
     0b0010,
@@ -78,15 +78,16 @@ def test_case_nbits4_directed( pytestconfig ):
     0b1101,
     0b1110,
     0b1111,
-
-  ], 4 )
+  ],
+  nbits=4 )
 
 #-------------------------------------------------------------------------
 # test_case_nbits13_directed
 #-------------------------------------------------------------------------
 
 def test_case_nbits13_directed( pytestconfig ):
-  run_sim( pytestconfig, [
+  run_sim( pytestconfig,
+  [
     0b0_0000_0000_0000,
     0b0_0000_0000_0001,
     0b0_0000_0000_0010,
@@ -104,7 +105,8 @@ def test_case_nbits13_directed( pytestconfig ):
     0b1_0101_0101_0101,
     0b0_1010_1010_1010,
     0b1_1111_1111_1111,
-  ], 13)
+  ],
+  nbits=13 )
 
 #-------------------------------------------------------------------------
 # test_case_nbits13_random
@@ -113,5 +115,5 @@ def test_case_nbits13_directed( pytestconfig ):
 @settings(deadline=1000,max_examples=20)
 @given( st.lists(pst.bits(13)) )
 def test_case_nbits13_random( pytestconfig, test_vectors ):
-  run_sim( pytestconfig, test_vectors, 13 )
+  run_sim( pytestconfig, test_vectors, nbits=13 )
 

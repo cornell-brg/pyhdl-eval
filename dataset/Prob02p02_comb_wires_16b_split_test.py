@@ -62,7 +62,8 @@ def run_sim( pytestconfig, test_vectors ):
 #-------------------------------------------------------------------------
 
 def test_case_directed( pytestconfig ):
-  run_sim( pytestconfig, [
+  run_sim( pytestconfig,
+  [
     0x00,
     0x01,
     0x10,

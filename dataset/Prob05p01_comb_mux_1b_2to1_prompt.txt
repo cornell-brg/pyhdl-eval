@@ -1,0 +1,14 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  in0
+ - input  in1
+ - input  sel
+ - output out
+
+The module should implement a 1-bit 2-to-1 multiplexer. The input sel
+should select which of the two inputs is used to write the output. If sel
+equals 0 then in0 should be selected and if sel equals 1 then then in1
+should be selected.
+

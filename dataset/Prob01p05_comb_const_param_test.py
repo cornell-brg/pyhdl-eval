@@ -48,12 +48,12 @@ def run_sim( pytestconfig, nbits, value ):
 #-------------------------------------------------------------------------
 
 def test_case_nbits8_directed( pytestconfig ):
-  run_sim( pytestconfig, 8, 0xef )
+  run_sim( pytestconfig, nbits=8, value=0xef )
 
 #-------------------------------------------------------------------------
 # test_case_nbits32_directed
 #-------------------------------------------------------------------------
 
 def test_case_nbits32_directed( pytestconfig ):
-  run_sim( pytestconfig, 32, 0xcafecafe )
+  run_sim( pytestconfig, nbits=32, value=0xcafecafe )
 

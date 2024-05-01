@@ -62,7 +62,8 @@ def run_sim( pytestconfig, test_vectors, nports, nbits ):
 #-------------------------------------------------------------------------
 
 def test_case_nports2_nbits8_directed( pytestconfig ):
-  run_sim( pytestconfig, [
+  run_sim( pytestconfig,
+  [
     ( 0x00, 0x00 ),
     ( 0x00, 0x01 ),
     ( 0x01, 0x00 ),
@@ -70,7 +71,8 @@ def test_case_nports2_nbits8_directed( pytestconfig ):
     ( 0x45, 0x67 ),
     ( 0x89, 0xab ),
     ( 0xcd, 0xef ),
-  ], 2, 8 )
+  ],
+  nports=2, nbits=8 )
 
 #-------------------------------------------------------------------------
 # test_case_nports2_nbits8_random
@@ -84,21 +86,23 @@ def test_case_nports2_nbits8_directed( pytestconfig ):
     )
   ))
 def test_case_nports2_nbits8_random( pytestconfig, test_vectors ):
-  run_sim( pytestconfig, test_vectors, 2, 8 )
+  run_sim( pytestconfig, test_vectors, nports=2, nbits=8 )
 
 #-------------------------------------------------------------------------
 # test_case_nports3_nbits13_directed
 #-------------------------------------------------------------------------
 
 def test_case_nports3_nbits13_directed( pytestconfig ):
-  run_sim( pytestconfig, [
+  run_sim( pytestconfig,
+  [
     ( 0x0000, 0x0000, 0x0000 ),
     ( 0x0000, 0x0000, 0x0001 ),
     ( 0x0000, 0x0001, 0x0000 ),
     ( 0x0001, 0x0000, 0x0000 ),
     ( 0x0123, 0x1567, 0x19ab ),
     ( 0x1def, 0x0123, 0x1567 ),
-  ], 3, 13 )
+  ],
+  nports=3, nbits=13 )
 
 #-------------------------------------------------------------------------
 # test_case_nports3_nbits13_random
@@ -112,5 +116,5 @@ def test_case_nports3_nbits13_directed( pytestconfig ):
     )
   ))
 def test_case_nports3_nbits13_random( pytestconfig, test_vectors ):
-  run_sim( pytestconfig, test_vectors, 3, 13 )
+  run_sim( pytestconfig, test_vectors, nports=3, nbits=13 )
 

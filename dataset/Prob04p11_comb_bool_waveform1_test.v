@@ -88,14 +88,14 @@ module Top();
     $display( "\ntest_case_1_directed" );
     t.reset_sequence();
 
-    compare( 1'b0, 1'b0, 1'b0 );
-    compare( 1'b0, 1'b0, 1'b1 );
-    compare( 1'b0, 1'b1, 1'b0 );
-    compare( 1'b0, 1'b1, 1'b1 );
-    compare( 1'b1, 1'b0, 1'b0 );
-    compare( 1'b1, 1'b0, 1'b1 );
-    compare( 1'b1, 1'b1, 1'b0 );
-    compare( 1'b1, 1'b1, 1'b1 );
+    compare(0,0,0);
+    compare(0,0,1);
+    compare(0,1,0);
+    compare(0,1,1);
+    compare(1,0,0);
+    compare(1,0,1);
+    compare(1,1,0);
+    compare(1,1,1);
 
   endtask
 

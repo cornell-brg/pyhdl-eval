@@ -1,0 +1,20 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  in0
+ - input  in1
+ - input  in2
+ - input  in3
+ - input  in4
+ - input  in5
+ - input  in6
+ - input  in7
+ - input  sel (3 bits)
+ - output out
+
+The module should implement a 1-bit 8-to-1 multiplexer. The input sel
+should select which of the eight inputs is used to write the output. If
+sel equals 0 then in0 should be selected, if sel equals 1 then in1 should
+be selected, and so on.
+

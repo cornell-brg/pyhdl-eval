@@ -66,7 +66,8 @@ def run_sim( pytestconfig, test_vectors ):
 #-------------------------------------------------------------------------
 
 def test_case_directed( pytestconfig ):
-  run_sim( pytestconfig, [
+  run_sim( pytestconfig,
+  [
     0x0_0000_0000_0000_0000_0000_0000,
     0x0_1234_1234_1234_1234_1234_1234,
     0x1_89ab_cdef_89ab_cdef_89ab_cdef,
@@ -74,7 +75,7 @@ def test_case_directed( pytestconfig ):
     0x4_0123_4567_89ab_cdef_0123_4567,
     0x8_dead_beef_dead_beef_dead_beef,
     0xf_ffff_ffff_ffff_ffff_ffff_ffff,
-  ] )
+  ])
 
 #-------------------------------------------------------------------------
 # test_case_random

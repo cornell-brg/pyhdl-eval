@@ -16,7 +16,7 @@ module Top();
   TestUtils t( .* );
 
   //----------------------------------------------------------------------
-  // nports2 nports2_nbits8: Instantiate reference and top modules
+  // nports2 nbits8: Instantiate reference and top modules
   //----------------------------------------------------------------------
   // If I use logic instead of wire for the output unpacked array it does
   // not seem to work with iverilog, so I use wire instead.
@@ -50,7 +50,7 @@ module Top();
   );
 
   //----------------------------------------------------------------------
-  // nports2_nbits8: compare
+  // nports2 nbits8: compare
   //----------------------------------------------------------------------
   // All tasks start at #1 after the rising edge of the clock. So we
   // write the inputs #1 after the rising edge, and check the outputs #1
@@ -85,7 +85,7 @@ module Top();
   endtask
 
   //----------------------------------------------------------------------
-  // nports2_nbits8: test_case_1_nports2_nbits8_directed
+  // nports2 nbits8: test_case_1_nports2_nbits8_directed
   //----------------------------------------------------------------------
 
   task test_case_1_nports2_nbits8_directed();
@@ -103,7 +103,7 @@ module Top();
   endtask
 
   //----------------------------------------------------------------------
-  // nports2_nbits8: test_case_2_nports2_nbits13_random
+  // nports2 nbits8: test_case_2_nports2_nbits13_random
   //----------------------------------------------------------------------
   // svt.seed is set to a known value in the reset() task, so when use
   // $urandom(t.seed) we will get reproducible random numbers no matter
@@ -119,7 +119,7 @@ module Top();
   endtask
 
   //----------------------------------------------------------------------
-  // nports3_nbits13: Instantiate reference and top modules
+  // nports3 nbits13: Instantiate reference and top modules
   //----------------------------------------------------------------------
   // If I use logic instead of wire for the output unpacked array it does
   // not seem to work with iverilog, so I use wire instead.
@@ -153,7 +153,7 @@ module Top();
   );
 
   //----------------------------------------------------------------------
-  // nports3_nbits13: compare
+  // nports3 nbits13: compare
   //----------------------------------------------------------------------
   // All tasks start at #1 after the rising edge of the clock. So we
   // write the inputs #1 after the rising edge, and check the outputs #1
@@ -194,7 +194,7 @@ module Top();
   endtask
 
   //----------------------------------------------------------------------
-  // nports3_nbits13: test_case_3_nports3_nbits13_directed
+  // nports3 nbits13: test_case_3_nports3_nbits13_directed
   //----------------------------------------------------------------------
 
   task test_case_3_nports3_nbits13_directed();
@@ -211,7 +211,7 @@ module Top();
   endtask
 
   //----------------------------------------------------------------------
-  // nports3_nbits13: test_case_4_nports3_nbits13_random
+  // nports3 nbits13: test_case_4_nports3_nbits13_random
   //----------------------------------------------------------------------
   // svt.seed is set to a known value in the reset() task, so when use
   // $urandom(t.seed) we will get reproducible random numbers no matter

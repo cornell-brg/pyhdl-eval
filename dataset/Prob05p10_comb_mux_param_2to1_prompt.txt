@@ -1,0 +1,16 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - parameter nbits
+ - input  in0 (nbits)
+ - input  in1 (nbits)
+ - input  sel
+ - output out (nbits)
+
+The module should implement a 2-to-1 multiplexer that is parameterized by
+the bitwidth of the input and output ports. The input sel should select
+which of the two inputs is used to write the output. If sel equals 0 then
+input in0 should be selected and if sel equals 1 then then input in1
+should be selected.
+

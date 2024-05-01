@@ -1,0 +1,14 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  in_
+ - input  sel (  7 bits)
+ - output out (128 bits)
+
+The module should implement a 1-bit 1-to-128. The input sel
+should select which bit of the output is written with the value of the
+input port in_. Unselected output bits should be set to zero. If sel
+equals 0 then bit 0 of out should be selected, if sel equals 1 then bit 1
+of out should be selected, and so on.
+

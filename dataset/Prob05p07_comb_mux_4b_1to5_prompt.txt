@@ -1,0 +1,19 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  in_  (4 bits)
+ - input  sel  (3 bits)
+ - output out0 (4 bits)
+ - output out1 (4 bits)
+ - output out2 (4 bits)
+ - output out3 (4 bits)
+ - output out4 (4 bits)
+
+The module should implement a 4-bit 1-to-5 demultiplexer. The input sel
+should select which of the outputs is written with the value of the input
+port in_. Unselected output ports should be set to all zeros. If sel
+equals 0 then out0 should be selected, if sel equals 1 then out1 should
+be selected, and so on. If the sel signal is invalid then all outputs
+should be set to all zeros.
+
