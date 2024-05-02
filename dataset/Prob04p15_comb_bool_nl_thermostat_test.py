@@ -5,7 +5,7 @@
 from pymtl3 import *
 from pymtl3.passes.backends.verilog import *
 
-from test_utils import construct
+from test_utils import construct, print_line_trace
 
 #-------------------------------------------------------------------------
 # PyMTL Reference
@@ -65,6 +65,9 @@ def run_sim( pytestconfig, test_vectors ):
 
     ref.sim_tick()
     dut.sim_tick()
+
+    print_line_trace( dut, dut.mode, dut.too_cold, dut.too_hot,
+                      dut.fan_on, ">", dut.heater, dut.aircon, dut.fan )
 
     assert ref.heater == dut.heater
     assert ref.aircon == dut.aircon

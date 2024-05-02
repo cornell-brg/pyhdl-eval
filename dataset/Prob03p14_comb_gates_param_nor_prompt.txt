@@ -2,7 +2,7 @@
 Implement a hardware module named TopModule with the following interface.
 All input and output ports are one bit unless otherwise specified.
 
- - paramet nbits
+ - parameter nbits
  - input  in_ (nbits)
  - output out
 

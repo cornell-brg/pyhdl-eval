@@ -103,11 +103,11 @@ module Top();
   endtask
 
   //----------------------------------------------------------------------
-  // test_case_1_directed
+  // test_case_1_valid
   //----------------------------------------------------------------------
 
-  task test_case_1_directed();
-    $display( "\ntest_case_1_directed" );
+  task test_case_1_valid();
+    $display( "\ntest_case_1_valid" );
     t.reset_sequence();
 
     compare(0,0,0,0,0,0);
@@ -118,9 +118,19 @@ module Top();
     compare(0,0,1,0,0,2);
     compare(0,0,0,0,0,3);
     compare(0,0,0,1,0,3);
-
     compare(0,0,0,0,0,4);
     compare(0,0,0,0,1,4);
+
+  endtask
+
+  //----------------------------------------------------------------------
+  // test_case_2_invalid
+  //----------------------------------------------------------------------
+
+  task test_case_2_invalid();
+    $display( "\ntest_case_2_invalid" );
+    t.reset_sequence();
+
     compare(0,0,0,0,0,5);
     compare(1,1,1,1,1,5);
     compare(0,0,0,0,0,6);
@@ -131,14 +141,14 @@ module Top();
   endtask
 
   //----------------------------------------------------------------------
-  // test_case_2_random
+  // test_case_3_random
   //----------------------------------------------------------------------
   // svt.seed is set to a known value in the reset() task, so when use
   // $urandom(t.seed) we will get reproducible random numbers no matter
   // the order that test cases are executed.
 
-  task test_case_2_random();
-    $display( "\ntest_case_2_random" );
+  task test_case_3_random();
+    $display( "\ntest_case_3_random" );
     t.reset_sequence();
 
     for ( int i = 0; i < 20; i = i+1 ) begin
@@ -157,8 +167,9 @@ module Top();
   initial begin
     #1;
 
-    if ((t.n <= 0) || (t.n == 1)) test_case_1_directed();
-    if ((t.n <= 0) || (t.n == 2)) test_case_2_random();
+    if ((t.n <= 0) || (t.n == 1)) test_case_1_valid();
+    if ((t.n <= 0) || (t.n == 2)) test_case_2_invalid();
+    if ((t.n <= 0) || (t.n == 3)) test_case_3_random();
 
     $write("\n");
     $finish;

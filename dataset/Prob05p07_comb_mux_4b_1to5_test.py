@@ -6,7 +6,7 @@ from pymtl3 import *
 from pymtl3.passes.backends.verilog import *
 from pymtl3.datatypes import strategies as pst
 
-from test_utils import construct
+from test_utils import construct, print_line_trace
 
 from hypothesis import settings, given
 from hypothesis import strategies as st
@@ -75,6 +75,9 @@ def run_sim( pytestconfig, test_vectors ):
     ref.sim_tick()
     dut.sim_tick()
 
+    print_line_trace( dut, dut.in_, dut.sel, ">", dut.out0, dut.out1,
+                      dut.out2, dut.out3, dut.out4 )
+
     assert ref.out0 == dut.out0
     assert ref.out1 == dut.out1
     assert ref.out2 == dut.out2
@@ -82,10 +85,10 @@ def run_sim( pytestconfig, test_vectors ):
     assert ref.out4 == dut.out4
 
 #-------------------------------------------------------------------------
-# test_case_directed
+# test_case_valid
 #-------------------------------------------------------------------------
 
-def test_case_directed( pytestconfig ):
+def test_case_valid( pytestconfig ):
   run_sim( pytestconfig,
   [
     (0,0),
@@ -96,9 +99,17 @@ def test_case_directed( pytestconfig ):
     (1,2),
     (0,3),
     (1,3),
-
     (0,4),
     (1,4),
+  ])
+
+#-------------------------------------------------------------------------
+# test_case_invalid
+#-------------------------------------------------------------------------
+
+def test_case_invalid( pytestconfig ):
+  run_sim( pytestconfig,
+  [
     (0,5),
     (1,5),
     (0,6),

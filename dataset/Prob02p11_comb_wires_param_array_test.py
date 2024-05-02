@@ -6,7 +6,7 @@ from pymtl3 import *
 from pymtl3.passes.backends.verilog import *
 from pymtl3.datatypes import strategies as pst
 
-from test_utils import construct
+from test_utils import construct, print_line_trace
 
 from hypothesis import settings, given
 from hypothesis import strategies as st
@@ -53,6 +53,15 @@ def run_sim( pytestconfig, test_vectors, nports, nbits ):
 
     ref.sim_tick()
     dut.sim_tick()
+
+    # Line Tracing
+    print(f"{dut.sim_cycle_count()-1:3}:",end=" ")
+    for i in range(nports):
+      print(f"{dut.in_[i]}",end=" ")
+    print(">",end=" ")
+    for i in range(nports):
+      print(f"{dut.out[i]}",end=" ")
+    print("")
 
     for i in range(nports):
       assert ref.out[i] == dut.out[i]

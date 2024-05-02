@@ -173,7 +173,7 @@ $(1)_sv_vr_test_logs = \
 
 $$($(1)_sv_vr_test_logs) : %-sv-vr-test.log : $(1)_test.py %.v
 	@$$(ECHO)  Testing $$(notdir $$*) with pymtl/verilator
-	-$$(QUIET) cd $(1); pytest ../$$< --verbose --tb=short \
+	-$$(QUIET) cd $(1); pytest ../$$< -s --verbose --tb=short \
                --verilog=$$(notdir $$*).v \
                $(REDIRECT_LOG) $$(notdir $$*)-sv-vr-test.log
 
@@ -222,7 +222,7 @@ $(1)_py_py_test_logs = \
 
 $$($(1)_py_py_test_logs) : %-py-py-test.log : $(1)_test.py %.py
 	@$$(ECHO)  Testing $$(notdir $$*) with pymtl
-	-$$(QUIET) cd $(1); pytest ../$$< --verbose --tb=short \
+	-$$(QUIET) cd $(1); pytest ../$$< -s --verbose --tb=short \
                --pymtl=$$(notdir $$*).py \
                $(REDIRECT_LOG) $$(notdir $$*)-py-py-test.log
 

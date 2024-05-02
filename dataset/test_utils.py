@@ -36,7 +36,7 @@ def construct( pytestconfig, python_file_name, RefModule, TopModule, **kwargs ):
 
     dut = mod.TopModule(**kwargs)
 
-    dut.apply( DefaultPassGroup(linetrace=True) )
+    dut.apply( DefaultPassGroup() )
     dut.sim_reset()
 
   # ... otherwise the design under test is a Verilog model
@@ -66,8 +66,22 @@ def construct( pytestconfig, python_file_name, RefModule, TopModule, **kwargs ):
     dut.set_metadata( VerilogTranslationPass.explicit_module_name, vout_prob_name )
     dut.apply( VerilogPlaceholderPass() )
     dut = VerilogTranslationImportPass()( dut )
-    dut.apply( DefaultPassGroup(linetrace=True) )
+    dut.apply( DefaultPassGroup() )
     dut.sim_reset()
 
+  print("")
+
   return ref,dut
+
+#-------------------------------------------------------------------------
+# print_line_trace
+#-------------------------------------------------------------------------
+
+def print_line_trace( dut, *args ):
+  print(f"{dut.sim_cycle_count()-1:3}:",end=" ")
+
+  for arg in args:
+    print(f"{arg}",end=" ")
+
+  print("")
 
