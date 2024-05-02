@@ -1,0 +1,13 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  in_ ( 4 bits)
+ - output out (16 bits)
+
+The module should convert a 4-bit binary encoded value to a 2-digit ASCII
+encoded value (using a decimal representation). For example, if the input
+is 0b0010, then the output should be the ASCII encoding for "02" and if
+the input is 0b1000, then the output should be the ASCII encoding for
+"10".
+

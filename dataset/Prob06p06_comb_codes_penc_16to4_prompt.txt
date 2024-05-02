@@ -1,0 +1,13 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  in_ (16 bits)
+ - output out ( 4 bits)
+
+The module should implement a 16-to-4 priority encoder. The output is a
+binary encoded value indicating the index of the input bit which is set
+to one. If more than one bit of the input is set to one, then the module
+should choose the "highest priority" bit (i.e., the bit with the lowest
+index). If no bits are set in the input, then the output should be zero.
+

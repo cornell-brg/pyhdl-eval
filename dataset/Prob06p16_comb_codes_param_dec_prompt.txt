@@ -1,0 +1,16 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - parameter nbits
+ - input  in_ (log2(bits))
+ - output out (nbits)
+
+The module should implement an M-to-N decoder. The output is a one-hot
+signal (i.e., exactly one bit is one) and the input is a binary encoded
+value indicating which bit of the output should be set to one. The output
+is nbits wide and the input is log2(nbits) wide. If nbits is not a power
+of two, then it might be possible for the input to be too large for the
+given number of bits in the output; in this situation set the output to
+be zero.
+

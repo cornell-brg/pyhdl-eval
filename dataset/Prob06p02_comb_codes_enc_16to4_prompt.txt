@@ -1,0 +1,12 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  in_ (16 bits)
+ - output out (4  bits)
+
+The module should implement a 16-to-4 encoder. The input is a one-hot
+signal (i.e., exactly one bit is one) and the output is a binary encoded
+value indicating the index of the input bit which is set to one. If the
+input is an invalid one-hot encoding then the output should be zero.
+
