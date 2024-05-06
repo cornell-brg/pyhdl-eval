@@ -97,10 +97,10 @@ of the experiments below, just do not use the --with-pregen configure
 option.
 
 ```
- % mkdir -p $HOME/vc/git-nvidia/cbatten
- % cd $HOME/vc/git-nvidia/cbatten
- % git clone ssh://git@gitlab-master.nvidia.com:12051/cbatten/pyhdl-eval-pregen.git
- % git clone ssh://git@gitlab-master.nvidia.com:12051/cbatten/pyhdl-eval.git
+ % mkdir -p $HOME/vc/git-nvidia/avr
+ % cd $HOME/vc/git-nvidia/avr
+ % git clone ssh://git@gitlab-master.nvidia.com:12051/avr/pyhdl-eval-pregen.git
+ % git clone ssh://git@gitlab-master.nvidia.com:12051/avr/pyhdl-eval.git
  % cd pyhdl-eval
  % TOPDIR=$PWD
 ```
