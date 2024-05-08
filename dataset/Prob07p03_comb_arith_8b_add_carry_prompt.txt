@@ -1,0 +1,16 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  in0 (8 bits)
+ - input  in1 (8 bits)
+ - input  cin
+ - output out (8 bits)
+ - output cout
+
+The module should implement an adder which adds the two given inputs and
+writes the result to the output. The adder should also include the carry
+input (i.e., the cin port) as part of the addition, and should write the
+final carry output to the cout port. Assume all values are encoded as
+two's complement binary numbers.
+

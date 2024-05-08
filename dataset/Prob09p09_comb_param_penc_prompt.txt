@@ -1,0 +1,15 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - parameter nbits
+ - input  in_ (nbits)
+ - output out (log2(nbits))
+
+The module should implement an N-to-M priority encoder. The output is a
+binary encoded value indicating the index of the input bit which is set
+to one. If more than one bit of the input is set to one, then the module
+should choose the "highest priority" bit (i.e., the bit with the lowest
+index). The input is nbits wide and the output is log2(nbits) wide. If no
+bits are set in the input, then the output should be zero.
+

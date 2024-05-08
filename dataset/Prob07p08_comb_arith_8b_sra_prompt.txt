@@ -1,0 +1,12 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  in_ (8 bits)
+ - input  amt (3 bits)
+ - output out (8 bits)
+
+The module should implement a variable right arithmetic shifter which
+takes as input a value to shift (in_) and the shift amount (amt) and
+writes the shifted result to the output (out).
+

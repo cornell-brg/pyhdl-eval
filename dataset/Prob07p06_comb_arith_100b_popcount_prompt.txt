@@ -1,0 +1,11 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  in_ (100 bits)
+ - output out (  7 bits)
+
+The module should implement a popcount unit which calculates the
+population count (i.e., the number of ones) of the input and writes the
+result to the output.
+

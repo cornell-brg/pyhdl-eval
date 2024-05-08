@@ -1,0 +1,20 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - parameter nbits
+ - input  in_ (nbits)
+ - input  amt (log2(nbits))
+ - input  op
+ - output out (nbits)
+
+The module should implement a variable rotator which takes as input a
+value to rotate (in_) and the rotation amount (amt) and writes the
+rotated result to the output (out). The module should be parameterized by
+the bitwidth (nbits) of the input and output ports; nbits can be assumed
+to be a power of two. The input op specifies what kind of rotate to
+perform using the following encoding:
+
+ - 0 : rotate left
+ - 1 : rotate right
+

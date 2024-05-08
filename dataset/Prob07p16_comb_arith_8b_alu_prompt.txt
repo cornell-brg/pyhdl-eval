@@ -1,0 +1,26 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  in0 (8 bits)
+ - input  in1 (8 bits)
+ - input  op  (3 bits)
+ - output out (8 bits)
+
+The module should implement an arithmetic logic unit (ALU) which performs
+a specific operation on the in0 and in1 inputs based on the op input and
+writes the result to the output. The op input encoding is as follows:
+
+ - 0 : addition            (out = in0 +  in1)
+ - 1 : subtraction         (out = in0 -  in1)
+ - 2 : shift left logical  (out = in0 << in1)
+ - 3 : shift right logical (out = in0 >> in1)
+ - 4 : less than           (out = in0 <  in1)
+ - 5 : equal               (out = in0 == in1)
+ - 6 : greater than        (out = in0 >  in1)
+
+Assume all values are encoded as unsigned binary numbers. Note that for
+the shift operations, only the least-significant three bits of the shift
+amount (i.e., in1) should be used, the remaining bits should be ignored.
+The output should be set to zero for any invalid op input encoding.
+

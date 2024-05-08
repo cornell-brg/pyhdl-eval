@@ -1,0 +1,14 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  in0 ( 8 bits)
+ - input  in1 ( 8 bits)
+ - input  in2 (16 bits)
+ - output out (16 bits)
+
+The module should implement an unsigned multiply-add unit which
+multiplies the the inputs in0 and in1, adds the corresponding product to
+the input in2, and writes the result to the output. Assume all values are
+encoded as unsigned binary numbers.
+

@@ -1,0 +1,18 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  in0 (8 bits)
+ - input  in1 (8 bits)
+ - output out (8 bits)
+ - output overflow
+
+The module should implement an unsigned fixed-point multiplier which
+multiplies the two given inputs and writes the result to the output.
+Assume all values are encoded as UQ4.4 fixed point (i.e., the most
+significant four bits represent the integer part and the least
+significant four bits represent the fraction part). Because the output is
+only 8 bits there is a chance of overflow (the full-precision output is
+too large to represent using UQ4.4). In the case of overflow, set the
+overflow signal high and the output to zero.
+
