@@ -236,6 +236,16 @@ $(1)-py-py-test-clean :
 py_py_test_clean_targets += $(1)-py-py-test-clean
 
 #-------------------------------------------------------------------------
+# All
+#-------------------------------------------------------------------------
+
+$(1)-analyze : $(1)-sv-iv-test $(1)-sv-vr-test $(1)-py-py-test
+	@$$(ECHO) Analyzing verilog + iverilog results 
+	$$(QUIET) $$(scripts_dir)/sv-iv-analyze $(1)
+	$$(QUIET) $$(scripts_dir)/sv-vr-analyze $(1)
+	$$(QUIET) $$(scripts_dir)/py-py-analyze $(1)
+
+#-------------------------------------------------------------------------
 # Clean up
 #-------------------------------------------------------------------------
 

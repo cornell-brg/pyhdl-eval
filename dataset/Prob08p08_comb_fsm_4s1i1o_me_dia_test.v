@@ -1,5 +1,5 @@
 //========================================================================
-// Prob06p13_comb_codes_8b_parity_test
+// Prob08p08_comb_fsm_4s1i1o_me_dia_test
 //========================================================================
 
 `include "test_utils.v"
@@ -19,22 +19,30 @@ module Top();
   // Instantiate reference and top modules
   //----------------------------------------------------------------------
 
-  logic [7:0] ref_module_in_;
+  logic [1:0] ref_module_state;
+  logic       ref_module_in_;
+  logic [1:0] ref_module_state_next;
   logic       ref_module_out;
 
   RefModule ref_module
   (
-    .in_ (ref_module_in_),
-    .out (ref_module_out)
+    .state      (ref_module_state),
+    .in_        (ref_module_in_),
+    .state_next (ref_module_state_next),
+    .out        (ref_module_out)
   );
 
-  logic [7:0] top_module_in_;
+  logic [1:0] top_module_state;
+  logic       top_module_in_;
+  logic [1:0] top_module_state_next;
   logic       top_module_out;
 
   TopModule top_module
   (
-    .in_ (top_module_in_),
-    .out (top_module_out)
+    .state      (top_module_state),
+    .in_        (top_module_in_),
+    .state_next (top_module_state_next),
+    .out        (top_module_out)
   );
 
   //----------------------------------------------------------------------
@@ -46,19 +54,25 @@ module Top();
 
   task compare
   (
-    input logic [7:0] in_
+    input logic [1:0] state,
+    input logic       in_
   );
 
-    ref_module_in_ = in_;
-    top_module_in_ = in_;
+    ref_module_state = state;
+    ref_module_in_   = in_;
+
+    top_module_state = state;
+    top_module_in_   = in_;
 
     #8;
 
     if ( t.n != 0 )
-      $display( "%3d: %x > %x", t.cycles,
-                top_module_in_, top_module_out );
+      $display( "%3d: %x %x > %x %x %x", t.cycles,
+                top_module_state,      top_module_in_,
+                top_module_state_next, top_module_out );
 
-    `TEST_UTILS_CHECK_EQ( top_module_out, ref_module_out );
+    `TEST_UTILS_CHECK_EQ( top_module_state_next, ref_module_state_next );
+    `TEST_UTILS_CHECK_EQ( top_module_out,        ref_module_out        );
 
     #2;
 
@@ -72,41 +86,14 @@ module Top();
     $display( "\ntest_case_1_directed" );
     t.reset_sequence();
 
-    compare( 4'b0000 );
-    compare( 4'b0001 );
-    compare( 4'b0010 );
-    compare( 4'b0011 );
-
-    compare( 4'b0100 );
-    compare( 4'b0101 );
-    compare( 4'b0110 );
-    compare( 4'b0111 );
-
-    compare( 4'b1000 );
-    compare( 4'b1001 );
-    compare( 4'b1010 );
-    compare( 4'b1011 );
-
-    compare( 4'b1100 );
-    compare( 4'b1101 );
-    compare( 4'b1110 );
-    compare( 4'b1111 );
-
-  endtask
-
-  //----------------------------------------------------------------------
-  // test_case_2_random
-  //----------------------------------------------------------------------
-  // svt.seed is set to a known value in the reset() task, so when use
-  // $urandom(t.seed) we will get reproducible random numbers no matter
-  // the order that test cases are executed.
-
-  task test_case_2_random();
-    $display( "\ntest_case_2_random" );
-    t.reset_sequence();
-
-    for ( int i = 0; i < 20; i = i+1 )
-      compare( $urandom(t.seed) );
+    compare( 0, 0 );
+    compare( 0, 1 );
+    compare( 1, 0 );
+    compare( 1, 1 );
+    compare( 2, 0 );
+    compare( 2, 1 );
+    compare( 3, 0 );
+    compare( 3, 1 );
 
   endtask
 
@@ -120,7 +107,6 @@ module Top();
     #1;
 
     if ((t.n <= 0) || (t.n == 1)) test_case_1_directed();
-    if ((t.n <= 0) || (t.n == 2)) test_case_2_random();
 
     $write("\n");
     $finish;

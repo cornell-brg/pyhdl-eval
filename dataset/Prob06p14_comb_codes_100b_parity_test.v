@@ -20,7 +20,7 @@ module Top();
   //----------------------------------------------------------------------
 
   logic [99:0] ref_module_in_;
-  logic [ 3:0] ref_module_out;
+  logic        ref_module_out;
 
   RefModule ref_module
   (
@@ -29,7 +29,7 @@ module Top();
   );
 
   logic [99:0] top_module_in_;
-  logic [ 3:0] top_module_out;
+  logic        top_module_out;
 
   TopModule top_module
   (

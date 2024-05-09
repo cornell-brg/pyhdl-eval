@@ -60,6 +60,7 @@ def run_sim( pytestconfig, test_vectors, nports, nbits ):
     print(f"{dut.sim_cycle_count()-1:3}:",end=" ")
     for i in range(nports):
       print(f"{dut.in_[i]}",end=" ")
+    print(f"{dut.sel}")
     print(f"> {dut.out}")
 
     assert ref.out == dut.out

@@ -1,0 +1,30 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  state      (2 bits)
+ - input  in_
+ - output state_next (2 bits)
+ - output out
+
+The module should implement the state transition and output logic for the
+Moore finite-state machine (FSM) described by the following table.
+
+   Current | Next State  Next State |
+   State   | if in_=0    if in_=1   | Output
+  ---------+------------------------+--------
+      A    |     A           B      |   0
+      B    |     C           B      |   0
+      C    |     A           D      |   0
+      D    |     C           B      |   1
+
+The state machine should use the following state encoding.
+
+ - A : 0
+ - B : 1
+ - C : 2
+ - D : 3
+
+The module should only implement the combinational state transition logic
+and output logic and should not include any sequential state.
+
