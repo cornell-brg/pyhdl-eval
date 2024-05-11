@@ -106,8 +106,8 @@ def run_sim( pytestconfig, test_vectors ):
     dut.state @= state
     dut.in_   @= in_
 
-    ref.sim_tick()
-    dut.sim_tick()
+    ref.sim_eval_combinational()
+    dut.sim_eval_combinational()
 
     print_line_trace( dut, dut.state, dut.in_,
                       ">", dut.state_next, dut.out0, dut.out1 )
@@ -115,6 +115,9 @@ def run_sim( pytestconfig, test_vectors ):
     assert ref.state_next == dut.state_next
     assert ref.out0       == dut.out0
     assert ref.out1       == dut.out1
+
+    ref.sim_tick()
+    dut.sim_tick()
 
 #-------------------------------------------------------------------------
 # test_case_valid

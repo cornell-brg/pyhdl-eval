@@ -51,8 +51,8 @@ def run_sim( pytestconfig, test_vectors, nports, nbits ):
       ref.in_[i] @= in_[i]
       dut.in_[i] @= in_[i]
 
-    ref.sim_tick()
-    dut.sim_tick()
+    ref.sim_eval_combinational()
+    dut.sim_eval_combinational()
 
     # Line Tracing
     print(f"{dut.sim_cycle_count()-1:3}:",end=" ")
@@ -65,6 +65,9 @@ def run_sim( pytestconfig, test_vectors, nports, nbits ):
 
     for i in range(nports):
       assert ref.out[i] == dut.out[i]
+
+    ref.sim_tick()
+    dut.sim_tick()
 
 #-------------------------------------------------------------------------
 # test_case_nports2_nbits8_directed

@@ -63,8 +63,8 @@ def run_sim( pytestconfig, test_vectors ):
     dut.too_hot  @= too_hot
     dut.fan_on   @= fan_on
 
-    ref.sim_tick()
-    dut.sim_tick()
+    ref.sim_eval_combinational()
+    dut.sim_eval_combinational()
 
     print_line_trace( dut, dut.mode, dut.too_cold, dut.too_hot,
                       dut.fan_on, ">", dut.heater, dut.aircon, dut.fan )
@@ -72,6 +72,9 @@ def run_sim( pytestconfig, test_vectors ):
     assert ref.heater == dut.heater
     assert ref.aircon == dut.aircon
     assert ref.fan    == dut.fan
+
+    ref.sim_tick()
+    dut.sim_tick()
 
 #-------------------------------------------------------------------------
 # test_case_directed

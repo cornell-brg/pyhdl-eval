@@ -64,8 +64,8 @@ def run_sim( pytestconfig, test_vectors ):
     dut.in1 @= in1
     dut.op  @= op
 
-    ref.sim_tick()
-    dut.sim_tick()
+    ref.sim_eval_combinational()
+    dut.sim_eval_combinational()
 
     print_line_trace( dut, dut.in0, f"({dut.in0.uint():4})",
                            dut.in1, f"({dut.in1.uint():4})",
@@ -74,6 +74,9 @@ def run_sim( pytestconfig, test_vectors ):
 
     assert ref.out == dut.out
     assert op <= 6 or dut.out == 0
+
+    ref.sim_tick()
+    dut.sim_tick()
 
 #-------------------------------------------------------------------------
 # test_case_add

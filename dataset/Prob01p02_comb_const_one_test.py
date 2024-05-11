@@ -32,8 +32,8 @@ def run_sim( pytestconfig ):
 
   ref,dut = construct( pytestconfig, __file__, RefModule, TopModule )
 
-  ref.sim_tick()
-  dut.sim_tick()
+  ref.sim_eval_combinational()
+  dut.sim_eval_combinational()
 
   print_line_trace( dut, dut.out )
 
@@ -42,9 +42,15 @@ def run_sim( pytestconfig ):
   ref.sim_tick()
   dut.sim_tick()
 
+  ref.sim_eval_combinational()
+  dut.sim_eval_combinational()
+
   print_line_trace( dut, dut.out )
 
   assert ref.out == dut.out
+
+  ref.sim_tick()
+  dut.sim_tick()
 
 #-------------------------------------------------------------------------
 # test_case_directed

@@ -52,13 +52,16 @@ def run_sim( pytestconfig, test_vectors ):
     dut.a @= a
     dut.b @= b
 
-    ref.sim_tick()
-    dut.sim_tick()
+    ref.sim_eval_combinational()
+    dut.sim_eval_combinational()
 
     print_line_trace( dut, dut.a, dut.b, ">", dut.sum, dut.cout )
 
     assert ref.sum  == dut.sum
     assert ref.cout == dut.cout
+
+    ref.sim_tick()
+    dut.sim_tick()
 
 #-------------------------------------------------------------------------
 # test_case_directed

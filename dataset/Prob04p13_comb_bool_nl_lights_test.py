@@ -53,13 +53,16 @@ def run_sim( pytestconfig, test_vectors ):
     dut.movement @= movement
     dut.force_on @= force_on
 
-    ref.sim_tick()
-    dut.sim_tick()
+    ref.sim_eval_combinational()
+    dut.sim_eval_combinational()
 
     print_line_trace( dut, dut.dark, dut.movement, dut.force_on, ">",
                       dut.turn_on_lights )
 
     assert ref.turn_on_lights == dut.turn_on_lights
+
+    ref.sim_tick()
+    dut.sim_tick()
 
 #-------------------------------------------------------------------------
 # test_case_directed

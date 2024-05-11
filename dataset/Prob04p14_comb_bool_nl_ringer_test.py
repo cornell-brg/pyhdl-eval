@@ -52,14 +52,17 @@ def run_sim( pytestconfig, test_vectors ):
     dut.vibrate_mode @= vibrate_mode
     dut.ring         @= ring
 
-    ref.sim_tick()
-    dut.sim_tick()
+    ref.sim_eval_combinational()
+    dut.sim_eval_combinational()
 
     print_line_trace( dut, dut.vibrate_mode, dut.ring, ">",
                       dut.turn_on_ringer, dut.turn_on_motor )
 
     assert ref.turn_on_ringer == dut.turn_on_ringer
     assert ref.turn_on_motor  == dut.turn_on_motor
+
+    ref.sim_tick()
+    dut.sim_tick()
 
 #-------------------------------------------------------------------------
 # test_case_directed

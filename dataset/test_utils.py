@@ -78,10 +78,30 @@ def construct( pytestconfig, python_file_name, RefModule, TopModule, **kwargs ):
 #-------------------------------------------------------------------------
 
 def print_line_trace( dut, *args ):
+
   print(f"{dut.sim_cycle_count()-1:3}:",end=" ")
 
   for arg in args:
     print(f"{arg}",end=" ")
 
   print("")
+
+#-------------------------------------------------------------------------
+# step
+#-------------------------------------------------------------------------
+
+def step( ref, dut, *args ):
+
+  ref.sim_eval_combinational()
+  dut.sim_eval_combinational()
+
+  print(f"{dut.sim_cycle_count()-1:3}:",end=" ")
+
+  for arg in args:
+    print(f"{arg}",end=" ")
+
+  print("")
+
+  ref.sim_tick()
+  dut.sim_tick()
 

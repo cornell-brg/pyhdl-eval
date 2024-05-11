@@ -50,13 +50,16 @@ def run_sim( pytestconfig, test_vectors ):
     ref.in_ @= in_
     dut.in_ @= in_
 
-    ref.sim_tick()
-    dut.sim_tick()
+    ref.sim_eval_combinational()
+    dut.sim_eval_combinational()
 
     print_line_trace( dut, dut.in_, ">", dut.out )
 
     assert ref.out == dut.out
     assert dut.out <= 100
+
+    ref.sim_tick()
+    dut.sim_tick()
 
 #-------------------------------------------------------------------------
 # test_case_small

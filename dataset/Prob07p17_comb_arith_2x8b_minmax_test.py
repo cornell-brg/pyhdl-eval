@@ -60,8 +60,8 @@ def run_sim( pytestconfig, test_vectors ):
     dut.in0 @= in0
     dut.in1 @= in1
 
-    ref.sim_tick()
-    dut.sim_tick()
+    ref.sim_eval_combinational()
+    dut.sim_eval_combinational()
 
     print_line_trace( dut, dut.in0, f"({dut.in0.uint():4})",
                            dut.in1, f"({dut.in1.uint():4})",
@@ -71,6 +71,9 @@ def run_sim( pytestconfig, test_vectors ):
     assert ref.min == dut.min
     assert ref.max == dut.max
     assert dut.min <= dut.max
+
+    ref.sim_tick()
+    dut.sim_tick()
 
 #-------------------------------------------------------------------------
 # test_case_directed

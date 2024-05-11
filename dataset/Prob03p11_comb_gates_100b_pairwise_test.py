@@ -54,8 +54,8 @@ def run_sim( pytestconfig, test_vectors ):
     ref.in_ @= in_
     dut.in_ @= in_
 
-    ref.sim_tick()
-    dut.sim_tick()
+    ref.sim_eval_combinational()
+    dut.sim_eval_combinational()
 
     print_line_trace( dut, dut.in_, ">",
                       dut.out_and, dut.out_or, dut.out_xnor )
@@ -63,6 +63,9 @@ def run_sim( pytestconfig, test_vectors ):
     assert ref.out_and  == dut.out_and
     assert ref.out_or   == dut.out_or
     assert ref.out_xnor == dut.out_xnor
+
+    ref.sim_tick()
+    dut.sim_tick()
 
 #-------------------------------------------------------------------------
 # test_case_directed

@@ -90,14 +90,17 @@ def run_sim( pytestconfig, test_vectors ):
     dut.state @= state
     dut.in_   @= in_
 
-    ref.sim_tick()
-    dut.sim_tick()
+    ref.sim_eval_combinational()
+    dut.sim_eval_combinational()
 
     print_line_trace( dut, dut.state, dut.in_,
                       ">", dut.state_next, dut.out )
 
     assert ref.state_next == dut.state_next
     assert ref.out        == dut.out
+
+    ref.sim_tick()
+    dut.sim_tick()
 
 #-------------------------------------------------------------------------
 # test_case_directed

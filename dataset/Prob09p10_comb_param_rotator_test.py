@@ -65,12 +65,15 @@ def run_sim( pytestconfig, test_vectors, nbits ):
     dut.amt @= amt
     dut.op  @= op
 
-    ref.sim_tick()
-    dut.sim_tick()
+    ref.sim_eval_combinational()
+    dut.sim_eval_combinational()
 
     print_line_trace( dut, dut.in_, dut.amt, dut.op, ">", dut.out )
 
     assert ref.out == dut.out
+
+    ref.sim_tick()
+    dut.sim_tick()
 
 #-------------------------------------------------------------------------
 # test_case_nbits4_left_rotate

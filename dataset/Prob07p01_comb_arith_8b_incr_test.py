@@ -48,13 +48,16 @@ def run_sim( pytestconfig, test_vectors ):
     ref.in_ @= in_
     dut.in_ @= in_
 
-    ref.sim_tick()
-    dut.sim_tick()
+    ref.sim_eval_combinational()
+    dut.sim_eval_combinational()
 
     print_line_trace( dut, dut.in_, f"({dut.in_.int():4})",
                       ">", dut.out, f"({dut.out.int():4})" )
 
     assert ref.out == dut.out
+
+    ref.sim_tick()
+    dut.sim_tick()
 
 #-------------------------------------------------------------------------
 # test_case_positive
