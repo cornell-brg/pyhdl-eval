@@ -100,8 +100,7 @@ def print_results(all_results, pass_rates):
     """Prints the combined results in a formatted table."""
     headers = [
         "iverilog",
-        "verilator",
-        "PyMTL"
+        "pymtl"
     ]
     header_line = f"{'':<35}"
     separator_line = f"{'':<34}"
@@ -128,7 +127,7 @@ def main():
   opts = parse_cmdline()
 
   # File names
-  files = ['sv-iv-summary.txt', 'sv-vr-summary.txt', 'py-py-summary.txt']
+  files = ['sv-iv-summary.txt', 'py-py-summary.txt']
 
   # Process the files
   all_results, pass_rates = combine_results(files)

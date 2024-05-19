@@ -1,0 +1,21 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  clk
+ - input  en ( 2 bits)
+ - input  d  (16 bits)
+ - output q  (16 bits)
+
+The module should implement 16 D flip-flops with byte write enables. The
+en input is used to indicate which bytes to write using the following
+encoding:
+
+ - 00 : do not write either byte
+ - 01 : write the least signficant byte
+ - 10 : write the most significant byte
+ - 11 : write both bytes
+
+Assume all sequential logic is triggered on the positive edge of the
+clock.
+

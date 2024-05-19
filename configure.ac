@@ -58,7 +58,7 @@ AC_MSG_NOTICE([using model: ${model}])
 
 AC_ARG_WITH(examples,
   AS_HELP_STRING([--with-examples],[Include in-context learning examples]),
-  [examples="yes"],
+  [examples="${with_examples}"],
   [examples="no"])
 
 AC_SUBST([examples])

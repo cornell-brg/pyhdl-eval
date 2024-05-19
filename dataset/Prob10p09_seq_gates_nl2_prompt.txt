@@ -1,0 +1,26 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  clk
+ - input  in0
+ - input  in1
+ - input  in2
+ - input  in3
+ - output out
+
+The module should implement the following circuit: input in0 should be
+connected to a D flip-flop (let's call this DFF0); input in1 should be
+connected to a second D flip-flop (let's call this DFF1); input in2
+should be connected to a third D flip-flop (let's call this DFF2); input
+in3 should be connected to a fourth D flip-flop (let's call this DFF3);
+the output of DFF0 should be connected to a NOT gate and the output of
+this NOT gate should be connected to the first input of a two-input OR
+gate; the output of DFF1 should be connected to the second input of this
+two-input OR gate; the output of DFF2 should be connected to the first
+input of another two-input OR gate; the output of DFF3 should be
+connected to a NOT gate and the output of this NOT gate should be
+connected to the second input of the two-input OR gate; the output of
+both two-input OR gates should be connected to a two-input AND gate; the
+output of the AND gate should be connected to the output port.
+

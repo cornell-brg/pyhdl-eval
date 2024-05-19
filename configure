@@ -1769,7 +1769,7 @@ $as_echo "$as_me: using model: ${model}" >&6;}
 
 # Check whether --with-examples was given.
 if test "${with_examples+set}" = set; then :
-  withval=$with_examples; examples="yes"
+  withval=$with_examples; examples="${with_examples}"
 else
   examples="no"
 fi

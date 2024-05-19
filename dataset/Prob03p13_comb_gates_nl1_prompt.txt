@@ -16,5 +16,5 @@ be connected to the first input of another two-input OR gate; input in3
 should be connected to a NOT gate and the output of this NOT gate should
 be connected to the second input of the two-input OR gate; the output of
 both two-input OR gates should be connected to a two-input AND gate; the
-output of the AND gate should be connected to the output port out.
+output of the AND gate should be connected to the output port.
 

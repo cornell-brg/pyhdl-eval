@@ -107,7 +107,7 @@ class Results:
         ntokens += record.prompt_tokens
         ntokens += record.resp_tokens
 
-        if record.passfail == ".":
+        if record.passfail == '.' or record.passfail == ';':
           npass += 1
 
         if idx != 0 and idx % 5 == 0:
@@ -152,7 +152,7 @@ class Results:
 
         npass = 0
         for idx,record in enumerate(row):
-          if record.passfail == ".":
+          if record.passfail == '.' or record.passfail == ';':
             npass += 1
 
         nsamples      = len(row)

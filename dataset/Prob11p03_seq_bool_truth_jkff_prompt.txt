@@ -1,0 +1,26 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  clk
+ - input  a
+ - input  b
+ - output q
+
+The module should implement a sequential circuit triggered by the
+positive edge of the clock. The module is described by the following
+truth table where q indicates the previous value of the state holding
+element before the rising edge of the clock and q_next indicates the next
+value of the state holding element after the rising edge of the clock.
+
+   a b q_prev | q_next
+  ------------+--------
+   0 0 0      | 0
+   0 0 1      | 1
+   0 1 0      | 0
+   0 1 1      | 0
+   1 0 0      | 1
+   1 0 1      | 1
+   1 1 0      | 1
+   1 1 1      | 0
+

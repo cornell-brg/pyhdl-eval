@@ -1,0 +1,13 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  clk
+ - input  en
+ - input  d
+ - output q
+
+The module should implement a D flip-flop with an enable. The input
+should only be sampled when the enable (en) input is one. Assume all
+sequential logic is triggered on the positive edge of the clock.
+

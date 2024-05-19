@@ -1,0 +1,37 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  clk
+ - input  a
+ - output f
+
+The module should implement a sequential circuit with a single bit of
+state described by the following simulation waveform. The waveform shows
+the input values and the desired output values on every cycle of the
+simulation. An X indicates that the output is undefined because there is
+no reset signal for this sequential circuit.
+
+   cycle | a f
+  -------+-----
+     0   | 1 X
+     1   | 0 1
+     2   | 0 0
+     3   | 0 0
+     4   | 0 0
+     5   | 1 0
+     6   | 1 1
+     7   | 0 1
+     8   | 1 0
+     9   | 0 1
+     10  | 0 0
+     11  | 1 0
+     12  | 1 1
+     13  | 0 1
+     14  | 1 0
+     15  | 0 1
+     16  | 1 0
+     17  | 1 1
+     18  | 0 1
+     19  | 1 0
+

@@ -1,0 +1,45 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  clk
+ - input  in0   (8 bits)
+ - input  in1   (8 bits)
+ - input  in2   (8 bits)
+ - input  in3   (8 bits)
+ - output min   (8 bits)
+ - output max   (8 bits)
+
+The module should implement a two-stage pipelined unit which finds both
+the minimum and maximum values across the four given input values. In the
+first stage, the module should compare in0 to in1 and determine the
+minimum and maximum of these two values; lets call the minimum min01 and
+the maximum max01. Also in the first stage, the module should compare in2
+and in3 and determine the the minimum and maximum of these two values;
+lets call the minimum min23 and the maximum max23. In the second stage,
+the module should compare the min12 and min23 to find the minimum of all
+four values and write this minimum value to the output min. Also in the
+second stage, the module should compare the max12 and max23 to find the
+maximum of all four values and write this maximum value to the output
+max.
+
+All transactions should have a two cycle latency (i.e., inputs on cycle i
+will produce the corresponding sum on cycle i+2). The module should be
+able to achieve full throughput, i.e., it should be able to accept new
+inputs every cycle and produce a valid output every cycle. Here is an
+example execution trace. An X indicates that the output is undefined
+because there is no reset signal for the pipeline registers.
+
+   cycle | in0 in1 in2 in3 min max
+  -------+-------------------------
+     0   | 00  00  00  00  XX  XX
+     1   | 01  02  03  04  XX  XX
+     2   | 04  05  03  02  00  00
+     3   | 06  03  04  05  01  04
+     4   | 00  00  00  00  02  05
+     5   | 00  00  00  00  03  06
+     6   | 00  00  00  00  00  00
+
+Assume all sequential logic is triggered on the positive edge of the
+clock.
+

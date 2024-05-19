@@ -11,7 +11,7 @@
 #     --top-p          LLM model top_p (default: 0.95)
 #     --max-tokens     LLM model max_tokens (default: 1024)
 #  -e --explain        Let the model include an explanation
-#  -x --examples       Include the in-context examples
+#     --examples       In-context examples to use (default: no examples)
 #  -r --rules          Include the in-context rules
 #     --lang           What language to generate (default: verilog)
 #     --output         File to write extracted code
@@ -58,7 +58,7 @@ def parse_cmdline():
   p.add_argument(       "--max-tokens",  type=int,   default=1024 )
   p.add_argument(       "--top-p",       type=float, default=0.95 )
   p.add_argument( "-e", "--explain",     action="store_true" )
-  p.add_argument( "-x", "--examples",    action="store_true" )
+  p.add_argument(       "--examples",    type=str,   default="NONE" )
   p.add_argument( "-r", "--rules",       action="store_true" )
   p.add_argument(       "--lang",        type=str,   default="verilog" )
   p.add_argument(       "--output",      type=str,   default="-" )
@@ -86,6 +86,7 @@ llm_gateway_chat_models = [
 nim_chat_models = [
   "ai-llama2-70b",
   "ai-llama3-70b",
+  "ai-llama3-8b",
   "ai-codellama-70b",
   "ai-gemma-7b",
   "ai-codegemma-7b",
@@ -121,10 +122,6 @@ You are a Verilog RTL designer that only writes code using correct
 Verilog syntax.
 """
 
-verilog_prompt_example_prefix_filename=os.path.dirname(__file__) + "/verilog-example-prefix.txt"
-with open(verilog_prompt_example_prefix_filename) as f:
-  verilog_prompt_example_prefix = f.read()
-
 verilog_prompt_rules_suffix="""
 Here are some additional rules and coding conventions.
 
@@ -150,10 +147,6 @@ pymtl_system_msg="""
 You are a PyMTL3 RTL designer that only writes code using correct
 PyMTL syntax.
 """
-
-pymtl_prompt_example_prefix_filename=os.path.dirname(__file__) + "/pymtl-example-prefix.txt"
-with open(pymtl_prompt_example_prefix_filename) as f:
-  pymtl_prompt_example_prefix = f.read()
 
 pymtl_prompt_rules_suffix=""
 
@@ -220,17 +213,32 @@ def main():
   # Check output language
 
   system_msg            = ""
-  prompt_example_prefix = ""
   prompt_rules_suffix   = ""
 
   if opts.lang == "verilog":
     system_msg            = verilog_system_msg
-    prompt_example_prefix = verilog_prompt_example_prefix
     prompt_rules_suffix   = verilog_prompt_rules_suffix
   elif opts.lang == "pymtl":
     system_msg            = pymtl_system_msg
-    prompt_example_prefix = pymtl_prompt_example_prefix
     prompt_rules_suffix   = pymtl_prompt_rules_suffix
+  else:
+    print("")
+    print(f"ERROR: Unknown language {lang}")
+    print("")
+    return
+
+  # Load the examples
+
+  prompt_example_prefix = ""
+  if opts.examples != "NONE":
+
+    if opts.lang == "verilog":
+      examples_filename=os.path.dirname(__file__) + f"/{opts.examples}-verilog.txt"
+    else:
+      examples_filename=os.path.dirname(__file__) + f"/{opts.examples}-pymtl.txt"
+
+    with open(examples_filename) as f:
+      prompt_example_prefix = f.read()
 
   # Check for an output file
 

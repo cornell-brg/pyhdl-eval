@@ -1,0 +1,41 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  clk
+ - input  in0   (8 bits)
+ - input  in1   (8 bits)
+ - input  in2   (8 bits)
+ - input  in3   (8 bits)
+ - output out01 (8 bits)
+ - output out23 (8 bits)
+ - output out   (8 bits)
+
+The module should implement a two-stage pipelined four-input adder. The
+first addition of in0 and in1 and the second addition of in2 and in3
+should occur during the first stage, and then the final addition should
+occur during the second stage. The final result should be written to the
+output out at the end of the second stage. The module should write output
+out01 with the sum of in0 and in1 and the output out23 with the sum of
+in2 and in3 at the end of the first stage.
+
+All transactions should have a two cycle latency (i.e., inputs on cycle i
+will produce the corresponding sum on cycle i+2). The module should be
+able to achieve full throughput, i.e., it should be able to accept new
+inputs every cycle and produce a valid output every cycle. Here is an
+example execution trace. An X indicates that the output is undefined
+because there is no reset signal for the pipeline registers.
+
+   cycle | in0 in1 in2 in3 out01 out23 out
+  -------+---------------------------------
+     0   | 00  00  00  00  XX    XX    XX
+     1   | 01  02  03  04  00    00    XX
+     2   | 02  03  04  05  03    07    00
+     3   | 03  04  05  06  05    09    0a
+     4   | 00  00  00  00  07    0b    0e
+     5   | 00  00  00  00  00    00    12
+     6   | 00  00  00  00  00    00    00
+
+Assume all sequential logic is triggered on the positive edge of the
+clock.
+

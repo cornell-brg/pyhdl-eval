@@ -1,0 +1,11 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  clk
+ - input  d (8 bits)
+ - output q (8 bits)
+
+The module should implement eight D flip-flops. Assume all sequential
+logic is triggered on the positive edge of the clock.
+

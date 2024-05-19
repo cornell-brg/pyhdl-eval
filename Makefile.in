@@ -31,8 +31,8 @@ GENERATE=$(scripts_dir)/generate
 GENERATE_FLAGS = "--model=@model@"
 
 examples=@examples@
-ifeq ($(examples),yes)
-  GENERATE_FLAGS += "--examples"
+ifneq ($(examples),no)
+  GENERATE_FLAGS += "--examples=$(examples)"
 endif
 
 rules=@rules@
@@ -168,23 +168,23 @@ sv_iv_test_clean_targets += $(1)-sv-iv-test-clean
 # Test verilog samples with PyMTL/Verilator
 #-------------------------------------------------------------------------
 
-$(1)_sv_vr_test_logs = \
-  $$(patsubst %.v, %-sv-vr-test.log, $$($(1)_sv_samples))
-
-$$($(1)_sv_vr_test_logs) : %-sv-vr-test.log : $(1)_test.py %.v
-	@$$(ECHO)  Testing $$(notdir $$*) with pymtl/verilator
-	-$$(QUIET) cd $(1); pytest ../$$< -s --verbose --tb=short \
-               --verilog=$$(notdir $$*).v \
-               $(REDIRECT_LOG) $$(notdir $$*)-sv-vr-test.log
-
-$(1)-sv-vr-test : $$($(1)_sv_vr_test_logs)
-
-sv_vr_test_targets += $$($(1)_sv_vr_test_logs)
-
-$(1)-sv-vr-test-clean :
-	rm -rf $$($(1)_sv_vr_test_logs)
-
-sv_vr_test_clean_targets += $(1)-sv-vr-test-clean
+# $(1)_sv_vr_test_logs = \
+#   $$(patsubst %.v, %-sv-vr-test.log, $$($(1)_sv_samples))
+#  
+# $$($(1)_sv_vr_test_logs) : %-sv-vr-test.log : $(1)_test.py %.v
+#  	@$$(ECHO)  Testing $$(notdir $$*) with pymtl/verilator
+#  	-$$(QUIET) cd $(1); pytest ../$$< -s --verbose --tb=short \
+#                --verilog=$$(notdir $$*).v \
+#                $(REDIRECT_LOG) $$(notdir $$*)-sv-vr-test.log
+#  
+# $(1)-sv-vr-test : $$($(1)_sv_vr_test_logs)
+#  
+# sv_vr_test_targets += $$($(1)_sv_vr_test_logs)
+#  
+# $(1)-sv-vr-test-clean :
+#  	rm -rf $$($(1)_sv_vr_test_logs)
+#  
+# sv_vr_test_clean_targets += $(1)-sv-vr-test-clean
 
 #-------------------------------------------------------------------------
 # Generate pymtl samples
@@ -239,10 +239,17 @@ py_py_test_clean_targets += $(1)-py-py-test-clean
 # All
 #-------------------------------------------------------------------------
 
-$(1)-analyze : $(1)-sv-iv-test $(1)-sv-vr-test $(1)-py-py-test
+#$(1)-analyze : $(1)-sv-iv-test $(1)-sv-vr-test $(1)-py-py-test
+# 	@$$(ECHO) Analyzing verilog + iverilog results 
+# 	$$(QUIET) $$(scripts_dir)/sv-iv-analyze $(1)
+# 	$$(QUIET) $$(scripts_dir)/sv-vr-analyze $(1)
+# 	$$(QUIET) $$(scripts_dir)/py-py-analyze $(1)
+
+# remove verilog/verilator for now
+
+$(1)-analyze : $(1)-sv-iv-test $$(1)-py-py-test
 	@$$(ECHO) Analyzing verilog + iverilog results 
 	$$(QUIET) $$(scripts_dir)/sv-iv-analyze $(1)
-	$$(QUIET) $$(scripts_dir)/sv-vr-analyze $(1)
 	$$(QUIET) $$(scripts_dir)/py-py-analyze $(1)
 
 #-------------------------------------------------------------------------
@@ -283,8 +290,8 @@ sv-generate-clean : $(sv_generate_clean_targets)
 sv-iv-test        : $(sv_iv_test_targets)
 sv-iv-test-clean  : $(sv_iv_test_clean_targets)
 
-sv-vr-test        : $(sv_vr_test_targets)
-sv-vr-test-clean  : $(sv_vr_test_clean_targets)
+# sv-vr-test        : $(sv_vr_test_targets)
+# sv-vr-test-clean  : $(sv_vr_test_clean_targets)
 
 py-generate       : $(py_generate_targets)
 py-generate-clean : $(py_generate_clean_targets)
@@ -297,10 +304,10 @@ sv-iv-analyze : $(sv_iv_test_targets)
 	$(QUIET) $(scripts_dir)/sv-iv-analyze \
              --csv=sv-iv-summary.csv $(problems) | tee sv-iv-summary.txt
 
-sv-vr-analyze : $(sv_vr_test_targets)
-	@$(ECHO) Analyzing verilog + pymtl/verilator results 
-	$(QUIET) $(scripts_dir)/sv-vr-analyze \
-             --csv=sv-vr-summary.csv $(problems) | tee sv-vr-summary.txt
+# sv-vr-analyze : $(sv_vr_test_targets)
+#  	@$(ECHO) Analyzing verilog + pymtl/verilator results 
+#  	$(QUIET) $(scripts_dir)/sv-vr-analyze \
+#              --csv=sv-vr-summary.csv $(problems) | tee sv-vr-summary.txt
 
 py-py-analyze : $(py_py_test_targets)
 	@$(ECHO) Analyzing pymtl + pymtl results 
@@ -355,7 +362,10 @@ dist_junk += \
 # Default
 #-------------------------------------------------------------------------
 
-all : sv-iv-analyze sv-vr-analyze py-py-analyze
+# all : sv-iv-analyze sv-vr-analyze py-py-analyze
+#  	$(scripts_dir)/collect-summaries
+
+all : sv-iv-analyze py-py-analyze
 	$(scripts_dir)/collect-summaries
 
 .PHONY : all

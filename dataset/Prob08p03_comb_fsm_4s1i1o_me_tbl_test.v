@@ -67,7 +67,7 @@ module Top();
     #8;
 
     if ( t.n != 0 )
-      $display( "%3d: %x %x > %x %x %x", t.cycles,
+      $display( "%3d: %x %x > %x %x", t.cycles,
                 top_module_state,      top_module_in_,
                 top_module_state_next, top_module_out );
 

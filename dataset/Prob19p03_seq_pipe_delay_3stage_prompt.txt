@@ -1,0 +1,30 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  clk
+ - input  in_ (8 bits)
+ - output out (8 bits)
+
+The module should implement a three-stage pipelined channel where the
+input data is passed unchanged through three stages of pipeline
+registers. Here is an example execution trace. An X indicates that the
+output is undefined because there is no reset signal for the pipeline
+registers.
+
+   cycle | in_ out
+  -------+---------
+     0   | 00  XX
+     1   | 0a  XX
+     2   | 0b  XX
+     3   | 0c  00
+     4   | 0d  0a
+     5   | 0e  0b
+     6   | 0f  0c
+     7   | 00  0d
+     8   | 00  0e
+     9   | 00  0f
+
+Assume all sequential logic is triggered on the positive edge of the
+clock.
+
