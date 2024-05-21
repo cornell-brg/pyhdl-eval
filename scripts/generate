@@ -7,7 +7,7 @@
 #  -h --help           Display this message
 #  -l --list-models    List supported models
 #     --model          LLM model to use (default: gpt-3.5-turbo)
-#     --temperature    LLM model temperature (default: 0.85)
+#     --temperature    LLM model temperature (default: 0.8)
 #     --top-p          LLM model top_p (default: 0.95)
 #     --max-tokens     LLM model max_tokens (default: 1024)
 #  -e --explain        Let the model include an explanation
@@ -31,6 +31,7 @@ import time
 from adlrchat.langchain import ADLRChat
 from adlrchat.langchain import LLMGatewayChat
 from langchain_nvidia_ai_endpoints import ChatNVIDIA
+from langchain_community.chat_models import ChatAnyscale
 from langchain.schema   import SystemMessage, HumanMessage
 from langchain.callbacks import get_openai_callback
 
@@ -86,7 +87,6 @@ llm_gateway_chat_models = [
 nim_chat_models = [
   "ai-llama2-70b",
   "ai-llama3-70b",
-  "ai-llama3-8b",
   "ai-codellama-70b",
   "ai-gemma-7b",
   "ai-codegemma-7b",
@@ -94,10 +94,24 @@ nim_chat_models = [
   "ai-mixtral-8x7b-instruct",
 ]
 
+anyscale_chat_models = [
+  "meta-llama/Meta-Llama-3-8B-Instruct",
+  "meta-llama/Meta-Llama-3-70B-Instruct",
+]
+
+all_chat_models = [
+  *adlr_chat_models,
+  *llm_gateway_chat_models,
+  *nim_chat_models,
+  *anyscale_chat_models,
+]
+
 model_aliases = {
-  "gpt3.5-turbo" : "gpt-3.5-turbo",
-  "gpt4"         : "gpt-4",
-  "gpt4-turbo"   : "gpt-4-turbo",
+  "gpt3.5-turbo"        : "gpt-3.5-turbo",
+  "gpt4"                : "gpt-4",
+  "gpt4-turbo"          : "gpt-4-turbo",
+  "anyscale/llama3-8b"  : "meta-llama/Meta-Llama-3-8B-Instruct",
+  "anyscale/llama3-70b" : "meta-llama/Meta-Llama-3-70B-Instruct",
 }
 
 #-------------------------------------------------------------------------
@@ -192,6 +206,12 @@ def main():
       print( f" - {model}" )
 
     print( "" )
+    print( "Anyscale Models" )
+
+    for model in anyscale_chat_models:
+      print( f" - {model}" )
+
+    print( "" )
     print( "Model Aliases" )
 
     for key,value in model_aliases.items():
@@ -204,7 +224,7 @@ def main():
   if opts.model in model_aliases:
     model = model_aliases[opts.model]
 
-  if model not in adlr_chat_models + llm_gateway_chat_models + nim_chat_models:
+  if model not in all_chat_models:
     print("")
     print(f"ERROR: Unknown model {model}")
     print("")
@@ -313,6 +333,16 @@ def main():
       temperature = temperature,
       top_p       = top_p,
       max_tokens  = max_tokens,
+    )
+  elif model in anyscale_chat_models:
+    optional_params = {
+      "top_p" : top_p,
+    }
+    llm = ChatAnyscale(
+      model       = model,
+      temperature = temperature,
+      max_tokens  = max_tokens,
+      model_kwargs = optional_params,
     )
   elif model in nim_chat_models:
     llm = ChatNVIDIA(
