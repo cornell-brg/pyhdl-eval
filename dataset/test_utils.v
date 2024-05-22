@@ -2,6 +2,11 @@
 // test_utils
 //========================================================================
 // A very simple verilog test framework.
+//
+// SPDX-License-Identifier: MIT
+// Author : Christopher Batten, NVIDIA
+// Date   : May 20, 2024
+//
 
 `ifndef TEST_UTILS_V
 `define TEST_UTILS_V

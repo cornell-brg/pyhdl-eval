@@ -1,69 +1,36 @@
 #=========================================================================
 # Prob09p06_comb_param_dec_test
 #=========================================================================
+# SPDX-License-Identifier: MIT
+# Author : Christopher Batten, NVIDIA
+# Date   : May 20, 2024
 
-from pymtl3 import *
-from pymtl3.passes.backends.verilog import *
-
-from test_utils import construct, print_line_trace
-
-#-------------------------------------------------------------------------
-# PyMTL Reference
-#-------------------------------------------------------------------------
-
-class RefModule( Component ):
-  def construct( s, nbits ):
-    s.in_ = InPort (clog2(nbits))
-    s.out = OutPort(nbits)
-
-    @update
-    def up():
-
-      s.out @= 0
-      if ( s.in_ <= nbits-1 ):
-        s.out[s.in_] @= 1
+from pyhdl_eval.cfg  import Config, InputPort, OutputPort
+from pyhdl_eval.core import run_sim
+from pyhdl_eval.bits import clog2
 
 #-------------------------------------------------------------------------
-# Verilog Wrapper
+# Configuration
 #-------------------------------------------------------------------------
 
-class TopModule( VerilogPlaceholder, Component ):
-  def construct( s, nbits ):
-    s.in_ = InPort (clog2(nbits))
-    s.out = OutPort(nbits)
-
-#-------------------------------------------------------------------------
-# run_sim
-#-------------------------------------------------------------------------
-
-def run_sim( pytestconfig, test_vectors, nbits ):
-
-  ref,dut = construct( pytestconfig, __file__, RefModule, TopModule,
-                       nbits=nbits )
-
-  for test_vector in test_vectors:
-
-    in_ = test_vector
-
-    ref.in_ @= in_
-    dut.in_ @= in_
-
-    ref.sim_eval_combinational()
-    dut.sim_eval_combinational()
-
-    print_line_trace( dut, dut.in_, ">", dut.out )
-
-    assert ref.out == dut.out
-
-    ref.sim_tick()
-    dut.sim_tick()
+def mk_config( nbits ):
+  config = Config(
+    parameters = {
+      "nbits" : nbits,
+    },
+    ports = [
+      ( "in_", InputPort (clog2(nbits)) ),
+      ( "out", OutputPort(nbits)        ),
+    ],
+  )
+  return config
 
 #-------------------------------------------------------------------------
 # test_case_nbits8_directed
 #-------------------------------------------------------------------------
 
 def test_case_nbits8_directed( pytestconfig ):
-  run_sim( pytestconfig,
+  run_sim( pytestconfig, __file__, mk_config(nbits=8),
   [
     0b000,
     0b001,
@@ -73,15 +40,14 @@ def test_case_nbits8_directed( pytestconfig ):
     0b101,
     0b110,
     0b111,
-  ],
-  nbits=8 )
+  ])
 
 #-------------------------------------------------------------------------
 # test_case_nbits10_valid
 #-------------------------------------------------------------------------
 
 def test_case_nbits10_valid( pytestconfig ):
-  run_sim( pytestconfig,
+  run_sim( pytestconfig, __file__, mk_config(nbits=10),
   [
     0b0000,
     0b0001,
@@ -93,15 +59,14 @@ def test_case_nbits10_valid( pytestconfig ):
     0b0111,
     0b1000,
     0b1001,
-  ],
-  nbits=10 )
+  ])
 
 #-------------------------------------------------------------------------
 # test_case_nbits10_invalid
 #-------------------------------------------------------------------------
 
 def test_case_nbits10_invalid( pytestconfig ):
-  run_sim( pytestconfig,
+  run_sim( pytestconfig, __file__, mk_config(nbits=10),
   [
     0b1010,
     0b1011,
@@ -109,6 +74,5 @@ def test_case_nbits10_invalid( pytestconfig ):
     0b1101,
     0b1110,
     0b1111,
-  ],
-  nbits=10 )
+  ])
 

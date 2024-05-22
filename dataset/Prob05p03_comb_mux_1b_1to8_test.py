@@ -1,110 +1,38 @@
 #=========================================================================
 # Prob05p03_comb_mux_1b_1to8_test
 #=========================================================================
+# SPDX-License-Identifier: MIT
+# Author : Christopher Batten, NVIDIA
+# Date   : May 20, 2024
 
-from pymtl3 import *
-from pymtl3.passes.backends.verilog import *
-
-from test_utils import construct, print_line_trace
-
-#-------------------------------------------------------------------------
-# PyMTL Reference
-#-------------------------------------------------------------------------
-
-class RefModule( Component ):
-  def construct( s ):
-    s.in_  = InPort()
-    s.sel  = InPort(3)
-    s.out0 = OutPort()
-    s.out1 = OutPort()
-    s.out2 = OutPort()
-    s.out3 = OutPort()
-    s.out4 = OutPort()
-    s.out5 = OutPort()
-    s.out6 = OutPort()
-    s.out7 = OutPort()
-
-    @update
-    def up():
-
-      s.out0 @= 0
-      s.out1 @= 0
-      s.out2 @= 0
-      s.out3 @= 0
-      s.out4 @= 0
-      s.out5 @= 0
-      s.out6 @= 0
-      s.out7 @= 0
-
-      if   s.sel == 0: s.out0 @= s.in_
-      elif s.sel == 1: s.out1 @= s.in_
-      elif s.sel == 2: s.out2 @= s.in_
-      elif s.sel == 3: s.out3 @= s.in_
-      elif s.sel == 4: s.out4 @= s.in_
-      elif s.sel == 5: s.out5 @= s.in_
-      elif s.sel == 6: s.out6 @= s.in_
-      elif s.sel == 7: s.out7 @= s.in_
+from pyhdl_eval.cfg  import Config, InputPort, OutputPort
+from pyhdl_eval.core import run_sim
 
 #-------------------------------------------------------------------------
-# Verilog Wrapper
+# Configuration
 #-------------------------------------------------------------------------
 
-class TopModule( VerilogPlaceholder, Component ):
-  def construct( s ):
-    s.in_  = InPort()
-    s.sel  = InPort(3)
-    s.out0 = OutPort()
-    s.out1 = OutPort()
-    s.out2 = OutPort()
-    s.out3 = OutPort()
-    s.out4 = OutPort()
-    s.out5 = OutPort()
-    s.out6 = OutPort()
-    s.out7 = OutPort()
-
-#-------------------------------------------------------------------------
-# run_sim
-#-------------------------------------------------------------------------
-
-def run_sim( pytestconfig, test_vectors ):
-
-  ref,dut = construct( pytestconfig, __file__, RefModule, TopModule )
-
-  for test_vector in test_vectors:
-
-    in_,sel = test_vector
-
-    ref.in_ @= in_
-    ref.sel @= sel
-
-    dut.in_ @= in_
-    dut.sel @= sel
-
-    ref.sim_eval_combinational()
-    dut.sim_eval_combinational()
-
-    print_line_trace( dut, dut.in_, dut.sel, ">", dut.out0, dut.out1,
-                      dut.out2, dut.out3, dut.out4, dut.out5, dut.out6,
-                      dut.out7 )
-
-    assert ref.out0 == dut.out0
-    assert ref.out1 == dut.out1
-    assert ref.out2 == dut.out2
-    assert ref.out3 == dut.out3
-    assert ref.out4 == dut.out4
-    assert ref.out5 == dut.out5
-    assert ref.out6 == dut.out6
-    assert ref.out7 == dut.out7
-
-    ref.sim_tick()
-    dut.sim_tick()
+config = Config(
+  ports = [
+    ( "in_",  InputPort (1) ),
+    ( "sel",  InputPort (3) ),
+    ( "out0", OutputPort(1) ),
+    ( "out1", OutputPort(1) ),
+    ( "out2", OutputPort(1) ),
+    ( "out3", OutputPort(1) ),
+    ( "out4", OutputPort(1) ),
+    ( "out5", OutputPort(1) ),
+    ( "out6", OutputPort(1) ),
+    ( "out7", OutputPort(1) ),
+  ],
+)
 
 #-------------------------------------------------------------------------
 # test_case_directed
 #-------------------------------------------------------------------------
 
 def test_case_directed( pytestconfig ):
-  run_sim( pytestconfig,
+  run_sim( pytestconfig, __file__, config,
   [
     (0,0),
     (1,0),

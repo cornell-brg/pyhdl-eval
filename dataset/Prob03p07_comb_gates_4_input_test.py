@@ -1,91 +1,36 @@
 #=========================================================================
 # Prob03p07_comb_gates_4_input_test
 #=========================================================================
+# SPDX-License-Identifier: MIT
+# Author : Christopher Batten, NVIDIA
+# Date   : May 20, 2024
 
-from pymtl3 import *
-from pymtl3.passes.backends.verilog import *
-
-from test_utils import construct, print_line_trace
-
-#-------------------------------------------------------------------------
-# PyMTL Reference
-#-------------------------------------------------------------------------
-
-class RefModule( Component ):
-  def construct( s ):
-    s.in0      = InPort()
-    s.in1      = InPort()
-    s.in2      = InPort()
-    s.in3      = InPort()
-    s.out_and  = OutPort()
-    s.out_nand = OutPort()
-    s.out_or   = OutPort()
-    s.out_nor  = OutPort()
-
-    @update
-    def up():
-      s.out_and  @=    s.in0 & s.in1 & s.in2 & s.in3
-      s.out_nand @= ~( s.in0 & s.in1 & s.in2 & s.in3 )
-      s.out_or   @=    s.in0 | s.in1 | s.in2 | s.in3
-      s.out_nor  @= ~( s.in0 | s.in1 | s.in2 | s.in3 )
+from pyhdl_eval.cfg  import Config, InputPort, OutputPort
+from pyhdl_eval.core import run_sim
 
 #-------------------------------------------------------------------------
-# Verilog Wrapper
+# Configuration
 #-------------------------------------------------------------------------
 
-class TopModule( VerilogPlaceholder, Component ):
-  def construct( s ):
-    s.in0      = InPort()
-    s.in1      = InPort()
-    s.in2      = InPort()
-    s.in3      = InPort()
-    s.out_and  = OutPort()
-    s.out_nand = OutPort()
-    s.out_or   = OutPort()
-    s.out_nor  = OutPort()
-
-#-------------------------------------------------------------------------
-# run_sim
-#-------------------------------------------------------------------------
-
-def run_sim( pytestconfig, test_vectors ):
-
-  ref,dut = construct( pytestconfig, __file__, RefModule, TopModule )
-
-  for test_vector in test_vectors:
-
-    in0,in1,in2,in3 = test_vector
-
-    ref.in0 @= in0
-    ref.in1 @= in1
-    ref.in2 @= in2
-    ref.in3 @= in3
-
-    dut.in0 @= in0
-    dut.in1 @= in1
-    dut.in2 @= in2
-    dut.in3 @= in3
-
-    ref.sim_eval_combinational()
-    dut.sim_eval_combinational()
-
-    print_line_trace( dut, dut.in0, dut.in1, dut.in2, dut.in3, ">",
-                      dut.out_and, dut.out_nand, dut.out_or, dut.out_nor )
-
-    assert ref.out_and  == dut.out_and
-    assert ref.out_nand == dut.out_nand
-    assert ref.out_or   == dut.out_or
-    assert ref.out_nor  == dut.out_nor
-
-    ref.sim_tick()
-    dut.sim_tick()
+config = Config(
+  ports = [
+    ( "in0",      InputPort (1) ),
+    ( "in1",      InputPort (1) ),
+    ( "in2",      InputPort (1) ),
+    ( "in3",      InputPort (1) ),
+    ( "out_and",  OutputPort(1) ),
+    ( "out_nand", OutputPort(1) ),
+    ( "out_or",   OutputPort(1) ),
+    ( "out_nor",  OutputPort(1) ),
+  ],
+)
 
 #-------------------------------------------------------------------------
 # test_case_directed
 #-------------------------------------------------------------------------
 
 def test_case_directed( pytestconfig ):
-  run_sim( pytestconfig,
+  run_sim( pytestconfig, __file__, config,
   [
     (0,0,0,0),
     (0,0,0,1),

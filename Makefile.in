@@ -1,6 +1,9 @@
 #=========================================================================
 # Makefile
 #=========================================================================
+# SPDX-License-Identifier: MIT
+# Author : Christopher Batten, NVIDIA
+# Date   : May 20, 2024
 
 #-------------------------------------------------------------------------
 # Basic setup
@@ -23,34 +26,56 @@ src_dir      := @srcdir@
 scripts_dir  := $(src_dir)/scripts
 
 #-------------------------------------------------------------------------
+# Configure
+#-------------------------------------------------------------------------
+
+include config.mk
+
+#-------------------------------------------------------------------------
 # Programs
 #-------------------------------------------------------------------------
 
 GENERATE=$(scripts_dir)/generate
 
-GENERATE_FLAGS = "--model=@model@"
+GENERATE_FLAGS := "--model=$(cfg_model)"
 
-examples=@examples@
-ifneq ($(examples),no)
-  GENERATE_FLAGS += "--examples=$(examples)"
+num_examples := $(cfg_examples)
+ifneq ($(num_examples),0)
+  GENERATE_FLAGS += "--examples=$(num_examples)"
 endif
 
-rules=@rules@
-ifeq ($(rules),yes)
-  GENERATE_FLAGS += "--rules"
+GENERATE_VERILOG_FLAGS := $(GENERATE_FLAGS)
+GENERATE_VERILOG_FLAGS += "--lang=verilog"
+
+GENERATE_PYDSL_FLAGS := $(GENERATE_FLAGS)
+pydsl := $(cfg_pydsl)
+ifneq ($(pydsl),no)
+  GENERATE_PYDSL_FLAGS += "--lang=$(pydsl)"
 endif
 
-IVERILOG_FLAGS=-Wall -Winfloop -Wno-timescale -g2012
-IVERILOG_COMPILE=@IVERILOG@ $(IVERILOG_FLAGS)
+IVERILOG_FLAGS   := -Wall -Winfloop -Wno-timescale -g2012
+IVERILOG_COMPILE := @IVERILOG@ $(IVERILOG_FLAGS)
+
+PYTEST := @PYTEST@
+
+#-------------------------------------------------------------------------
+# Verilog ref test
+#-------------------------------------------------------------------------
+# When this is enabled, we do not actually use an LLM to generate the
+# Verilog samples. Instead we copy the Verilog reference and rename
+# the module from TopModule to RefModel. This can help us test the
+# Verilog reference implementations.
+
+enable_ref_test := $(cfg_ref_test)
 
 #-------------------------------------------------------------------------
 # Dataset
 #-------------------------------------------------------------------------
 
-dataset_dir = @dataset_dir@
+dataset_dir = $(cfg_dataset)
 VPATH = ${dataset_dir}
-include problems.mk
-include samples.mk
+
+num_samples = $(cfg_samples)
 
 # Define prompt files
 
@@ -106,7 +131,7 @@ define problem_template
 
 # Figure out number of samples for this problem
 
-sample_num_strs != seq --format "%02g" 1 $$($(1)_num_samples)
+sample_num_strs != seq --format "%02g" 1 $$(num_samples)
 
 #-------------------------------------------------------------------------
 # Generate verilog samples
@@ -115,17 +140,28 @@ sample_num_strs != seq --format "%02g" 1 $$($(1)_num_samples)
 $(1)_sv_samples       := $$(patsubst %, $(1)/$(1)_sample%.v, $$(sample_num_strs))
 $(1)_sv_generate_logs := $$(patsubst %, $(1)/$(1)_sample%-sv-generate.log, $$(sample_num_strs))
 
+ifeq ($(enable_ref_test),yes)
+$$($(1)_sv_samples) : %.v : $(1)_ref.v
+	@$$(ECHO) Generating $$(notdir $$@) verilog
+	$$(QUIET) mkdir -p $(1)
+	$$(QUIET) sed -e's/RefModule/TopModule/' $$< > $$@
+	$$(QUIET) echo "Copied reference to create sample" \
+              $(REDIRECT_LOG) $$*-sv-generate.log
+else
 $$($(1)_sv_samples) : %.v : $(1)_prompt.txt
 	@$$(ECHO) Generating $$(notdir $$@) verilog
 	$$(QUIET) mkdir -p $(1)
-	$$(QUIET) $$(GENERATE) $$(GENERATE_FLAGS) --lang=verilog --verbose \
+	$$(QUIET) $$(GENERATE) $$(GENERATE_VERILOG_FLAGS) --verbose \
               --output $$@ $$< \
               $(REDIRECT_LOG) $$*-sv-generate.log
+endif
 
 $(1)-sv-generate : $$($(1)_sv_samples)
 
+ifneq ($(cfg_verilog),no)
 pregen_files += $$($(1)_sv_samples)
 pregen_files += $$($(1)_sv_generate_logs)
+endif
 
 sv_generate_targets += $$($(1)_sv_samples)
 
@@ -139,55 +175,33 @@ sv_generate_clean_targets += $(1)-sv-generate-clean
 # Test verilog samples
 #-------------------------------------------------------------------------
 
-$(1)_sv_iv_test_bins = \
+$(1)_sv_test_bins = \
   $$(patsubst %.v, %, $$($(1)_sv_samples))
 
-$(1)_sv_iv_test_logs = \
-  $$(patsubst %.v, %-sv-iv-test.log, $$($(1)_sv_samples))
+$(1)_sv_test_logs = \
+  $$(patsubst %.v, %-sv-test.log, $$($(1)_sv_samples))
 
-$$($(1)_sv_iv_test_logs) : %-sv-iv-test.log : %.v $(1)_test.v $(1)_ref.v
+$$($(1)_sv_test_logs) : %-sv-test.log : %.v $(1)_test.v $(1)_ref.v
 	@$$(ECHO)  Testing $$(notdir $$*) with iverilog
 	-$$(QUIET) $(IVERILOG_COMPILE) -s Top -I $(dataset_dir) -o $$* $$^ \
-               $(REDIRECT_LOG) $$*-sv-iv-test.log
+               $(REDIRECT_LOG) $$*-sv-test.log
 	-$$(QUIET) timeout 30 ./$$* +test-case=-1 $(REDIRECT_APPEND_LOG) $$@; \
              if [[ $$$${PIPESTATUS[0]} == 124 ]]; then    \
                echo "TIMEOUT" $(REDIRECT_APPEND_LOG) $$@; \
              fi
 
-$(1)-sv-iv-test : $$($(1)_sv_iv_test_logs)
+$(1)-sv-test : $$($(1)_sv_test_logs)
 
-sv_iv_test_targets += $$($(1)_sv_iv_test_logs)
+sv_test_targets += $$($(1)_sv_test_logs)
 
-$(1)-sv-iv-test-clean :
-	rm -rf $$($(1)_sv_iv_test_bins)
-	rm -rf $$($(1)_sv_iv_test_logs)
+$(1)-sv-test-clean :
+	rm -rf $$($(1)_sv_test_bins)
+	rm -rf $$($(1)_sv_test_logs)
 
-sv_iv_test_clean_targets += $(1)-sv-iv-test-clean
-
-#-------------------------------------------------------------------------
-# Test verilog samples with PyMTL/Verilator
-#-------------------------------------------------------------------------
-
-# $(1)_sv_vr_test_logs = \
-#   $$(patsubst %.v, %-sv-vr-test.log, $$($(1)_sv_samples))
-#  
-# $$($(1)_sv_vr_test_logs) : %-sv-vr-test.log : $(1)_test.py %.v
-#  	@$$(ECHO)  Testing $$(notdir $$*) with pymtl/verilator
-#  	-$$(QUIET) cd $(1); pytest ../$$< -s --verbose --tb=short \
-#                --verilog=$$(notdir $$*).v \
-#                $(REDIRECT_LOG) $$(notdir $$*)-sv-vr-test.log
-#  
-# $(1)-sv-vr-test : $$($(1)_sv_vr_test_logs)
-#  
-# sv_vr_test_targets += $$($(1)_sv_vr_test_logs)
-#  
-# $(1)-sv-vr-test-clean :
-#  	rm -rf $$($(1)_sv_vr_test_logs)
-#  
-# sv_vr_test_clean_targets += $(1)-sv-vr-test-clean
+sv_test_clean_targets += $(1)-sv-test-clean
 
 #-------------------------------------------------------------------------
-# Generate pymtl samples
+# Generate pydsl samples
 #-------------------------------------------------------------------------
 
 $(1)_py_samples       := $$(patsubst %, $(1)/$(1)_sample%.py, $$(sample_num_strs))
@@ -196,14 +210,16 @@ $(1)_py_generate_logs := $$(patsubst %, $(1)/$(1)_sample%-py-generate.log, $$(sa
 $$($(1)_py_samples) : %.py : $(1)_prompt.txt
 	@$$(ECHO) Generating $$(notdir $$@) pymtl
 	$$(QUIET) mkdir -p $(1)
-	$$(QUIET) $$(GENERATE) $$(GENERATE_FLAGS) --lang=pymtl --verbose \
+	$$(QUIET) $$(GENERATE) $$(GENERATE_PYDSL_FLAGS) --verbose \
               --output $$@ $$< \
               $(REDIRECT_LOG) $$*-py-generate.log
 
 $(1)-py-generate : $$($(1)_py_samples)
 
+ifneq ($(cfg_pydsl),no)
 pregen_files += $$($(1)_py_samples)
 pregen_files += $$($(1)_py_generate_logs)
+endif
 
 py_generate_targets += $$($(1)_py_samples)
 
@@ -214,43 +230,26 @@ $(1)-py-generate-clean :
 py_generate_clean_targets += $(1)-py-generate-clean
 
 #-------------------------------------------------------------------------
-# Test pymtl samples with pymtl
+# Test pydsl samples with pytest
 #-------------------------------------------------------------------------
 
-$(1)_py_py_test_logs = \
-  $$(patsubst %.py, %-py-py-test.log, $$($(1)_py_samples))
+$(1)_py_test_logs = \
+  $$(patsubst %.py, %-py-test.log, $$($(1)_py_samples))
 
-$$($(1)_py_py_test_logs) : %-py-py-test.log : $(1)_test.py %.py
+$$($(1)_py_test_logs) : %-py-test.log : $(1)_test.py %.py
 	@$$(ECHO)  Testing $$(notdir $$*) with pymtl
-	-$$(QUIET) cd $(1); pytest ../$$< -s --verbose --tb=short \
-               --pymtl=$$(notdir $$*).py \
-               $(REDIRECT_LOG) $$(notdir $$*)-py-py-test.log
+	-$$(QUIET) cd $(1); $(PYTEST) ../$$< -s --verbose --tb=short \
+               --$$(pydsl)=$$(notdir $$*).py \
+               $(REDIRECT_LOG) $$(notdir $$*)-py-test.log
 
-$(1)-py-py-test : $$($(1)_py_py_test_logs)
+$(1)-py-test : $$($(1)_py_test_logs)
 
-py_py_test_targets += $$($(1)_py_py_test_logs)
+py_test_targets += $$($(1)_py_test_logs)
 
-$(1)-py-py-test-clean :
-	rm -rf $$($(1)_py_py_test_logs)
+$(1)-py-test-clean :
+	rm -rf $$($(1)_py_test_logs)
 
-py_py_test_clean_targets += $(1)-py-py-test-clean
-
-#-------------------------------------------------------------------------
-# All
-#-------------------------------------------------------------------------
-
-#$(1)-analyze : $(1)-sv-iv-test $(1)-sv-vr-test $(1)-py-py-test
-# 	@$$(ECHO) Analyzing verilog + iverilog results 
-# 	$$(QUIET) $$(scripts_dir)/sv-iv-analyze $(1)
-# 	$$(QUIET) $$(scripts_dir)/sv-vr-analyze $(1)
-# 	$$(QUIET) $$(scripts_dir)/py-py-analyze $(1)
-
-# remove verilog/verilator for now
-
-$(1)-analyze : $(1)-sv-iv-test $$(1)-py-py-test
-	@$$(ECHO) Analyzing verilog + iverilog results 
-	$$(QUIET) $$(scripts_dir)/sv-iv-analyze $(1)
-	$$(QUIET) $$(scripts_dir)/py-py-analyze $(1)
+py_test_clean_targets += $(1)-py-test-clean
 
 #-------------------------------------------------------------------------
 # Clean up
@@ -266,14 +265,12 @@ junk += $(1)
 # Phony targets
 
 .PHONY : $(1)-sv-generate
-.PHONY : $(1)-sv-iv-test
-.PHONY : $(1)-sv-iv-test-clean
-.PHONY : $(1)-sv-vr-test
-.PHONY : $(1)-sv-vr-test-clean
+.PHONY : $(1)-sv-test
+.PHONY : $(1)-sv-test-clean
 
 .PHONY : $(1)-py-generate
-.PHONY : $(1)-py-py-test
-.PHONY : $(1)-py-py-test-clean
+.PHONY : $(1)-py-test
+.PHONY : $(1)-py-test-clean
 
 endef
 
@@ -286,37 +283,26 @@ $(foreach problem, $(problems), \
 
 sv-generate       : $(sv_generate_targets)
 sv-generate-clean : $(sv_generate_clean_targets)
-
-sv-iv-test        : $(sv_iv_test_targets)
-sv-iv-test-clean  : $(sv_iv_test_clean_targets)
-
-# sv-vr-test        : $(sv_vr_test_targets)
-# sv-vr-test-clean  : $(sv_vr_test_clean_targets)
+sv-test           : $(sv_test_targets)
+sv-test-clean     : $(sv_test_clean_targets)
 
 py-generate       : $(py_generate_targets)
 py-generate-clean : $(py_generate_clean_targets)
+py-test           : $(py_test_targets)
+py-test-clean     : $(py_test_clean_targets)
 
-py-py-test        : $(py_py_test_targets)
-py-py-test-clean  : $(py_py_test_clean_targets)
+sv-analyze : $(sv_test_targets)
+	@$(ECHO) Analyzing verilog results
+	$(QUIET) $(scripts_dir)/analyze-verilog \
+             --csv=sv-summary.csv $(problems) | tee sv-summary.txt
 
-sv-iv-analyze : $(sv_iv_test_targets)
-	@$(ECHO) Analyzing verilog + iverilog results 
-	$(QUIET) $(scripts_dir)/sv-iv-analyze \
-             --csv=sv-iv-summary.csv $(problems) | tee sv-iv-summary.txt
+py-analyze : $(py_test_targets)
+	@$(ECHO) Analyzing pydsl results
+	$(QUIET) $(scripts_dir)/analyze-$(pydsl) \
+             --csv=py-summary.csv $(problems) | tee py-summary.txt
 
-# sv-vr-analyze : $(sv_vr_test_targets)
-#  	@$(ECHO) Analyzing verilog + pymtl/verilator results 
-#  	$(QUIET) $(scripts_dir)/sv-vr-analyze \
-#              --csv=sv-vr-summary.csv $(problems) | tee sv-vr-summary.txt
-
-py-py-analyze : $(py_py_test_targets)
-	@$(ECHO) Analyzing pymtl + pymtl results 
-	$(QUIET) $(scripts_dir)/py-py-analyze \
-             --csv=py-py-summary.csv $(problems) | tee py-py-summary.txt
-
-junk += sv-iv-summary.txt sv-iv-summary.csv
-junk += sv-vr-summary.txt sv-vr-summary.csv
-junk += py-py-summary.txt py-py-summary.csv
+junk += sv-summary.txt sv-summary.csv
+junk += py-summary.txt py-summary.csv
 
 #-------------------------------------------------------------------------
 # pregen
@@ -326,20 +312,20 @@ junk += py-py-summary.txt py-py-summary.csv
 # We use the special $(file make function because the number of files
 # can be so large that it might exceed the command line limit.
 
-pregen_dir := ../../pymtl-eval-pregen
+pregen_dir := $(cfg_pregen_dir)
 
-extra_pregen_files = \
-  problems.mk \
-  samples.mk \
-  sv-iv-summary.txt \
-  sv-iv-summary.csv \
-  sv-vr-summary.txt \
-  sv-vr-summary.csv \
-  py-py-summary.txt \
-  py-py-summary.csv \
+extra_pregen_files = config.mk
+
+ifneq ($(cfg_verilog),no)
+extra_pregen_files += sv-summary.txt sv-summary.csv
+endif
+
+ifneq ($(cfg_pydsl),no)
+extra_pregen_files += py-summary.txt py-summary.csv
+endif
 
 ifneq ($(pregen_dir),NOT_ENABLED)
-pregen: $(sv_samples)
+pregen:
 	$(file >  files-to-copy.txt, $(pregen_files))
 	$(file >> files-to-copy.txt, $(extra_pregen_files))
 	sed -i.bak -e 's/ \+/\n/g' files-to-copy.txt
@@ -362,11 +348,17 @@ dist_junk += \
 # Default
 #-------------------------------------------------------------------------
 
-# all : sv-iv-analyze sv-vr-analyze py-py-analyze
-#  	$(scripts_dir)/collect-summaries
+all_targets :=
 
-all : sv-iv-analyze py-py-analyze
-	$(scripts_dir)/collect-summaries
+ifneq ($(cfg_verilog),no)
+all_targets += sv-analyze
+endif
+
+ifneq ($(cfg_pydsl),no)
+all_targets += py-analyze
+endif
+
+all : $(all_targets)
 
 .PHONY : all
 
@@ -391,4 +383,3 @@ distclean :
 	rm -rf *~ \#* wave.vcd $(junk) $(dist_junk)
 
 .PHONY : clean
-

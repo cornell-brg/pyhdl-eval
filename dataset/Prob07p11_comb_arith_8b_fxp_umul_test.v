@@ -1,6 +1,9 @@
 //========================================================================
 // Prob07p11_comb_arith_8b_fxp_umul_test
 //========================================================================
+// SPDX-License-Identifier: MIT
+// Author : Christopher Batten, NVIDIA
+// Date   : May 20, 2024
 
 `include "test_utils.v"
 

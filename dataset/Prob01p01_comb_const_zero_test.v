@@ -1,6 +1,9 @@
 //========================================================================
 // Prob01p01_comb_const_zero_test
 //========================================================================
+// SPDX-License-Identifier: MIT
+// Author : Christopher Batten, NVIDIA
+// Date   : May 20, 2024
 
 `include "test_utils.v"
 

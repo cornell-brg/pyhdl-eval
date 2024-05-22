@@ -1,89 +1,37 @@
 #=========================================================================
 # Prob07p15_comb_arith_8b_alu_test
 #=========================================================================
+# SPDX-License-Identifier: MIT
+# Author : Christopher Batten, NVIDIA
+# Date   : May 20, 2024
 
-from pymtl3 import *
-from pymtl3.passes.backends.verilog import *
-from pymtl3.datatypes import strategies as pst
-
-from test_utils import construct, print_line_trace
+from pyhdl_eval.cfg  import Config, InputPort, OutputPort, TraceFormat
+from pyhdl_eval.core import run_sim
+from pyhdl_eval      import strategies as pst
 
 from hypothesis import settings, given
 from hypothesis import strategies as st
 
 #-------------------------------------------------------------------------
-# PyMTL Reference
+# Configuration
 #-------------------------------------------------------------------------
 
-class RefModule( Component ):
-  def construct( s ):
-    s.in0 = InPort (8)
-    s.in1 = InPort (8)
-    s.op  = InPort (3)
-    s.out = OutPort(8)
-
-    @update
-    def up():
-      if   s.op == 0 : s.out @= s.in0 +  s.in1
-      elif s.op == 1 : s.out @= s.in0 -  s.in1
-      elif s.op == 2 : s.out @= s.in0 << zext( s.in1[0:3], 8 )
-      elif s.op == 3 : s.out @= s.in0 >> zext( s.in1[0:3], 8 )
-      elif s.op == 4 : s.out @= zext( s.in0 <  s.in1, 8 )
-      elif s.op == 5 : s.out @= zext( s.in0 == s.in1, 8 )
-      elif s.op == 6 : s.out @= zext( s.in0 >  s.in1, 8 )
-      else           : s.out @= 0
-
-#-------------------------------------------------------------------------
-# Verilog Wrapper
-#-------------------------------------------------------------------------
-
-class TopModule( VerilogPlaceholder, Component ):
-  def construct( s ):
-    s.in0 = InPort (8)
-    s.in1 = InPort (8)
-    s.op  = InPort (3)
-    s.out = OutPort(8)
-
-#-------------------------------------------------------------------------
-# run_sim
-#-------------------------------------------------------------------------
-
-def run_sim( pytestconfig, test_vectors ):
-
-  ref,dut = construct( pytestconfig, __file__, RefModule, TopModule )
-
-  for test_vector in test_vectors:
-
-    in0,in1,op = test_vector
-
-    ref.in0 @= in0
-    ref.in1 @= in1
-    ref.op  @= op
-
-    dut.in0 @= in0
-    dut.in1 @= in1
-    dut.op  @= op
-
-    ref.sim_eval_combinational()
-    dut.sim_eval_combinational()
-
-    print_line_trace( dut, dut.in0, f"({dut.in0.uint():4})",
-                           dut.in1, f"({dut.in1.uint():4})",
-                           dut.op,
-                      ">", dut.out, f"({dut.out.uint():4})" )
-
-    assert ref.out == dut.out
-    assert op <= 6 or dut.out == 0
-
-    ref.sim_tick()
-    dut.sim_tick()
+config = Config(
+  ports = [
+    ( "in0", InputPort (8) ),
+    ( "in1", InputPort (8) ),
+    ( "op",  InputPort (3) ),
+    ( "out", OutputPort(8) ),
+  ],
+  trace_format=TraceFormat.UINT,
+)
 
 #-------------------------------------------------------------------------
 # test_case_add
 #-------------------------------------------------------------------------
 
 def test_case_add( pytestconfig ):
-  run_sim( pytestconfig,
+  run_sim( pytestconfig, __file__, config,
   [
     (   0,  0, 0 ),
     (   1,  1, 0 ),
@@ -99,7 +47,7 @@ def test_case_add( pytestconfig ):
 #-------------------------------------------------------------------------
 
 def test_case_sub( pytestconfig ):
-  run_sim( pytestconfig,
+  run_sim( pytestconfig, __file__, config,
   [
     (   0,  0, 1 ),
     (   1,  1, 1 ),
@@ -115,7 +63,7 @@ def test_case_sub( pytestconfig ):
 #-------------------------------------------------------------------------
 
 def test_case_srl( pytestconfig ):
-  run_sim( pytestconfig,
+  run_sim( pytestconfig, __file__, config,
   [
     (   0,  0, 2 ),
     (   1,  1, 2 ),
@@ -131,7 +79,7 @@ def test_case_srl( pytestconfig ):
 #-------------------------------------------------------------------------
 
 def test_case_sll( pytestconfig ):
-  run_sim( pytestconfig,
+  run_sim( pytestconfig, __file__, config,
   [
     (   0,  0, 3 ),
     (   1,  1, 3 ),
@@ -147,7 +95,7 @@ def test_case_sll( pytestconfig ):
 #-------------------------------------------------------------------------
 
 def test_case_lt( pytestconfig ):
-  run_sim( pytestconfig,
+  run_sim( pytestconfig, __file__, config,
   [
     (   0,  0, 4 ),
     (   1,  1, 4 ),
@@ -163,7 +111,7 @@ def test_case_lt( pytestconfig ):
 #-------------------------------------------------------------------------
 
 def test_case_eq( pytestconfig ):
-  run_sim( pytestconfig,
+  run_sim( pytestconfig, __file__, config,
   [
     (   0,  0, 5 ),
     (   1,  1, 5 ),
@@ -179,7 +127,7 @@ def test_case_eq( pytestconfig ):
 #-------------------------------------------------------------------------
 
 def test_case_gt( pytestconfig ):
-  run_sim( pytestconfig,
+  run_sim( pytestconfig, __file__, config,
   [
     (   0,  0, 6 ),
     (   1,  1, 6 ),
@@ -197,5 +145,5 @@ def test_case_gt( pytestconfig ):
 @settings(deadline=1000,max_examples=20)
 @given( st.lists( st.tuples( pst.bits(8), pst.bits(8), pst.bits(3) ) ))
 def test_case_random( pytestconfig, test_vectors ):
-  run_sim( pytestconfig, test_vectors )
+  run_sim( pytestconfig, __file__, config, test_vectors )
 

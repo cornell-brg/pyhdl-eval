@@ -1,89 +1,33 @@
 #=========================================================================
 # Prob03p10_comb_gates_4b_pairwise_test
 #=========================================================================
+# SPDX-License-Identifier: MIT
+# Author : Christopher Batten, NVIDIA
+# Date   : May 20, 2024
 
-from pymtl3 import *
-from pymtl3.passes.backends.verilog import *
-
-from test_utils import construct, print_line_trace
-
-#-------------------------------------------------------------------------
-# PyMTL Reference
-#-------------------------------------------------------------------------
-
-class RefModule( Component ):
-  def construct( s ):
-    s.in_      = InPort(4)
-    s.out_and  = OutPort(3)
-    s.out_or   = OutPort(3)
-    s.out_xnor = OutPort(3)
-
-    @update
-    def up():
-
-      # AND operation on consecutive pairs
-
-      s.out_and[0]  @= s.in_[0] & s.in_[1];
-      s.out_and[1]  @= s.in_[1] & s.in_[2];
-      s.out_and[2]  @= s.in_[2] & s.in_[3];
-
-      # OR operation on consecutive pairs
-
-      s.out_or[0]   @= s.in_[0] | s.in_[1];
-      s.out_or[1]   @= s.in_[1] | s.in_[2];
-      s.out_or[2]   @= s.in_[2] | s.in_[3];
-
-      # XNOR operation on consecutive pairs
-
-      s.out_xnor[0] @= ~(s.in_[0] ^ s.in_[1]);
-      s.out_xnor[1] @= ~(s.in_[1] ^ s.in_[2]);
-      s.out_xnor[2] @= ~(s.in_[2] ^ s.in_[3]);
+from pyhdl_eval.cfg  import Config, InputPort, OutputPort, TraceFormat
+from pyhdl_eval.core import run_sim
 
 #-------------------------------------------------------------------------
-# Verilog Wrapper
+# Configuration
 #-------------------------------------------------------------------------
 
-class TopModule( VerilogPlaceholder, Component ):
-  def construct( s ):
-    s.in_      = InPort(4)
-    s.out_and  = OutPort(3)
-    s.out_or   = OutPort(3)
-    s.out_xnor = OutPort(3)
-
-#-------------------------------------------------------------------------
-# run_sim
-#-------------------------------------------------------------------------
-
-def run_sim( pytestconfig, test_vectors ):
-
-  ref,dut = construct( pytestconfig, __file__, RefModule, TopModule )
-
-  for test_vector in test_vectors:
-
-    in_ = test_vector
-
-    ref.in_ @= in_
-    dut.in_ @= in_
-
-    ref.sim_eval_combinational()
-    dut.sim_eval_combinational()
-
-    print_line_trace( dut, dut.in_, ">",
-                      dut.out_and, dut.out_or, dut.out_xnor )
-
-    assert ref.out_and  == dut.out_and
-    assert ref.out_or   == dut.out_or
-    assert ref.out_xnor == dut.out_xnor
-
-    ref.sim_tick()
-    dut.sim_tick()
+config = Config(
+  ports = [
+    ( "in_",      InputPort (4) ),
+    ( "out_and",  OutputPort(3) ),
+    ( "out_or",   OutputPort(3) ),
+    ( "out_xnor", OutputPort(3) ),
+  ],
+  trace_format=TraceFormat.BIN,
+)
 
 #-------------------------------------------------------------------------
 # test_case_directed
 #-------------------------------------------------------------------------
 
 def test_case_directed( pytestconfig ):
-  run_sim( pytestconfig,
+  run_sim( pytestconfig, __file__, config,
   [
     0b0000,
     0b0001,

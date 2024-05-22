@@ -1,6 +1,9 @@
 //========================================================================
 // Prob03p05_comb_gates_hadd_test
 //========================================================================
+// SPDX-License-Identifier: MIT
+// Author : Christopher Batten, NVIDIA
+// Date   : May 20, 2024
 
 `include "test_utils.v"
 

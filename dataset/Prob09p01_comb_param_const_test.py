@@ -1,69 +1,40 @@
 #=========================================================================
 # Prob09p01_comb_param_const_test
 #=========================================================================
+# SPDX-License-Identifier: MIT
+# Author : Christopher Batten, NVIDIA
+# Date   : May 20, 2024
 
-from pymtl3 import *
-from pymtl3.passes.backends.verilog import *
-
-from test_utils import construct, print_line_trace
-
-#-------------------------------------------------------------------------
-# PyMTL Reference
-#-------------------------------------------------------------------------
-
-class RefModule( Component ):
-  def construct( s, nbits, value ):
-    s.out = OutPort(nbits)
-    s.out //= value
+from pyhdl_eval.cfg  import Config, InputPort, OutputPort
+from pyhdl_eval.core import run_sim
 
 #-------------------------------------------------------------------------
-# Verilog Wrapper
+# Configuration
 #-------------------------------------------------------------------------
 
-class TopModule( VerilogPlaceholder, Component ):
-  def construct( s, nbits, value ):
-    s.out = OutPort(nbits)
-
-#-------------------------------------------------------------------------
-# run_sim
-#-------------------------------------------------------------------------
-
-def run_sim( pytestconfig, nbits, value ):
-
-  ref,dut = construct( pytestconfig, __file__, RefModule, TopModule,
-                       nbits=nbits, value=value )
-
-  ref.sim_eval_combinational()
-  dut.sim_eval_combinational()
-
-  print_line_trace( dut, dut.out )
-
-  assert ref.out == dut.out
-
-  ref.sim_tick()
-  dut.sim_tick()
-
-  ref.sim_eval_combinational()
-  dut.sim_eval_combinational()
-
-  print_line_trace( dut, dut.out )
-
-  assert ref.out == dut.out
-
-  ref.sim_tick()
-  dut.sim_tick()
+def mk_config( nbits, value ):
+  config = Config(
+    parameters = {
+      "nbits" : nbits,
+      "value" : value,
+    },
+    ports = [
+      ( "out", OutputPort(nbits) ),
+    ],
+  )
+  return config
 
 #-------------------------------------------------------------------------
 # test_case_nbits8_directed
 #-------------------------------------------------------------------------
 
 def test_case_nbits8_directed( pytestconfig ):
-  run_sim( pytestconfig, nbits=8, value=0xef )
+  run_sim( pytestconfig, __file__, mk_config(nbits=8,value=0xef) )
 
 #-------------------------------------------------------------------------
 # test_case_nbits32_directed
 #-------------------------------------------------------------------------
 
 def test_case_nbits32_directed( pytestconfig ):
-  run_sim( pytestconfig, nbits=32, value=0xcafecafe )
+  run_sim( pytestconfig, __file__, mk_config(nbits=32,value=0xcafecafe) )
 

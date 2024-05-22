@@ -1,86 +1,37 @@
 #=========================================================================
 # Prob07p08_comb_arith_8b_rotator_test
 #=========================================================================
+# SPDX-License-Identifier: MIT
+# Author : Christopher Batten, NVIDIA
+# Date   : May 20, 2024
 
-from pymtl3 import *
-from pymtl3.passes.backends.verilog import *
-from pymtl3.datatypes import strategies as pst
-
-from test_utils import construct, print_line_trace
+from pyhdl_eval.cfg  import Config, InputPort, OutputPort, TraceFormat
+from pyhdl_eval.core import run_sim
+from pyhdl_eval      import strategies as pst
 
 from hypothesis import settings, given
 from hypothesis import strategies as st
 
 #-------------------------------------------------------------------------
-# PyMTL Reference
+# Configuration
 #-------------------------------------------------------------------------
 
-class RefModule( Component ):
-  def construct( s ):
-    s.in_ = InPort (8)
-    s.amt = InPort (3)
-    s.op  = InPort ()
-    s.out = OutPort(8)
-
-    s.temp = Wire(16)
-
-    @update
-    def up():
-      if ( s.op == 0 ):
-        s.temp @= concat( s.in_, s.in_ ) << zext( s.amt, 16 )
-        s.out  @= s.temp[8:16]
-      else:
-        s.temp @= concat( s.in_, s.in_ ) >> zext( s.amt, 16 )
-        s.out  @= s.temp[0:8]
-
-#-------------------------------------------------------------------------
-# Verilog Wrapper
-#-------------------------------------------------------------------------
-
-class TopModule( VerilogPlaceholder, Component ):
-  def construct( s ):
-    s.in_ = InPort (8)
-    s.amt = InPort (3)
-    s.op  = InPort ()
-    s.out = OutPort(8)
-
-#-------------------------------------------------------------------------
-# run_sim
-#-------------------------------------------------------------------------
-
-def run_sim( pytestconfig, test_vectors ):
-
-  ref,dut = construct( pytestconfig, __file__, RefModule, TopModule )
-
-  for test_vector in test_vectors:
-
-    in_,amt,op = test_vector
-
-    ref.in_ @= in_
-    ref.amt @= amt
-    ref.op  @= op
-
-    dut.in_ @= in_
-    dut.amt @= amt
-    dut.op  @= op
-
-    ref.sim_eval_combinational()
-    dut.sim_eval_combinational()
-
-    print_line_trace( dut, f"{dut.in_.uint():#010b}", dut.amt, dut.op,
-                      ">", f"{dut.out.uint():#010b}" )
-
-    assert ref.out == dut.out
-
-    ref.sim_tick()
-    dut.sim_tick()
+config = Config(
+  ports = [
+    ( "in_", InputPort (8) ),
+    ( "amt", InputPort (3) ),
+    ( "op",  InputPort (1) ),
+    ( "out", OutputPort(8) ),
+  ],
+  trace_format=TraceFormat.BIN,
+)
 
 #-------------------------------------------------------------------------
 # test_case_left_rotate
 #-------------------------------------------------------------------------
 
 def test_case_left_rotate( pytestconfig ):
-  run_sim( pytestconfig,
+  run_sim( pytestconfig, __file__, config,
   [
     ( 0b0101_1101, 0, 0 ),
     ( 0b0101_1101, 1, 0 ),
@@ -97,7 +48,7 @@ def test_case_left_rotate( pytestconfig ):
 #-------------------------------------------------------------------------
 
 def test_case_right_rotate( pytestconfig ):
-  run_sim( pytestconfig,
+  run_sim( pytestconfig, __file__, config,
   [
     ( 0b1101_0101, 0, 1 ),
     ( 0b1101_0101, 1, 1 ),
@@ -116,5 +67,5 @@ def test_case_right_rotate( pytestconfig ):
 @settings(deadline=1000,max_examples=20)
 @given( st.lists( st.tuples( pst.bits(8), pst.bits(3), pst.bits(1) ) ))
 def test_case_random( pytestconfig, test_vectors ):
-  run_sim( pytestconfig, test_vectors )
+  run_sim( pytestconfig, __file__, config, test_vectors )
 

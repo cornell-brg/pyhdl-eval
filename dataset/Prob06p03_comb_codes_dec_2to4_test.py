@@ -1,68 +1,30 @@
 #=========================================================================
 # Prob06p03_comb_codes_dec_2to4_test
 #=========================================================================
+# SPDX-License-Identifier: MIT
+# Author : Christopher Batten, NVIDIA
+# Date   : May 20, 2024
 
-from pymtl3 import *
-from pymtl3.passes.backends.verilog import *
-
-from test_utils import construct, print_line_trace
-
-#-------------------------------------------------------------------------
-# PyMTL Reference
-#-------------------------------------------------------------------------
-
-class RefModule( Component ):
-  def construct( s ):
-    s.in_ = InPort (2)
-    s.out = OutPort(4)
-
-    @update
-    def up():
-      if   s.in_ == 0: s.out @= 0b0001
-      elif s.in_ == 1: s.out @= 0b0010
-      elif s.in_ == 2: s.out @= 0b0100
-      elif s.in_ == 3: s.out @= 0b1000
+from pyhdl_eval.cfg  import Config, InputPort, OutputPort
+from pyhdl_eval.core import run_sim
 
 #-------------------------------------------------------------------------
-# Verilog Wrapper
+# Configuration
 #-------------------------------------------------------------------------
 
-class TopModule( VerilogPlaceholder, Component ):
-  def construct( s ):
-    s.in_ = InPort (2)
-    s.out = OutPort(4)
-
-#-------------------------------------------------------------------------
-# run_sim
-#-------------------------------------------------------------------------
-
-def run_sim( pytestconfig, test_vectors ):
-
-  ref,dut = construct( pytestconfig, __file__, RefModule, TopModule )
-
-  for test_vector in test_vectors:
-
-    in_ = test_vector
-
-    ref.in_ @= in_
-    dut.in_ @= in_
-
-    ref.sim_eval_combinational()
-    dut.sim_eval_combinational()
-
-    print_line_trace( dut, dut.in_, ">", dut.out )
-
-    assert ref.out == dut.out
-
-    ref.sim_tick()
-    dut.sim_tick()
+config = Config(
+  ports = [
+    ( "in_", InputPort (2) ),
+    ( "out", OutputPort(4) ),
+  ],
+)
 
 #-------------------------------------------------------------------------
 # test_case_directed
 #-------------------------------------------------------------------------
 
 def test_case_directed( pytestconfig ):
-  run_sim( pytestconfig,
+  run_sim( pytestconfig, __file__, config,
   [
     0b00,
     0b01,

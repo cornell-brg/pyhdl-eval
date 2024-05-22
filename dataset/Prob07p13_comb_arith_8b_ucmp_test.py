@@ -1,84 +1,38 @@
 #=========================================================================
 # Prob07p13_comb_arith_8b_ucmp_test
 #=========================================================================
+# SPDX-License-Identifier: MIT
+# Author : Christopher Batten, NVIDIA
+# Date   : May 20, 2024
 
-from pymtl3 import *
-from pymtl3.passes.backends.verilog import *
-from pymtl3.datatypes import strategies as pst
-
-from test_utils import construct, print_line_trace
+from pyhdl_eval.cfg  import Config, InputPort, OutputPort, TraceFormat
+from pyhdl_eval.core import run_sim
+from pyhdl_eval      import strategies as pst
 
 from hypothesis import settings, given
 from hypothesis import strategies as st
 
 #-------------------------------------------------------------------------
-# PyMTL Reference
+# Configuration
 #-------------------------------------------------------------------------
 
-class RefModule( Component ):
-  def construct( s ):
-    s.in0 = InPort (8)
-    s.in1 = InPort (8)
-    s.lt  = OutPort()
-    s.eq  = OutPort()
-    s.gt  = OutPort()
-
-    @update
-    def up():
-      s.lt @= s.in0 <  s.in1
-      s.eq @= s.in0 == s.in1
-      s.gt @= s.in0 >  s.in1
-
-#-------------------------------------------------------------------------
-# Verilog Wrapper
-#-------------------------------------------------------------------------
-
-class TopModule( VerilogPlaceholder, Component ):
-  def construct( s ):
-    s.in0 = InPort (8)
-    s.in1 = InPort (8)
-    s.lt  = OutPort()
-    s.eq  = OutPort()
-    s.gt  = OutPort()
-
-#-------------------------------------------------------------------------
-# run_sim
-#-------------------------------------------------------------------------
-
-def run_sim( pytestconfig, test_vectors ):
-
-  ref,dut = construct( pytestconfig, __file__, RefModule, TopModule )
-
-  for test_vector in test_vectors:
-
-    in0,in1 = test_vector
-
-    ref.in0 @= in0
-    ref.in1 @= in1
-
-    dut.in0 @= in0
-    dut.in1 @= in1
-
-    ref.sim_eval_combinational()
-    dut.sim_eval_combinational()
-
-    print_line_trace( dut, dut.in0, f"({dut.in0.uint():4})",
-                           dut.in1, f"({dut.in1.uint():4})",
-                      ">", dut.lt, dut.eq, dut.gt )
-
-    assert ref.lt == dut.lt
-    assert ref.eq == dut.eq
-    assert ref.gt == dut.gt
-
-    ref.sim_tick()
-    dut.sim_tick()
+config = Config(
+  ports = [
+    ( "in0", InputPort (8) ),
+    ( "in1", InputPort (8) ),
+    ( "lt",  OutputPort(1) ),
+    ( "eq",  OutputPort(1) ),
+    ( "gt",  OutputPort(1) ),
+  ],
+  trace_format=TraceFormat.UINT,
+)
 
 #-------------------------------------------------------------------------
 # test_case_lt
 #-------------------------------------------------------------------------
 
 def test_case_lt( pytestconfig ):
-  run_sim( pytestconfig,
+  run_sim( pytestconfig, __file__, config,
   [
     (   0,   1 ),
     (   1,   2 ),
@@ -96,7 +50,7 @@ def test_case_lt( pytestconfig ):
 #-------------------------------------------------------------------------
 
 def test_case_eq( pytestconfig ):
-  run_sim( pytestconfig,
+  run_sim( pytestconfig, __file__, config,
   [
     (   0,   0 ),
     (  16,  16 ),
@@ -111,7 +65,7 @@ def test_case_eq( pytestconfig ):
 #-------------------------------------------------------------------------
 
 def test_case_gt( pytestconfig ):
-  run_sim( pytestconfig,
+  run_sim( pytestconfig, __file__, config,
   [
     (   1,   0 ),
     (   2,   1 ),
@@ -132,5 +86,5 @@ def test_case_gt( pytestconfig ):
 @settings(deadline=1000,max_examples=20)
 @given( st.lists( st.tuples( pst.bits(8), pst.bits(8) ) ))
 def test_case_random( pytestconfig, test_vectors ):
-  run_sim( pytestconfig, test_vectors )
+  run_sim( pytestconfig, __file__, config, test_vectors )
 

@@ -6,20 +6,20 @@
 #  -v --verbose        Display the prompt
 #  -h --help           Display this message
 #  -l --list-models    List supported models
-#     --model          LLM model to use (default: gpt-3.5-turbo)
+#     --model          LLM model to use (default: openai/gpt-3.5-turbo)
 #     --temperature    LLM model temperature (default: 0.8)
 #     --top-p          LLM model top_p (default: 0.95)
 #     --max-tokens     LLM model max_tokens (default: 1024)
-#  -e --explain        Let the model include an explanation
-#     --examples       In-context examples to use (default: no examples)
-#  -r --rules          Include the in-context rules
+#     --examples       Number of in-context examples to use (default: 0)
 #     --lang           What language to generate (default: verilog)
 #     --output         File to write extracted code
 #
-# Use a LLM to generate verilog or PyMTL from the given prompt.
+# Use a LLM to generate verilog or a Python-embedded DSL from the
+# given prompt.
 #
-# Author : Christopher Batten
-# Date   : Mar 15, 2024
+# SPDX-License-Identifier: MIT
+# Author : Christopher Batten, NVIDIA
+# Date   : May 20, 2024
 #
 
 import argparse
@@ -28,7 +28,6 @@ import os
 import re
 import time
 
-from adlrchat.langchain import ADLRChat
 from adlrchat.langchain import LLMGatewayChat
 from langchain_nvidia_ai_endpoints import ChatNVIDIA
 from langchain_community.chat_models import ChatAnyscale
@@ -54,15 +53,13 @@ def parse_cmdline():
   p.add_argument( "-h", "--help",        action="store_true" )
   p.add_argument( "-v", "--verbose",     action="store_true" )
   p.add_argument( "-l", "--list-models", action="store_true" )
-  p.add_argument(       "--model",       type=str,   default="gpt-3.5-turbo" )
+  p.add_argument(       "--model",       type=str,   default="openai/gpt-3.5-turbo" )
   p.add_argument(       "--temperature", type=float, default=0.8 )
   p.add_argument(       "--max-tokens",  type=int,   default=1024 )
   p.add_argument(       "--top-p",       type=float, default=0.95 )
-  p.add_argument( "-e", "--explain",     action="store_true" )
-  p.add_argument(       "--examples",    type=str,   default="NONE" )
-  p.add_argument( "-r", "--rules",       action="store_true" )
+  p.add_argument(       "--examples",    type=int,   default=0 )
   p.add_argument(       "--lang",        type=str,   default="verilog" )
-  p.add_argument(       "--output",      type=str,   default="-" )
+  p.add_argument(       "--output",      type=str,   default="NONE" )
   p.add_argument( "prompt_filename" )
 
   opts = p.parse_args()
@@ -73,11 +70,6 @@ def parse_cmdline():
 # Models
 #-------------------------------------------------------------------------
 
-adlr_chat_models = [
-  "chipllama_70b_steer_delta",
-  "mixtral-chat",
-]
-
 llm_gateway_chat_models = [
   "gpt-3.5-turbo",
   "gpt-4",
@@ -85,33 +77,47 @@ llm_gateway_chat_models = [
 ]
 
 nim_chat_models = [
+  "ai-gemma-2b",
   "ai-llama2-70b",
   "ai-llama3-70b",
-  "ai-codellama-70b",
-  "ai-gemma-7b",
   "ai-codegemma-7b",
-  "ai-mistral-7b-instruct-v2",
-  "ai-mixtral-8x7b-instruct",
+  "ai-codellama-70b",
 ]
 
 anyscale_chat_models = [
+  "codellama/CodeLlama-70b-Instruct-hf",
+  "google/gemma-7b-it",
   "meta-llama/Meta-Llama-3-8B-Instruct",
   "meta-llama/Meta-Llama-3-70B-Instruct",
+  "mistralai/Mistral-7B-Instruct-v0.1",
+  "mistralai/Mixtral-8x7B-Instruct-v0.1",
+  "mistralai/Mixtral-8x22B-Instruct-v0.1",
 ]
 
 all_chat_models = [
-  *adlr_chat_models,
   *llm_gateway_chat_models,
   *nim_chat_models,
   *anyscale_chat_models,
 ]
 
 model_aliases = {
-  "gpt3.5-turbo"        : "gpt-3.5-turbo",
-  "gpt4"                : "gpt-4",
-  "gpt4-turbo"          : "gpt-4-turbo",
-  "anyscale/llama3-8b"  : "meta-llama/Meta-Llama-3-8B-Instruct",
-  "anyscale/llama3-70b" : "meta-llama/Meta-Llama-3-70B-Instruct",
+  "openai/gpt3.5-turbo"    : "gpt-3.5-turbo",
+  "openai/gpt4"            : "gpt-4",
+  "openai/gpt4-turbo"      : "gpt-4-turbo",
+
+  "nim/gemma-2b"           : "ai-gemma-2b",
+  "nim/llama2-70b"         : "ai-llama2-70b",
+  "nim/llama3-70b"         : "ai-llama3-70b",
+  "nim/codegemma-7b"       : "ai-codegemma-7b",
+  "nim/codellama-70b"      : "ai-codellama-70b",
+
+  "anyscale/codellama-70b" : "codellama/CodeLlama-70b-Instruct-hf",
+  "anyscale/gemma-7b"      : "google/gemma-7b-it",
+  "anyscale/llama3-8b"     : "meta-llama/Meta-Llama-3-8B-Instruct",
+  "anyscale/llama3-70b"    : "meta-llama/Meta-Llama-3-70B-Instruct",
+  "anyscale/mistral-7b"    : "mistralai/Mistral-7B-Instruct-v0.1",
+  "anyscale/mixtral-8x7b"  : "mistralai/Mixtral-8x7B-Instruct-v0.1",
+  "anyscale/mixtral-8x22b" : "mistralai/Mixtral-8x22B-Instruct-v0.1",
 }
 
 #-------------------------------------------------------------------------
@@ -136,39 +142,29 @@ You are a Verilog RTL designer that only writes code using correct
 Verilog syntax.
 """
 
-verilog_prompt_rules_suffix="""
-Here are some additional rules and coding conventions.
-
- - declare all ports and signals as logic; do not to use wire or reg
-
- - for combinational logic with an always block do not explicitly specify
-   the sensitivity list; instead use always @(*)
-
- - all sized numeric constants must have a size greater than zero
-   (e.g, 0'b0 is not a valid expression)
-
- - an always block must read at least one signal otherwise it will never
-   be executed; use an assign statement instead of an always block in
-   situations where there is no need to read any signals
-
- - if the module uses a synchronous reset signal, this means the reset
-   signal is sampled with respect to the clock. When implementing a
-   synchronous reset signal, do not include posedge reset in the
-   sensitivity list of any sequential always block.
-"""
-
 pymtl_system_msg="""
 You are a PyMTL3 RTL designer that only writes code using correct
 PyMTL syntax.
 """
 
-pymtl_prompt_rules_suffix=""
+pyrtl_system_msg="""
+You are a PyRTL RTL designer that only writes code using correct
+PyRTL syntax.
+"""
 
-pymtl_prompt_rules_suffix="""
-Here are some additional rules and coding conventions.
+myhdl_system_msg="""
+You are a MyHDL RTL designer that only writes code using correct
+MyHDL syntax.
+"""
 
- - The only Python decorators you can use are @update and @update_ff. Do
-   not use any other kind of Python decorator in your solution.
+migen_system_msg="""
+You are a Migen RTL designer that only writes code using correct
+Migen syntax.
+"""
+
+amaranth_system_msg="""
+You are a Amaranth RTL designer that only writes code using correct
+Amaranth syntax.
 """
 
 prompt_no_explain_suffix="""
@@ -187,11 +183,6 @@ def main():
   # Check models
 
   if opts.list_models:
-    print( "" )
-    print( "ADLRChat Models" )
-
-    for model in adlr_chat_models:
-      print( f" - {model}" )
 
     print( "" )
     print( "LLMGatewayChat Models" )
@@ -220,6 +211,7 @@ def main():
     print( "" )
     return
 
+  model_alias = opts.model
   model = opts.model
   if opts.model in model_aliases:
     model = model_aliases[opts.model]
@@ -232,15 +224,14 @@ def main():
 
   # Check output language
 
-  system_msg            = ""
-  prompt_rules_suffix   = ""
+  system_msg = ""
 
-  if opts.lang == "verilog":
-    system_msg            = verilog_system_msg
-    prompt_rules_suffix   = verilog_prompt_rules_suffix
-  elif opts.lang == "pymtl":
-    system_msg            = pymtl_system_msg
-    prompt_rules_suffix   = pymtl_prompt_rules_suffix
+  if   opts.lang == "verilog":  system_msg = verilog_system_msg
+  elif opts.lang == "pymtl":    system_msg = pymtl_system_msg
+  elif opts.lang == "pyrtl":    system_msg = pyrtl_system_msg
+  elif opts.lang == "myhdl":    system_msg = myhdl_system_msg
+  elif opts.lang == "migen":    system_msg = migen_system_msg
+  elif opts.lang == "amaranth": system_msg = amaranth_system_msg
   else:
     print("")
     print(f"ERROR: Unknown language {lang}")
@@ -250,15 +241,10 @@ def main():
   # Load the examples
 
   prompt_example_prefix = ""
-  if opts.examples != "NONE":
-
-    if opts.lang == "verilog":
-      examples_filename=os.path.dirname(__file__) + f"/{opts.examples}-verilog.txt"
-    else:
-      examples_filename=os.path.dirname(__file__) + f"/{opts.examples}-pymtl.txt"
-
+  for i in range(opts.examples):
+    examples_filename = os.path.dirname(__file__) + f"/../examples/{opts.lang}-ex{i+1}.txt"
     with open(examples_filename) as f:
-      prompt_example_prefix = f.read()
+      prompt_example_prefix += f.read().rstrip() + "\n"
 
   # Check for an output file
 
@@ -276,6 +262,7 @@ def main():
 
   out.print( "" )
   out.print( f"problem     = {problem}"     )
+  out.print( f"model_alias = {model_alias}" )
   out.print( f"model       = {model}"       )
   out.print( f"temperature = {temperature}" )
   out.print( f"top_p       = {top_p}"       )
@@ -289,18 +276,10 @@ def main():
   # Create full prompt
 
   full_prompt = ""
-  if opts.examples:
-    full_prompt += prompt_example_prefix
-
+  full_prompt += prompt_example_prefix
   full_prompt += "\nQuestion:\n"
   full_prompt += prompt.strip() + "\n"
-
-  if opts.rules:
-    full_prompt += prompt_rules_suffix
-
-  if not opts.explain:
-    full_prompt = full_prompt.rstrip() + "\n" + prompt_no_explain_suffix
-
+  full_prompt = full_prompt.rstrip() + "\n" + prompt_no_explain_suffix
   full_prompt += "\nAnswer:\n"
 
   # Print system message and prompt
@@ -320,15 +299,15 @@ def main():
 
   # Query the LLM
 
-  if model in adlr_chat_models:
-    llm = ADLRChat(
+  if model in llm_gateway_chat_models:
+    llm = LLMGatewayChat(
       model       = model,
       temperature = temperature,
       top_p       = top_p,
       max_tokens  = max_tokens,
     )
-  elif model in llm_gateway_chat_models:
-    llm = LLMGatewayChat(
+  elif model in nim_chat_models:
+    llm = ChatNVIDIA(
       model       = model,
       temperature = temperature,
       top_p       = top_p,
@@ -343,13 +322,6 @@ def main():
       temperature = temperature,
       max_tokens  = max_tokens,
       model_kwargs = optional_params,
-    )
-  elif model in nim_chat_models:
-    llm = ChatNVIDIA(
-      model       = model,
-      temperature = temperature,
-      top_p       = top_p,
-      max_tokens  = max_tokens,
     )
   else:
     # should never reach here
@@ -392,42 +364,13 @@ def main():
 
   # Extract code from response
 
-  file = open( opts.output, 'w' )
+  if opts.output != "NONE":
 
-  print( "", file=file )
+    file = open( opts.output, 'w' )
 
-  # Scan response for code using <CODE></CODE>
+    print( "", file=file )
 
-  found_code_lines = []
-  found_code_start = False
-  found_code_end   = False
-
-  for line in iter(resp.content.splitlines()):
-
-    if not found_code_start:
-      if line.strip() == "<CODE>":
-        found_code_start = True
-      elif line.lstrip().startswith("<CODE>"):
-        found_code_lines.append( line.lstrip().replace("<CODE>","") )
-        found_code_start = True
-
-    elif found_code_start and not found_code_end:
-      if line.strip() == "</CODE>":
-        found_code_end = True
-      elif line.rstrip().endswith("</CODE>"):
-        found_code_lines.append( line.rstrip().replace("</CODE>","") )
-        found_code_end = True
-      else:
-        found_code_lines.append( line )
-
-  if found_code_start and found_code_end:
-    for line in found_code_lines:
-      print( line, file=file )
-
-  # If did not find code by looking for <CODE></CODE>, then scan response
-  # for code using backticks
-
-  if not found_code_start and not found_code_end:
+    # Scan response for code using <CODE></CODE>
 
     found_code_lines = []
     found_code_start = False
@@ -436,31 +379,62 @@ def main():
     for line in iter(resp.content.splitlines()):
 
       if not found_code_start:
-        if line.lstrip().startswith("```"):
+        if line.strip() == "<CODE>":
+          found_code_start = True
+        elif line.lstrip().startswith("<CODE>"):
+          found_code_lines.append( line.lstrip().replace("<CODE>","") )
           found_code_start = True
 
       elif found_code_start and not found_code_end:
-        if line.rstrip().endswith("```"):
+        if line.strip() == "</CODE>":
+          found_code_end = True
+        elif line.rstrip().endswith("</CODE>"):
+          found_code_lines.append( line.rstrip().replace("</CODE>","") )
           found_code_end = True
         else:
           found_code_lines.append( line )
 
     if found_code_start and found_code_end:
       for line in found_code_lines:
-        print(line, file=file )
+        print( line, file=file )
 
-      # Print comment so we can track responses that did not use
-      # <CODE></CODE> correctly
+    # If did not find code by looking for <CODE></CODE>, then scan response
+    # for code using backticks
 
-      print( "", file=file )
-      if opts.lang == "verilog":
-        comment_delim = "//"
-      elif opts.lang == "pymtl":
-        comment_delim = "#"
-      print( comment_delim + " PYHDL-EVAL: response did not use <CODE></CODE> correctly", file=file )
+    if not found_code_start and not found_code_end:
 
-  print( "", file=file )
+      found_code_lines = []
+      found_code_start = False
+      found_code_end   = False
 
-  file.close()
+      for line in iter(resp.content.splitlines()):
+
+        if not found_code_start:
+          if line.lstrip().startswith("```"):
+            found_code_start = True
+
+        elif found_code_start and not found_code_end:
+          if line.rstrip().endswith("```"):
+            found_code_end = True
+          else:
+            found_code_lines.append( line )
+
+      if found_code_start and found_code_end:
+        for line in found_code_lines:
+          print(line, file=file )
+
+        # Print comment so we can track responses that did not use
+        # <CODE></CODE> correctly
+
+        print( "", file=file )
+        if opts.lang == "verilog":
+          comment_delim = "//"
+        else:
+          comment_delim = "#"
+        print( comment_delim + " PYHDL-EVAL: response did not use <CODE></CODE> correctly", file=file )
+
+    print( "", file=file )
+
+    file.close()
 
 main()

@@ -1,61 +1,27 @@
 #=========================================================================
 # Prob01p04_comb_const_32b_value_test
 #=========================================================================
+# SPDX-License-Identifier: MIT
+# Author : Christopher Batten, NVIDIA
+# Date   : May 20, 2024
 
-from pymtl3 import *
-from pymtl3.passes.backends.verilog import *
-
-from test_utils import construct, print_line_trace
-
-#-------------------------------------------------------------------------
-# PyMTL Reference
-#-------------------------------------------------------------------------
-
-class RefModule( Component ):
-  def construct( s ):
-    s.out = OutPort(32)
-    s.out //= 0xdeadbeef
+from pyhdl_eval.cfg  import Config, OutputPort
+from pyhdl_eval.core import run_sim
 
 #-------------------------------------------------------------------------
-# Verilog Wrapper
+# Configuration
 #-------------------------------------------------------------------------
 
-class TopModule( VerilogPlaceholder, Component ):
-  def construct( s ):
-    s.out = OutPort(32)
-
-#-------------------------------------------------------------------------
-# run_sim
-#-------------------------------------------------------------------------
-
-def run_sim( pytestconfig ):
-
-  ref,dut = construct( pytestconfig, __file__, RefModule, TopModule )
-
-  ref.sim_eval_combinational()
-  dut.sim_eval_combinational()
-
-  print_line_trace( dut, dut.out )
-
-  assert ref.out == dut.out
-
-  ref.sim_tick()
-  dut.sim_tick()
-
-  ref.sim_eval_combinational()
-  dut.sim_eval_combinational()
-
-  print_line_trace( dut, dut.out )
-
-  assert ref.out == dut.out
-
-  ref.sim_tick()
-  dut.sim_tick()
+config = Config(
+  ports = [
+    ( "out", OutputPort(32) ),
+  ],
+)
 
 #-------------------------------------------------------------------------
 # test_case_directed
 #-------------------------------------------------------------------------
 
 def test_case_directed( pytestconfig ):
-  run_sim( pytestconfig )
+  run_sim( pytestconfig, __file__, config )
 

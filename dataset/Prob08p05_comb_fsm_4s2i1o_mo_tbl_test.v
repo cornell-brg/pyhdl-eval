@@ -1,6 +1,9 @@
 //========================================================================
 // Prob08p05_comb_fsm_4s2i1o_mo_tbl_test
 //========================================================================
+// SPDX-License-Identifier: MIT
+// Author : Christopher Batten, NVIDIA
+// Date   : May 20, 2024
 
 `include "test_utils.v"
 

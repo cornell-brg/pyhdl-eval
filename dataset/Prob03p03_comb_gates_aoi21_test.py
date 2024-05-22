@@ -1,74 +1,32 @@
 #=========================================================================
 # Prob03p03_comb_gates_aoi21_test
 #=========================================================================
+# SPDX-License-Identifier: MIT
+# Author : Christopher Batten, NVIDIA
+# Date   : May 20, 2024
 
-from pymtl3 import *
-from pymtl3.passes.backends.verilog import *
-
-from test_utils import construct, print_line_trace
-
-#-------------------------------------------------------------------------
-# PyMTL Reference
-#-------------------------------------------------------------------------
-
-class RefModule( Component ):
-  def construct( s ):
-    s.in0 = InPort()
-    s.in1 = InPort()
-    s.in2 = InPort()
-    s.out = OutPort()
-
-    @update
-    def up():
-      s.out @= ~((s.in0 & s.in1) | s.in2)
+from pyhdl_eval.cfg  import Config, InputPort, OutputPort
+from pyhdl_eval.core import run_sim
 
 #-------------------------------------------------------------------------
-# Verilog Wrapper
+# Configuration
 #-------------------------------------------------------------------------
 
-class TopModule( VerilogPlaceholder, Component ):
-  def construct( s ):
-    s.in0 = InPort()
-    s.in1 = InPort()
-    s.in2 = InPort()
-    s.out = OutPort()
-
-#-------------------------------------------------------------------------
-# run_sim
-#-------------------------------------------------------------------------
-
-def run_sim( pytestconfig, test_vectors ):
-
-  ref,dut = construct( pytestconfig, __file__, RefModule, TopModule )
-
-  for test_vector in test_vectors:
-
-    in0,in1,in2 = test_vector
-
-    ref.in0 @= in0
-    ref.in1 @= in1
-    ref.in1 @= in2
-
-    dut.in0 @= in0
-    dut.in1 @= in1
-    dut.in1 @= in2
-
-    ref.sim_eval_combinational()
-    dut.sim_eval_combinational()
-
-    print_line_trace( dut, dut.in0, dut.in1, dut.in2, ">", dut.out )
-
-    assert ref.out == dut.out
-
-    ref.sim_tick()
-    dut.sim_tick()
+config = Config(
+  ports = [
+    ( "in0", InputPort (1) ),
+    ( "in1", InputPort (1) ),
+    ( "in2", InputPort (1) ),
+    ( "out", OutputPort(1) ),
+  ],
+)
 
 #-------------------------------------------------------------------------
 # test_case_directed
 #-------------------------------------------------------------------------
 
 def test_case_directed( pytestconfig ):
-  run_sim( pytestconfig,
+  run_sim( pytestconfig, __file__, config,
   [
     (0,0,0),
     (0,0,1),

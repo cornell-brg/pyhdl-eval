@@ -1,6 +1,9 @@
 //========================================================================
 // Prob19p07_seq_pipe_add4_2stage_test
 //========================================================================
+// SPDX-License-Identifier: MIT
+// Author : Christopher Batten, NVIDIA
+// Date   : May 20, 2024
 
 `include "test_utils.v"
 

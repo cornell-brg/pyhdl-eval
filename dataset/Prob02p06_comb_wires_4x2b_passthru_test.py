@@ -1,95 +1,40 @@
 #=========================================================================
 # Prob02p06_comb_wires_4x2b_passthru_test
 #=========================================================================
+# SPDX-License-Identifier: MIT
+# Author : Christopher Batten, NVIDIA
+# Date   : May 20, 2024
 
-from pymtl3 import *
-from pymtl3.passes.backends.verilog import *
-from pymtl3.datatypes import strategies as pst
-
-from test_utils import construct, print_line_trace
+from pyhdl_eval.cfg  import Config, InputPort, OutputPort
+from pyhdl_eval.core import run_sim
+from pyhdl_eval      import strategies as pst
 
 from hypothesis import settings, given
 from hypothesis import strategies as st
 
 #-------------------------------------------------------------------------
-# PyMTL Reference
+# Configuration
 #-------------------------------------------------------------------------
 
-class RefModule( Component ):
-  def construct( s ):
-    s.in0  = InPort (2)
-    s.in1  = InPort (2)
-    s.in2  = InPort (2)
-    s.in3  = InPort (2)
-    s.out0 = OutPort(2)
-    s.out1 = OutPort(2)
-    s.out2 = OutPort(2)
-    s.out3 = OutPort(2)
-
-    @update
-    def up():
-      s.out0 @= s.in0
-      s.out1 @= s.in1
-      s.out2 @= s.in2
-      s.out3 @= s.in3
-
-#-------------------------------------------------------------------------
-# Verilog Wrapper
-#-------------------------------------------------------------------------
-
-class TopModule( VerilogPlaceholder, Component ):
-  def construct( s ):
-    s.in0  = InPort (2)
-    s.in1  = InPort (2)
-    s.in2  = InPort (2)
-    s.in3  = InPort (2)
-    s.out0 = OutPort(2)
-    s.out1 = OutPort(2)
-    s.out2 = OutPort(2)
-    s.out3 = OutPort(2)
-
-#-------------------------------------------------------------------------
-# run_sim
-#-------------------------------------------------------------------------
-
-def run_sim( pytestconfig, test_vectors ):
-
-  ref,dut = construct( pytestconfig, __file__, RefModule, TopModule )
-
-  for test_vector in test_vectors:
-
-    in0, in1, in2, in3 = test_vector
-
-    ref.in0 @= in0
-    ref.in1 @= in1
-    ref.in2 @= in2
-    ref.in3 @= in3
-
-    dut.in0 @= in0
-    dut.in1 @= in1
-    dut.in2 @= in2
-    dut.in3 @= in3
-
-    ref.sim_eval_combinational()
-    dut.sim_eval_combinational()
-
-    print_line_trace( dut, dut.in0, dut.in1, dut.in2, dut.in3, ">",
-                      dut.out0, dut.out1, dut.out2, dut.out3 )
-
-    assert ref.out0 == dut.out0
-    assert ref.out1 == dut.out1
-    assert ref.out2 == dut.out2
-    assert ref.out3 == dut.out3
-
-    ref.sim_tick()
-    dut.sim_tick()
+config = Config(
+  ports = [
+    ( "in0",  InputPort (2) ),
+    ( "in1",  InputPort (2) ),
+    ( "in2",  InputPort (2) ),
+    ( "in3",  InputPort (2) ),
+    ( "out0", OutputPort(2) ),
+    ( "out1", OutputPort(2) ),
+    ( "out2", OutputPort(2) ),
+    ( "out3", OutputPort(2) ),
+  ],
+)
 
 #-------------------------------------------------------------------------
 # test_case_directed
 #-------------------------------------------------------------------------
 
 def test_case_directed( pytestconfig ):
-  run_sim( pytestconfig,
+  run_sim( pytestconfig, __file__, config,
   [
     ( 0, 0, 0, 0 ),
     ( 0, 1, 2, 3 ),
@@ -113,5 +58,5 @@ def test_case_directed( pytestconfig ):
     )
   ))
 def test_case_random( pytestconfig, test_vectors ):
-  run_sim( pytestconfig, test_vectors )
+  run_sim( pytestconfig, __file__, config, test_vectors )
 

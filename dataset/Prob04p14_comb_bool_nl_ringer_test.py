@@ -1,75 +1,32 @@
 #=========================================================================
 # Prob04p14_comb_bool_nl_ringer_test
 #=========================================================================
+# SPDX-License-Identifier: MIT
+# Author : Christopher Batten, NVIDIA
+# Date   : May 20, 2024
 
-from pymtl3 import *
-from pymtl3.passes.backends.verilog import *
-
-from test_utils import construct, print_line_trace
-
-#-------------------------------------------------------------------------
-# PyMTL Reference
-#-------------------------------------------------------------------------
-
-class RefModule( Component ):
-  def construct( s ):
-    s.vibrate_mode   = InPort()
-    s.ring           = InPort()
-    s.turn_on_ringer = OutPort()
-    s.turn_on_motor  = OutPort()
-
-    @update
-    def up():
-      s.turn_on_ringer @= ~s.vibrate_mode & s.ring
-      s.turn_on_motor  @=  s.vibrate_mode & s.ring
+from pyhdl_eval.cfg  import Config, InputPort, OutputPort
+from pyhdl_eval.core import run_sim
 
 #-------------------------------------------------------------------------
-# Verilog Wrapper
+# Configuration
 #-------------------------------------------------------------------------
 
-class TopModule( VerilogPlaceholder, Component ):
-  def construct( s ):
-    s.vibrate_mode   = InPort()
-    s.ring           = InPort()
-    s.turn_on_ringer = OutPort()
-    s.turn_on_motor  = OutPort()
-
-#-------------------------------------------------------------------------
-# run_sim
-#-------------------------------------------------------------------------
-
-def run_sim( pytestconfig, test_vectors ):
-
-  ref,dut = construct( pytestconfig, __file__, RefModule, TopModule )
-
-  for test_vector in test_vectors:
-
-    vibrate_mode,ring = test_vector
-
-    ref.vibrate_mode @= vibrate_mode
-    ref.ring         @= ring
-
-    dut.vibrate_mode @= vibrate_mode
-    dut.ring         @= ring
-
-    ref.sim_eval_combinational()
-    dut.sim_eval_combinational()
-
-    print_line_trace( dut, dut.vibrate_mode, dut.ring, ">",
-                      dut.turn_on_ringer, dut.turn_on_motor )
-
-    assert ref.turn_on_ringer == dut.turn_on_ringer
-    assert ref.turn_on_motor  == dut.turn_on_motor
-
-    ref.sim_tick()
-    dut.sim_tick()
+config = Config(
+  ports = [
+    ( "vibrate_mode",   InputPort (1) ),
+    ( "ring",           InputPort (1) ),
+    ( "turn_on_ringer", OutputPort(1) ),
+    ( "turn_on_motor",  OutputPort(1) ),
+  ],
+)
 
 #-------------------------------------------------------------------------
 # test_case_directed
 #-------------------------------------------------------------------------
 
 def test_case_directed( pytestconfig ):
-  run_sim( pytestconfig,
+  run_sim( pytestconfig, __file__, config,
   [
     (0,0),
     (0,1),

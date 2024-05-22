@@ -12,8 +12,9 @@
 #
 #  https://stackoverflow.com/questions/451413
 #
-# Author : Christopher Batten
-# Date   : Feb 26, 2024
+# SPDX-License-Identifier: MIT
+# Author : Christopher Batten, NVIDIA
+# Date   : May 20, 2024
 #
 
 import argparse

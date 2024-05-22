@@ -1,6 +1,9 @@
 //========================================================================
 // Prob02p04_comb_wires_100b_bit_rev_test
 //========================================================================
+// SPDX-License-Identifier: MIT
+// Author : Christopher Batten, NVIDIA
+// Date   : May 20, 2024
 
 `include "test_utils.v"
 

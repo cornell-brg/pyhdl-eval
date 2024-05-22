@@ -1,6 +1,9 @@
 //========================================================================
 // Prob07p12_comb_arith_8b_madd_test
 //========================================================================
+// SPDX-License-Identifier: MIT
+// Author : Christopher Batten, NVIDIA
+// Date   : May 20, 2024
 
 `include "test_utils.v"
 

@@ -1,6 +1,9 @@
 //========================================================================
 // Prob09p08_comb_param_rotator_test
 //========================================================================
+// SPDX-License-Identifier: MIT
+// Author : Christopher Batten, NVIDIA
+// Date   : May 20, 2024
 
 `include "test_utils.v"
 

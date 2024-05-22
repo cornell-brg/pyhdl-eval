@@ -1,0 +1,59 @@
+
+Question:
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - parameter nbits
+ - input     clk
+ - input     reset
+ - input     in_ (nbits)
+ - output    out (nbits)
+
+The module should implement an N-bit registered incrementer with an
+active-high synchronous reset. The bitwidth is specified by the parameter
+nbits. The N-bit input is first registered and then incremented by one on
+the next cycle. The internal state should be reset to zero when the reset
+input is one. Assume all values are encoded as two's complement binary
+numbers. Assume all sequential logic is triggered on the positive edge of
+the clock.
+
+Enclose your code with <CODE> and </CODE>. Only output the code snippet
+and do NOT output anything else.
+
+Answer:
+<CODE>
+from myhdl import *
+
+@block
+def TopModule( clk, reset, in_, out, nbits ):
+
+  # Sequential logic
+
+  reg_out = Signal( modbv(0)[nbits:] )
+
+  @always( clk.posedge )
+  def seq():
+    if reset:
+      reg_out.next = 0
+    else:
+      reg_out.next = in_
+
+  # Combinational logic
+
+  temp_wire = Signal( modbv(0)[nbits:] )
+
+  @always_comb
+  def comb0():
+    temp_wire.next = reg_out + 1
+
+  # Structural connections
+
+  @always_comb
+  def comb1():
+    out.next = temp_wire
+
+  # Return blocks
+
+  return seq, comb0, comb1
+</CODE>
+

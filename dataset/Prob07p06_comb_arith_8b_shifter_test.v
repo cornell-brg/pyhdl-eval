@@ -1,6 +1,9 @@
 //========================================================================
 // Prob07p06_comb_arith_8b_shifter_test
 //========================================================================
+// SPDX-License-Identifier: MIT
+// Author : Christopher Batten, NVIDIA
+// Date   : May 20, 2024
 
 `include "test_utils.v"
 

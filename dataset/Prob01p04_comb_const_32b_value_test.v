@@ -1,6 +1,9 @@
 //========================================================================
 // Prob01p04_comb_const_32b_value_test
 //========================================================================
+// SPDX-License-Identifier: MIT
+// Author : Christopher Batten, NVIDIA
+// Date   : May 20, 2024
 
 `include "test_utils.v"
 

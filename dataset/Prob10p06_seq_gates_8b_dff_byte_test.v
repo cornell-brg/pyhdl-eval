@@ -1,6 +1,9 @@
 //========================================================================
 // Prob10p06_seq_gates_8b_dff_byte_test
 //========================================================================
+// SPDX-License-Identifier: MIT
+// Author : Christopher Batten, NVIDIA
+// Date   : May 20, 2024
 
 `include "test_utils.v"
 

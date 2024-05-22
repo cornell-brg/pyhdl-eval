@@ -1,6 +1,9 @@
 //========================================================================
 // Prob10p07_seq_gates_nl0
 //========================================================================
+// SPDX-License-Identifier: MIT
+// Author : Christopher Batten, NVIDIA
+// Date   : May 20, 2024
 
 `include "test_utils.v"
 

@@ -1,75 +1,32 @@
 #=========================================================================
 # Prob04p13_comb_bool_nl_lights_test
 #=========================================================================
+# SPDX-License-Identifier: MIT
+# Author : Christopher Batten, NVIDIA
+# Date   : May 20, 2024
 
-from pymtl3 import *
-from pymtl3.passes.backends.verilog import *
-
-from test_utils import construct, print_line_trace
-
-#-------------------------------------------------------------------------
-# PyMTL Reference
-#-------------------------------------------------------------------------
-
-class RefModule( Component ):
-  def construct( s ):
-    s.dark           = InPort()
-    s.movement       = InPort()
-    s.force_on       = InPort()
-    s.turn_on_lights = OutPort()
-
-    @update
-    def up():
-      s.turn_on_lights @= (s.dark & s.movement) | s.force_on
+from pyhdl_eval.cfg  import Config, InputPort, OutputPort
+from pyhdl_eval.core import run_sim
 
 #-------------------------------------------------------------------------
-# Verilog Wrapper
+# Configuration
 #-------------------------------------------------------------------------
 
-class TopModule( VerilogPlaceholder, Component ):
-  def construct( s ):
-    s.dark           = InPort()
-    s.movement       = InPort()
-    s.force_on       = InPort()
-    s.turn_on_lights = OutPort()
-
-#-------------------------------------------------------------------------
-# run_sim
-#-------------------------------------------------------------------------
-
-def run_sim( pytestconfig, test_vectors ):
-
-  ref,dut = construct( pytestconfig, __file__, RefModule, TopModule )
-
-  for test_vector in test_vectors:
-
-    dark,movement,force_on = test_vector
-
-    ref.dark     @= dark
-    ref.movement @= movement
-    ref.force_on @= force_on
-
-    dut.dark     @= dark
-    dut.movement @= movement
-    dut.force_on @= force_on
-
-    ref.sim_eval_combinational()
-    dut.sim_eval_combinational()
-
-    print_line_trace( dut, dut.dark, dut.movement, dut.force_on, ">",
-                      dut.turn_on_lights )
-
-    assert ref.turn_on_lights == dut.turn_on_lights
-
-    ref.sim_tick()
-    dut.sim_tick()
+config = Config(
+  ports = [
+    ( "dark",           InputPort (1) ),
+    ( "movement",       InputPort (1) ),
+    ( "force_on",       InputPort (1) ),
+    ( "turn_on_lights", OutputPort(1) ),
+  ],
+)
 
 #-------------------------------------------------------------------------
 # test_case_directed
 #-------------------------------------------------------------------------
 
 def test_case_directed( pytestconfig ):
-  run_sim( pytestconfig,
+  run_sim( pytestconfig, __file__, config,
   [
     (0,0,0),
     (0,0,1),

@@ -1,6 +1,9 @@
 //========================================================================
 // Prob04p02_comb_bool_logic_eq1_test
 //========================================================================
+// SPDX-License-Identifier: MIT
+// Author : Christopher Batten, NVIDIA
+// Date   : May 20, 2024
 
 `include "test_utils.v"
 

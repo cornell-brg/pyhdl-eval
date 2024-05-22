@@ -1,6 +1,9 @@
 //========================================================================
 // Prob02p07_comb_wires_5x3b_to_4x4b_test
 //========================================================================
+// SPDX-License-Identifier: MIT
+// Author : Christopher Batten, NVIDIA
+// Date   : May 20, 2024
 
 `include "test_utils.v"
 

@@ -1,0 +1,51 @@
+
+Question:
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  clk
+ - input  reset
+ - input  in_ (8 bits)
+ - output out (8 bits)
+
+The module should implement an 8-bit registered incrementer with an
+active-high synchronous reset. The 8-bit input is first registered and
+then incremented by one on the next cycle. The internal state should be
+reset to zero when the reset input is one. Assume all values are encoded
+as two's complement binary numbers. Assume all sequential logic is
+triggered on the positive edge of the clock.
+
+Enclose your code with <CODE> and </CODE>. Only output the code snippet
+and do NOT output anything else.
+
+Answer:
+<CODE>
+from migen import *
+
+@ResetInserter()
+class TopModule( Module ):
+
+  def __init__( s ):
+
+    # Port-based interface
+
+    s.in_ = Signal(8)
+    s.out = Signal(8)
+
+    # Sequential logic
+
+    reg_out = Signal( 8, reset=0 )
+
+    s.sync += reg_out.eq( s.in_ )
+
+    # Combinational logic
+
+    temp_wire = Signal(8)
+
+    s.comb += temp_wire.eq( reg_out + 1 )
+
+    # Structural connections
+
+    s.comb += s.out.eq( temp_wire )
+</CODE>
+

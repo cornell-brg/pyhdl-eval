@@ -1,0 +1,43 @@
+
+Question:
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  in_ (8 bits)
+ - output out (8 bits)
+
+The module should implement an incrementer which increments the input by
+one and writes the result to the output. Assume all values are encoded as
+two's complement binary numbers.
+
+Enclose your code with <CODE> and </CODE>. Only output the code snippet
+and do NOT output anything else.
+
+Answer:
+<CODE>
+from amaranth import *
+
+class TopModule( Elaboratable ):
+
+  def __init__( s ):
+
+    # Port-based interface
+
+    s.in_ = Signal(8)
+    s.out = Signal(8)
+
+  def elaborate( s, platform ):
+
+    # Create module
+
+    m = Module()
+
+    # Combinational logic
+
+    m.d.comb += s.out.eq( s.in_ + 1 )
+
+    # Return module
+
+    return m
+</CODE>
+

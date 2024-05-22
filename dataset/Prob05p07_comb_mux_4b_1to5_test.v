@@ -1,6 +1,9 @@
 //========================================================================
 // Prob05p07_comb_mux_4b_1to5_test
 //========================================================================
+// SPDX-License-Identifier: MIT
+// Author : Christopher Batten, NVIDIA
+// Date   : May 20, 2024
 
 `include "test_utils.v"
 

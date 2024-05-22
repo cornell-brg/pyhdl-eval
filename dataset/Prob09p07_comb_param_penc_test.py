@@ -1,73 +1,40 @@
 #=========================================================================
 # Prob09p07_comb_param_penc_test
 #=========================================================================
+# SPDX-License-Identifier: MIT
+# Author : Christopher Batten, NVIDIA
+# Date   : May 20, 2024
 
-from pymtl3 import *
-from pymtl3.passes.backends.verilog import *
-from pymtl3.datatypes import strategies as pst
-
-from test_utils import construct, print_line_trace
+from pyhdl_eval.cfg  import Config, InputPort, OutputPort
+from pyhdl_eval.core import run_sim
+from pyhdl_eval.bits import clog2
+from pyhdl_eval      import strategies as pst
 
 from hypothesis import settings, given
 from hypothesis import strategies as st
 
 #-------------------------------------------------------------------------
-# PyMTL Reference
+# Configuration
 #-------------------------------------------------------------------------
 
-class RefModule( Component ):
-  def construct( s, nbits ):
-    s.in_ = InPort (nbits)
-    s.out = OutPort(clog2(nbits))
-
-    @update
-    def up():
-      s.out @= 0
-      for i in reversed(range(nbits)):
-        if s.in_[i] == 1:
-          s.out @= i
-
-#-------------------------------------------------------------------------
-# Verilog Wrapper
-#-------------------------------------------------------------------------
-
-class TopModule( VerilogPlaceholder, Component ):
-  def construct( s, nbits ):
-    s.in_ = InPort (nbits)
-    s.out = OutPort(clog2(nbits))
-
-#-------------------------------------------------------------------------
-# run_sim
-#-------------------------------------------------------------------------
-
-def run_sim( pytestconfig, test_vectors, nbits ):
-
-  ref,dut = construct( pytestconfig, __file__, RefModule, TopModule,
-                       nbits=nbits )
-
-  for test_vector in test_vectors:
-
-    in_ = test_vector
-
-    ref.in_ @= in_
-    dut.in_ @= in_
-
-    ref.sim_eval_combinational()
-    dut.sim_eval_combinational()
-
-    print_line_trace( dut, dut.in_, ">", dut.out )
-
-    assert ref.out == dut.out
-
-    ref.sim_tick()
-    dut.sim_tick()
+def mk_config( nbits ):
+  config = Config(
+    parameters = {
+      "nbits" : nbits,
+    },
+    ports = [
+      ( "in_", InputPort (nbits)        ),
+      ( "out", OutputPort(clog2(nbits)) ),
+    ],
+  )
+  return config
 
 #-------------------------------------------------------------------------
 # test_case_nbits8_directed
 #-------------------------------------------------------------------------
 
 def test_case_nbits8_directed( pytestconfig ):
-  run_sim( pytestconfig,
+  run_sim( pytestconfig, __file__, mk_config(nbits=8),
   [
     0b0000_0000,
     0b0000_0001,
@@ -108,8 +75,7 @@ def test_case_nbits8_directed( pytestconfig ):
     0b1101_0000,
     0b1110_0000,
     0b1111_0000,
-  ],
-  nbits=8 )
+  ])
 
 #-------------------------------------------------------------------------
 # test_case_nbits8_random
@@ -118,14 +84,14 @@ def test_case_nbits8_directed( pytestconfig ):
 @settings(deadline=1000,max_examples=20)
 @given( st.lists( pst.bits(8) ))
 def test_case_nbits8_random( pytestconfig, test_vectors ):
-  run_sim( pytestconfig, test_vectors, nbits=8 )
+  run_sim( pytestconfig, __file__, mk_config(nbits=8), test_vectors )
 
 #-------------------------------------------------------------------------
 # test_case_nbits10_directed
 #-------------------------------------------------------------------------
 
 def test_case_nbits10_directed( pytestconfig ):
-  run_sim( pytestconfig,
+  run_sim( pytestconfig, __file__, mk_config(nbits=10),
   [
     0b00_0000_0000,
     0b00_0000_0001,
@@ -171,8 +137,7 @@ def test_case_nbits10_directed( pytestconfig ):
     0b01_0000_0000,
     0b10_0000_0000,
     0b11_0000_0000,
-  ],
-  nbits=10 )
+  ])
 
 #-------------------------------------------------------------------------
 # test_case_nbits10_random
@@ -181,5 +146,5 @@ def test_case_nbits10_directed( pytestconfig ):
 @settings(deadline=1000,max_examples=20)
 @given( st.lists( pst.bits(10) ))
 def test_case_nbits10_random( pytestconfig, test_vectors ):
-  run_sim( pytestconfig, test_vectors, nbits=10 )
+  run_sim( pytestconfig, __file__, mk_config(nbits=10), test_vectors )
 
