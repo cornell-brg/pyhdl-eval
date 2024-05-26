@@ -8,8 +8,8 @@
 module TopModule
 (
   input  logic       clk,
-  input  logic       ld,
   input  logic       en,
+  input  logic       ld,
   input  logic [7:0] in_,
   output logic [7:0] out
 );

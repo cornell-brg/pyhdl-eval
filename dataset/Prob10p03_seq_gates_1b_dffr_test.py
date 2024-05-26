@@ -5,6 +5,8 @@
 # Author : Christopher Batten, NVIDIA
 # Date   : May 20, 2024
 
+import pytest
+
 from pyhdl_eval.cfg  import Config, InputPort, OutputPort
 from pyhdl_eval.core import run_sim
 from pyhdl_eval      import strategies as pst
@@ -45,6 +47,7 @@ def test_case_directed( pytestconfig ):
 # test_case_directed_reset
 #-------------------------------------------------------------------------
 
+@pytest.mark.multi_reset
 def test_case_directed_reset( pytestconfig ):
   run_sim( pytestconfig, __file__, config,
   [
@@ -68,6 +71,7 @@ def test_case_directed_reset( pytestconfig ):
 # test_case_random_reset
 #-------------------------------------------------------------------------
 
+@pytest.mark.multi_reset
 @settings(deadline=1000,max_examples=20)
 @given( st.lists( st.tuples( pst.bits(1), pst.bits(1) ) ))
 def test_case_random_reset( pytestconfig, test_vectors ):

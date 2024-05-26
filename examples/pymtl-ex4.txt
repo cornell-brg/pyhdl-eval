@@ -1,0 +1,58 @@
+
+Question:
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input     clk
+ - input     en
+ - input     ld
+ - input     in_ (8 bits)
+ - output    out (8 bits)
+
+The module should implement an N-bit counting registered incrementer with
+an enable. When the input ld is high (regardless of the value of the
+input en), then the input (in_) should be loaded into an internal
+register. When the input en is high, then the module should increment the
+internal register by one. The internal register should always be
+connected to the output regardless of whether the module is enabled or
+not. Assume all sequential logic is triggered on the positive edge of the
+clock.
+
+Answer:
+<CODE>
+from pymtl3 import *
+
+class TopModule( Component ):
+
+  def construct( s ):
+
+    # Port-based interface
+
+    s.en  = InPort ()
+    s.ld  = InPort ()
+    s.in_ = InPort ( Bits8 )
+    s.out = OutPort( Bits8 )
+
+    # Sequential logic
+
+    s.reg_next = Wire( Bits8 )
+    s.reg_out  = Wire( Bits8 )
+
+    @update_ff
+    def seq():
+      if s.ld:
+        s.reg_out <<= s.in_
+      elif s.en:
+        s.reg_out <<= s.reg_next
+
+    # Combinational logic
+
+    @update
+    def comb():
+      s.reg_next @= s.reg_out + 1
+
+    # Structural connections
+
+    s.out //= s.reg_out
+</CODE>
+

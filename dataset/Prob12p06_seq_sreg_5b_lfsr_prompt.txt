@@ -1,0 +1,37 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  clk
+ - input  reset
+ - output out (5 bits)
+
+The module should implement a 5-bit maximum-length Galios linear feedback
+shift register (LFSR) with an active-high synchronous reset.
+
+We can represent a 5-bit standard shift register which shifts bits to the
+right as follows:
+
+  in --> S[4] --> S[3] --> S[2] --> S[1] --> S[0] --> out
+
+S[i] refers to the ith flip-flop in the shift register, where i ranges
+from 0 to 4 inclusive. A Galois LFSR is a shift register with two-input
+XOR gates inserted between specific bits of the shift register; the
+output of the shift register is connected to the free input of each XOR
+gate. If the XOR gates are inserted carefully, the LFSR can be made to be
+"maximum-length". A maximum-length LFSR of n bits cycles through 2**n-1
+states before repeating (the all-zero state is never reached).
+
+The module should implement the following 5-bit maximal-length Galois
+LFSR where a single XOR gate is inserted between S[2] and S[3].
+
+  .--> S[4] --> S[3] --> XOR --> S[2] --> S[1] --> S[0] --.
+  |                       ^                               |
+  '-----------------------'-------------------------------'
+
+All five bits of the shift register should be connected to the output.
+The module's internal shift register should be reset to binary one (i.e.,
+S[0] should be reset to one while the remaining bits should be reset to
+zero) one when the reset input is one. Assume all sequential logic is
+triggered on the positive edge of the clock.
+

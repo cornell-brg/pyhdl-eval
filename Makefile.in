@@ -149,7 +149,7 @@ $$($(1)_sv_samples) : %.v : $(1)_ref.v
               $(REDIRECT_LOG) $$*-sv-generate.log
 else
 $$($(1)_sv_samples) : %.v : $(1)_prompt.txt
-	@$$(ECHO) Generating $$(notdir $$@) verilog
+	@$$(ECHO) Generating $$(notdir $$@) for verilog
 	$$(QUIET) mkdir -p $(1)
 	$$(QUIET) $$(GENERATE) $$(GENERATE_VERILOG_FLAGS) --verbose \
               --output $$@ $$< \
@@ -182,11 +182,12 @@ $(1)_sv_test_logs = \
   $$(patsubst %.v, %-sv-test.log, $$($(1)_sv_samples))
 
 $$($(1)_sv_test_logs) : %-sv-test.log : %.v $(1)_test.v $(1)_ref.v
-	@$$(ECHO)  Testing $$(notdir $$*) with iverilog
+	@$$(ECHO)  Testing $$(notdir $$*) for verilog
 	-$$(QUIET) $(IVERILOG_COMPILE) -s Top -I $(dataset_dir) -o $$* $$^ \
                $(REDIRECT_LOG) $$*-sv-test.log
-	-$$(QUIET) timeout 30 ./$$* +test-case=-1 $(REDIRECT_APPEND_LOG) $$@; \
-             if [[ $$$${PIPESTATUS[0]} == 124 ]]; then    \
+	-$$(QUIET) timeout 30 \
+               ./$$* +test-case=-1 $(REDIRECT_APPEND_LOG) $$@; \
+             if [[ $$$${PIPESTATUS[0]} == 124 ]]; then \
                echo "TIMEOUT" $(REDIRECT_APPEND_LOG) $$@; \
              fi
 
@@ -208,7 +209,7 @@ $(1)_py_samples       := $$(patsubst %, $(1)/$(1)_sample%.py, $$(sample_num_strs
 $(1)_py_generate_logs := $$(patsubst %, $(1)/$(1)_sample%-py-generate.log, $$(sample_num_strs))
 
 $$($(1)_py_samples) : %.py : $(1)_prompt.txt
-	@$$(ECHO) Generating $$(notdir $$@) pymtl
+	@$$(ECHO) Generating $$(notdir $$@) for $$(pydsl)
 	$$(QUIET) mkdir -p $(1)
 	$$(QUIET) $$(GENERATE) $$(GENERATE_PYDSL_FLAGS) --verbose \
               --output $$@ $$< \
@@ -237,10 +238,15 @@ $(1)_py_test_logs = \
   $$(patsubst %.py, %-py-test.log, $$($(1)_py_samples))
 
 $$($(1)_py_test_logs) : %-py-test.log : $(1)_test.py %.py
-	@$$(ECHO)  Testing $$(notdir $$*) with pymtl
-	-$$(QUIET) cd $(1); $(PYTEST) ../$$< -s --verbose --tb=short \
-               --$$(pydsl)=$$(notdir $$*).py \
-               $(REDIRECT_LOG) $$(notdir $$*)-py-test.log
+	@$$(ECHO)  Testing $$(notdir $$*) for $$(pydsl)
+	-$$(QUIET) cd $(1); \
+             timeout 30 \
+               $(PYTEST) ../$$< -sx --verbose --tb=short \
+                 --$$(pydsl)=$$(notdir $$*).py \
+                 $(REDIRECT_LOG) $$(notdir $$*)-py-test.log; \
+             if [[ $$$${PIPESTATUS[0]} == 124 ]]; then  \
+               echo "TIMEOUT" $(REDIRECT_APPEND_LOG) $$(notdir $$*)-py-test.log; \
+             fi
 
 $(1)-py-test : $$($(1)_py_test_logs)
 
@@ -348,17 +354,35 @@ dist_junk += \
 # Default
 #-------------------------------------------------------------------------
 
-all_targets :=
+# Only generating verilog
 
 ifneq ($(cfg_verilog),no)
-all_targets += sv-analyze
+ifeq  ($(cfg_pydsl),no)
+
+all : sv-analyze
+
+endif
 endif
 
+# Only generating pydsl
+
+ifeq  ($(cfg_verilog),no)
 ifneq ($(cfg_pydsl),no)
-all_targets += py-analyze
+
+all : py-analyze
+
+endif
 endif
 
-all : $(all_targets)
+# Generating both verilog and pydsl
+
+ifneq ($(cfg_verilog),no)
+ifneq ($(cfg_pydsl),no)
+
+all : sv-analyze py-analyze
+	$(scripts_dir)/collect-summaries
+endif
+endif
 
 .PHONY : all
 

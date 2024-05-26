@@ -7,7 +7,7 @@
 
 from pyrtl import *
 
-def TopModule( ld, en, in_ ):
+def TopModule( en, ld, in_ ):
 
   # Declare outputs
 

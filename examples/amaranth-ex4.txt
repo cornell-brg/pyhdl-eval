@@ -1,0 +1,64 @@
+
+Question:
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input     clk
+ - input     en
+ - input     ld
+ - input     in_ (8 bits)
+ - output    out (8 bits)
+
+The module should implement an N-bit counting registered incrementer with
+an enable. When the input ld is high (regardless of the value of the
+input en), then the input (in_) should be loaded into an internal
+register. When the input en is high, then the module should increment the
+internal register by one. The internal register should always be
+connected to the output regardless of whether the module is enabled or
+not. Assume all sequential logic is triggered on the positive edge of the
+clock.
+
+Answer:
+<CODE>
+from amaranth import *
+
+class TopModule( Elaboratable ):
+
+  def __init__( s ):
+
+    # Port-based interface
+
+    s.en  = Signal()
+    s.ld  = Signal()
+    s.in_ = Signal(8)
+    s.out = Signal(8)
+
+  def elaborate( s, platform ):
+
+    # Create module
+
+    m = Module()
+
+    # Sequential logic
+
+    reg_next = Signal( 8 )
+    reg_out  = Signal( 8 )
+
+    with m.If( s.ld ):
+      m.d.sync += reg_out.eq( s.in_ )
+    with m.Elif( s.en ):
+      m.d.sync += reg_out.eq( reg_next )
+
+    # Combinational logic
+
+    m.d.comb += reg_next.eq( reg_out + 1 )
+
+    # Structural connections
+
+    m.d.comb += s.out.eq( reg_out )
+
+    # Return module
+
+    return m
+</CODE>
+

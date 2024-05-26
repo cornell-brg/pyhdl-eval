@@ -1,0 +1,15 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  clk
+ - input  reset
+ - output out (3 bits)
+
+The module should implement a 3-bit binary down counter with an
+active-high synchronous reset. The counter should be reset to seven when
+the reset input is one. The counter should then count down by one every
+cycle; when the counter reaches zero it should wrap-around. The internal
+counter register should be directly connected to the output port. Assume
+all sequential logic is triggered on the positive edge of the clock.
+

@@ -243,6 +243,10 @@ def analyze_result( results, problem, sample, generate_log, compile_log, verilog
         result_record.passfail = 'c'
         break
 
+      if "TIMEOUT" in line:
+        result_record.passfail = 'T'
+        break
+
       if "timeout!" in line:
         result_record.passfail = 'T'
         break

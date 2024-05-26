@@ -13,8 +13,8 @@ class TopModule( Component ):
 
     # Port-based interface
 
-    s.ld  = InPort ()
     s.en  = InPort ()
+    s.ld  = InPort ()
     s.in_ = InPort ( Bits8 )
     s.out = OutPort( Bits8 )
 

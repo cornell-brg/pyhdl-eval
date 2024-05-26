@@ -13,8 +13,8 @@ class TopModule( Module ):
 
     # Port-based interface
 
-    s.ld  = Signal()
     s.en  = Signal()
+    s.ld  = Signal()
     s.in_ = Signal(8)
     s.out = Signal(8)
 

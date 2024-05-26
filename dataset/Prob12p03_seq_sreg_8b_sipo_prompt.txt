@@ -1,0 +1,19 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  clk
+ - input  reset
+ - input  en
+ - input  sin
+ - output pout
+
+The module should implement an 8-bit, serial-input, parallel-output shift
+register with an active-high synchronous reset and an enable. When the
+input en is high, then the shift register should shift all of its values
+by one bit to the left and use the input sin as the new the
+least-significant bit of the shift register. All eight bits of the shift
+register should be connected to the output pout. The shift register
+should be reset to zero when the reset input is one. Assume all
+sequential logic is triggered on the positive edge of the clock.
+

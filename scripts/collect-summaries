@@ -1,0 +1,138 @@
+#!/usr/bin/env python
+#=========================================================================
+# collect-summaries [options]
+#=========================================================================
+#
+#  -v --verbose        Display the prompt
+#  -h --help           Display this message
+#
+# Collect text summaries into a single summary
+#
+# Author : Christopher Batten (with GPT4 assitance)
+# Date   : Apr 17, 2024
+#
+
+import argparse
+import sys
+
+#-------------------------------------------------------------------------
+# Command line processing
+#-------------------------------------------------------------------------
+
+class ArgumentParserWithCustomError(argparse.ArgumentParser):
+  def error( self, msg = "" ):
+    if ( msg ): print("\n ERROR: %s" % msg)
+    print("")
+    file = open( sys.argv[0] )
+    for ( lineno, line ) in enumerate( file ):
+      if ( line[0] != '#' ): sys.exit(msg != "")
+      if ( (lineno == 2) or (lineno >= 4) ): print( line[1:].rstrip("\n") )
+
+def parse_cmdline():
+  p = ArgumentParserWithCustomError( add_help=False )
+
+  p.add_argument( "-h", "--help",        action="store_true" )
+  p.add_argument( "-v", "--verbose",     action="store_true" )
+
+  opts = p.parse_args()
+  if opts.help: p.error()
+  return opts
+
+#-------------------------------------------------------------------------
+# read_file
+#-------------------------------------------------------------------------
+
+def read_file(filename):
+  """Reads a file and returns the lines."""
+  with open(filename, 'r') as file:
+    lines = file.readlines()
+  return lines
+
+#-------------------------------------------------------------------------
+# parse_line
+#-------------------------------------------------------------------------
+
+def parse_lines(lines):
+  """Parses lines of each file to extract problem results and summary
+  statistics."""
+
+  results = {}
+  pass_rate = None
+  for line in lines:
+    if 'Prob' in line:
+      line = line.replace("(100%)","(  %)")
+      parts = line.split()
+      problem_name = parts[0]
+
+      # Extract just the sequence of characters,
+      # skipping the number and percentages
+      sequence = ' '.join(parts[4:])
+      results[problem_name] = sequence
+
+    elif 'pass_rate' in line:
+      pass_rate = float(line.split('=')[-1].strip())
+
+  return results, pass_rate
+
+#-------------------------------------------------------------------------
+# combine_results
+#-------------------------------------------------------------------------
+
+def combine_results(files):
+  """Combines results from all files into a single output."""
+  all_results = {}
+  pass_rates = []
+  for file in files:
+    data = read_file(file)
+    results, pass_rate = parse_lines(data)
+    pass_rates.append(pass_rate)
+    for problem_name, result in results.items():
+      if problem_name not in all_results:
+        all_results[problem_name] = []
+      all_results[problem_name].append(result)
+  return all_results, pass_rates
+
+#-------------------------------------------------------------------------
+# print_results
+#-------------------------------------------------------------------------
+
+def print_results(all_results, pass_rates):
+    """Prints the combined results in a formatted table."""
+    headers = [
+        "verilog",
+        "pydsl"
+    ]
+    header_line = f"{'':<35}"
+    separator_line = f"{'':<34}"
+    for i in range(len(headers)):
+        header_line += f"{headers[i]} ({pass_rates[i]:.2f}%)".ljust(25)
+        separator_line += "-----------------------".center(25)
+
+    print("")
+    print(header_line)
+    print(separator_line)
+    for problem_name, results in sorted(all_results.items()):
+        print(f"{problem_name:35s}", end="")
+        for result in results:
+            print(f"{result:25s}", end="")
+        print()
+    print("")
+
+#-------------------------------------------------------------------------
+# Main
+#-------------------------------------------------------------------------
+
+def main():
+
+  opts = parse_cmdline()
+
+  # File names
+  files = ['sv-summary.txt', 'py-summary.txt']
+
+  # Process the files
+  all_results, pass_rates = combine_results(files)
+
+  # Print the formatted results
+  print_results(all_results, pass_rates)
+
+main()

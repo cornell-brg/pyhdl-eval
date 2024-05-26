@@ -234,6 +234,10 @@ def analyze_result( results, problem, sample, generate_log, compile_log, pydsl )
         result_record.passfail = 'v'
         break
 
+      if "TIMEOUT" in line:
+        result_record.passfail = 'T'
+        break
+
       if "PASSED" in line:
         one_pass = True
 

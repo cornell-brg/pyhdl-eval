@@ -206,6 +206,10 @@ def analyze_result( results, problem, sample, generate_log, compile_log, pymtl )
 
       # will need to add in more compile error checks here eventually
 
+      if "FieldReassignError(" in line:
+        result_record.passfail = 'f'
+        break
+
       if "AttributeError: 'TopModule' object has no attribute 'update'" in line:
         result_record.passfail = 'u'
         break
@@ -256,6 +260,10 @@ def analyze_result( results, problem, sample, generate_log, compile_log, pymtl )
 
       if "ValueError: " in line:
         result_record.passfail = 'v'
+        break
+
+      if "TIMEOUT" in line:
+        result_record.passfail = 'T'
         break
 
       if "PASSED" in line:

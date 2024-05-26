@@ -8,7 +8,7 @@
 from myhdl import *
 
 @block
-def TopModule( clk, ld, en, in_, out ):
+def TopModule( clk, en, ld, in_, out ):
 
   # Sequential logic
 

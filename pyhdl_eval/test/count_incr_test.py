@@ -21,8 +21,8 @@ from hypothesis import strategies as st
 config = Config(
   ports = [
     ( "clk",   InputPort (1) ),
-    ( "ld",    InputPort (1) ),
     ( "en",    InputPort (1) ),
+    ( "ld",    InputPort (1) ),
     ( "in_",   InputPort (8) ),
     ( "out",   OutputPort(8) ),
   ],
@@ -38,13 +38,13 @@ config = Config(
 def test_case_ld_zero( dslstr ):
   run_sim( dslstr, __file__, config,
   [
-    # ld en in_
+    # en ld in_
     ( 1, 1, 0 ),
-    ( 0, 1, 0 ),
-    ( 0, 1, 0 ),
-    ( 0, 1, 0 ),
-    ( 0, 1, 0 ),
-    ( 0, 1, 0 ),
+    ( 1, 0, 0 ),
+    ( 1, 0, 0 ),
+    ( 1, 0, 0 ),
+    ( 1, 0, 0 ),
+    ( 1, 0, 0 ),
     ( 0, 0, 0 ),
     ( 0, 0, 0 ),
   ])
@@ -57,13 +57,13 @@ def test_case_ld_zero( dslstr ):
 def test_case_ld_small( dslstr ):
   run_sim( dslstr, __file__, config,
   [
-    # ld en in_
+    # en ld in_
     ( 1, 1, 4 ),
-    ( 0, 1, 0 ),
-    ( 0, 1, 0 ),
-    ( 0, 1, 0 ),
-    ( 0, 1, 0 ),
-    ( 0, 1, 0 ),
+    ( 1, 0, 0 ),
+    ( 1, 0, 0 ),
+    ( 1, 0, 0 ),
+    ( 1, 0, 0 ),
+    ( 1, 0, 0 ),
     ( 0, 0, 0 ),
     ( 0, 0, 0 ),
   ])
@@ -76,13 +76,13 @@ def test_case_ld_small( dslstr ):
 def test_case_ld_large( dslstr ):
   run_sim( dslstr, __file__, config,
   [
-    # ld en in_
+    # en ld in_
     ( 1, 1, 254 ),
-    ( 0, 1,   0 ),
-    ( 0, 1,   0 ),
-    ( 0, 1,   0 ),
-    ( 0, 1,   0 ),
-    ( 0, 1,   0 ),
+    ( 1, 0,   0 ),
+    ( 1, 0,   0 ),
+    ( 1, 0,   0 ),
+    ( 1, 0,   0 ),
+    ( 1, 0,   0 ),
     ( 0, 0,   0 ),
     ( 0, 0,   0 ),
   ])
@@ -95,21 +95,21 @@ def test_case_ld_large( dslstr ):
 def test_case_mult_ld( dslstr ):
   run_sim( dslstr, __file__, config,
   [
-    # ld en in_
+    # en ld in_
     ( 1, 1, 0 ),
-    ( 0, 1, 0 ),
-    ( 0, 1, 0 ),
-    ( 0, 1, 0 ),
-    ( 0, 1, 0 ),
-    ( 0, 1, 0 ),
+    ( 1, 0, 0 ),
+    ( 1, 0, 0 ),
+    ( 1, 0, 0 ),
+    ( 1, 0, 0 ),
+    ( 1, 0, 0 ),
     ( 0, 0, 0 ),
     ( 0, 0, 0 ),
     ( 1, 1, 9 ),
-    ( 0, 1, 0 ),
-    ( 0, 1, 0 ),
-    ( 0, 1, 0 ),
-    ( 0, 1, 0 ),
-    ( 0, 1, 0 ),
+    ( 1, 0, 0 ),
+    ( 1, 0, 0 ),
+    ( 1, 0, 0 ),
+    ( 1, 0, 0 ),
+    ( 1, 0, 0 ),
     ( 0, 0, 0 ),
     ( 0, 0, 0 ),
   ])
@@ -122,21 +122,21 @@ def test_case_mult_ld( dslstr ):
 def test_case_mult_en( dslstr ):
   run_sim( dslstr, __file__, config,
   [
-    # ld en in_
+    # en ld in_
     ( 1, 1,  0 ),
-    ( 0, 1,  1 ),
+    ( 1, 0,  1 ),
     ( 0, 0,  2 ),
     ( 0, 0,  3 ),
-    ( 0, 1,  4 ),
-    ( 0, 1,  5 ),
+    ( 1, 0,  4 ),
+    ( 1, 0,  5 ),
     ( 0, 0,  6 ),
     ( 0, 0,  7 ),
-    ( 0, 1,  8 ),
-    ( 0, 1,  9 ),
+    ( 1, 0,  8 ),
+    ( 1, 0,  9 ),
     ( 0, 0, 10 ),
     ( 0, 0, 11 ),
-    ( 0, 1, 12 ),
-    ( 0, 1, 13 ),
+    ( 1, 0, 12 ),
+    ( 1, 0, 13 ),
     ( 0, 0, 14 ),
     ( 0, 0, 15 ),
     ( 0, 0,  0 ),

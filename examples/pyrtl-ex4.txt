@@ -1,0 +1,54 @@
+
+Question:
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input     clk
+ - input     en
+ - input     ld
+ - input     in_ (8 bits)
+ - output    out (8 bits)
+
+The module should implement an N-bit counting registered incrementer with
+an enable. When the input ld is high (regardless of the value of the
+input en), then the input (in_) should be loaded into an internal
+register. When the input en is high, then the module should increment the
+internal register by one. The internal register should always be
+connected to the output regardless of whether the module is enabled or
+not. Assume all sequential logic is triggered on the positive edge of the
+clock.
+
+Answer:
+<CODE>
+from pyrtl import *
+
+def TopModule( en, ld, in_ ):
+
+  # Declare outputs
+
+  out = WireVector(8)
+
+  # Sequential logic
+
+  reg_next = WireVector(8)
+  reg_out  = Register(8)
+
+  with conditional_assignment:
+    with ld:
+      reg_out.next |= in_
+    with en:
+      reg_out.next |= reg_next
+
+  # Combinational logic
+
+  reg_next <<= reg_out + 1
+
+  # Structural connections
+
+  out <<= reg_out
+
+  # Return outputs
+
+  return out
+</CODE>
+
