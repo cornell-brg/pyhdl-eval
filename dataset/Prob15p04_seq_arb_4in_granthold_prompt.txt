@@ -1,0 +1,55 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  clk
+ - input  reset
+ - input  reqs   (4 bits)
+ - input  holds  (4 bits)
+ - output grants (4 bits)
+
+The module should implement a 4-input grant-hold round-robin priority
+arbiter with an active-high synchronous reset. Each bit of the input reqs
+corresponds to one of the four requesters; if reqs[i] is high then this
+means requester i has a valid request. The output grants is either all
+zeros (meaning no requesters had a valid request on this cycle) or is a
+one-hot bit vector indicating which requester won the arbitration.
+
+The internal priority register should be reset to 0001 (i.e., requester 0
+has the highest priority) when the reset input is one. When a request
+wins arbitration it should have the lowest priority in the next cycle of
+arbitration. For example, if requester 2 wins arbitration, then on the
+next cycle the priority register should be 1000 (i.e., requester 3 has
+the highest priority and requester 2 has the lowest priority). If there
+are no valid requests then the priority should not change.
+
+The input hold enables a requester to extend the duration of its grant.
+Once a requester has won arbitration, it can continue to automatically
+win arbitration as long as it keeps its corresponding hold signal high.
+When the requester sets its hold signal low, the arbiter should resume
+standard round-robin arbitration. Any internal state tracking the
+previous grant signals should be reset to zero when the reset input is
+one.
+
+Here is an example execution trace.
+
+   cycle | reqs holds grants
+  -------+---------------------
+     0   | 1111 0001  0001
+     1   | 1111 0001  0001
+     2   | 1111 0001  0001
+     3   | 1111 0000  0010
+     4   | 1111 0000  0100
+     5   | 1111 0000  1000
+     6   | 1111 1000  1000
+     7   | 1111 1000  1000
+     8   | 1111 0000  0001
+     9   | 0000 0000  0000
+    10   | 1111 0000  0010
+    11   | 0000 0000  0000
+    12   | 0000 0000  0000
+    13   | 1111 0000  0100
+
+Assume all sequential logic is triggered on the positive edge of the
+clock.
+

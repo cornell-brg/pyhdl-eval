@@ -7,7 +7,7 @@
 
 import pytest
 
-from pyhdl_eval.cfg  import Config, InputPort, OutputPort, TraceFormat
+from pyhdl_eval.cfg  import Config, InputPort, OutputPort
 from pyhdl_eval.core import run_sim
 from pyhdl_eval      import strategies as pst
 

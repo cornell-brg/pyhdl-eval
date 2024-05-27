@@ -1,0 +1,33 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  clk
+ - input  reset
+ - input  tick
+ - input  set_en
+ - input  set_hours (4 bits)
+ - input  set_mins  (6 bits)
+ - input  set_pm
+ - output hours (4 bits)
+ - output mins  (6 bits)
+ - output pm
+
+The module should implement a 12-hour clock with an active-high
+synchronous reset. The 12-hour clock's input clk runs much faster than
+one Hertz, so the input tick is used to indicate when the 12-hour clock
+should increment. The 12-hour clock can assume the input tick is asserted
+for one cycle once a minute.
+
+The outputs hours and mins should be binary encoded values indicating the
+current time. The output pm should be zero if the current time is in the
+morning, and the output pm should be one if the current time is in the
+afternoon. The input set_en can be used to set the current time of the
+12-hour clock. When the input set_en is high, the 12-hour clock should
+set its internal hours state based on the set_hours, set_mins, and set_pm
+inputs.
+
+The 12-hour clock should be reset to 12:00am, when the reset input is one
+when the reset input is one. Assume all sequential logic is triggered on
+the positive edge of the clock.
+

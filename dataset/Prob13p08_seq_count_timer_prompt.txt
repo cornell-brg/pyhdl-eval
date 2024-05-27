@@ -1,0 +1,27 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  clk
+ - input  reset
+ - input  restart
+ - input  tick
+ - input  run
+ - output mins (6 bits)
+ - output secs (6 bits)
+
+The module should implement a timer with an active-high synchronous
+reset. The timer's input clk runs much faster than one Hertz, so the
+input tick is used to indicate when the timer should increment. The
+module can assume the input tick is asserted for one cycle once a second.
+
+When the input restart is high, the timer should be cleared to zero. When
+both the run and tick signals are high the timer should be incremented.
+When the run signal is low, the timer should hold its current value. The
+outputs mins and secs should be binary encoded values indicating the
+amount of time the timer has been running. If the timer reaches 59
+xminutes and 59 seconds it should stop with an output of 59:59.
+
+The outputs should be reset to zero when the reset input is one. Assume
+all sequential logic is triggered on the positive edge of the clock.
+

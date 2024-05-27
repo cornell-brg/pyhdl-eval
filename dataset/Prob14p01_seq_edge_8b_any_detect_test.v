@@ -51,7 +51,8 @@ module Top();
 
   task compare
   (
-    input logic [7:0] in_
+    input logic [7:0] in_,
+    input logic       check_output
   );
 
     ref_module_in_ = in_;
@@ -63,7 +64,9 @@ module Top();
       $display( "%3d: %x > %x", t.cycles,
                 top_module_in_, top_module_out );
 
-    `TEST_UTILS_CHECK_EQ( top_module_out, ref_module_out );
+    if ( check_output ) begin
+      `TEST_UTILS_CHECK_EQ( top_module_out, ref_module_out );
+    end
 
     #2;
 
@@ -77,14 +80,14 @@ module Top();
     $display( "\ntest_case_1_one_bit_toggle" );
     t.reset_sequence();
 
-    //       in_
-    compare( 8'b0000_0000 );
-    compare( 8'b0000_0001 );
-    compare( 8'b0000_0000 );
-    compare( 8'b0000_0001 );
-    compare( 8'b0000_0000 );
-    compare( 8'b0000_0001 );
-    compare( 8'b0000_0000 );
+    compare( 8'b0000_0000, 0 ); // do not check output
+    compare( 8'b0000_0000, 1 );
+    compare( 8'b0000_0001, 1 );
+    compare( 8'b0000_0000, 1 );
+    compare( 8'b0000_0001, 1 );
+    compare( 8'b0000_0000, 1 );
+    compare( 8'b0000_0001, 1 );
+    compare( 8'b0000_0000, 1 );
 
   endtask
 
@@ -96,19 +99,19 @@ module Top();
     $display( "\ntest_case_2_one_bit_repeat" );
     t.reset_sequence();
 
-    //       in_
-    compare( 8'b0000_0000 );
-    compare( 8'b0000_0000 );
-    compare( 8'b0000_0000 );
-    compare( 8'b0000_0000 );
-    compare( 8'b0000_0001 );
-    compare( 8'b0000_0001 );
-    compare( 8'b0000_0001 );
-    compare( 8'b0000_0001 );
-    compare( 8'b0000_0000 );
-    compare( 8'b0000_0000 );
-    compare( 8'b0000_0000 );
-    compare( 8'b0000_0000 );
+    compare( 8'b0000_0000, 0 ); // do not check output
+    compare( 8'b0000_0000, 1 );
+    compare( 8'b0000_0000, 1 );
+    compare( 8'b0000_0000, 1 );
+    compare( 8'b0000_0000, 1 );
+    compare( 8'b0000_0001, 1 );
+    compare( 8'b0000_0001, 1 );
+    compare( 8'b0000_0001, 1 );
+    compare( 8'b0000_0001, 1 );
+    compare( 8'b0000_0000, 1 );
+    compare( 8'b0000_0000, 1 );
+    compare( 8'b0000_0000, 1 );
+    compare( 8'b0000_0000, 1 );
 
   endtask
 
@@ -120,19 +123,19 @@ module Top();
     $display( "\ntest_case_3_many_bits" );
     t.reset_sequence();
 
-    //       in_
-    compare( 8'b0000_0000 );
-    compare( 8'b1010_1010 );
-    compare( 8'b0000_0000 );
-    compare( 8'b1010_1010 );
-    compare( 8'b0101_0101 );
-    compare( 8'b1111_1111 );
-    compare( 8'b0101_0101 );
-    compare( 8'b1111_1111 );
-    compare( 8'b0000_0000 );
-    compare( 8'b1010_1010 );
-    compare( 8'b0000_0000 );
-    compare( 8'b1010_1010 );
+    compare( 8'b0000_0000, 0 ); // do not check output
+    compare( 8'b0000_0000, 1 );
+    compare( 8'b1010_1010, 1 );
+    compare( 8'b0000_0000, 1 );
+    compare( 8'b1010_1010, 1 );
+    compare( 8'b0101_0101, 1 );
+    compare( 8'b1111_1111, 1 );
+    compare( 8'b0101_0101, 1 );
+    compare( 8'b1111_1111, 1 );
+    compare( 8'b0000_0000, 1 );
+    compare( 8'b1010_1010, 1 );
+    compare( 8'b0000_0000, 1 );
+    compare( 8'b1010_1010, 1 );
 
   endtask
 
@@ -144,15 +147,15 @@ module Top();
     $display( "\ntest_case_4_example" );
     t.reset_sequence();
 
-    //       in_
-    compare( 8'b0000_0000 );
-    compare( 8'b0000_0000 );
-    compare( 8'b0001_0001 );
-    compare( 8'b0101_0101 );
-    compare( 8'b0001_0001 );
-    compare( 8'b0100_0100 );
-    compare( 8'b0000_0000 );
-    compare( 8'b0000_0000 );
+    compare( 8'b0000_0000, 0 ); // do not check output
+    compare( 8'b0000_0000, 1 );
+    compare( 8'b0000_0000, 1 );
+    compare( 8'b0001_0001, 1 );
+    compare( 8'b0101_0101, 1 );
+    compare( 8'b0001_0001, 1 );
+    compare( 8'b0100_0100, 1 );
+    compare( 8'b0000_0000, 1 );
+    compare( 8'b0000_0000, 1 );
 
   endtask
 
@@ -164,8 +167,9 @@ module Top();
     $display( "\ntest_case_5_random" );
     t.reset_sequence();
 
+    compare( 8'b0000_0000, 0 ); // do not check output
     for ( int i = 0; i < 60; i = i+1 )
-      compare( $urandom(t.seed) );
+      compare( $urandom(t.seed), 1 );
 
   endtask
 

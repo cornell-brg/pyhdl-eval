@@ -1,5 +1,5 @@
 #=========================================================================
-# Prob13p04_seq_count_3b_bin_up_dn_test
+# Prob15p03_seq_arb_4in_roundrobin_test
 #=========================================================================
 # SPDX-License-Identifier: MIT
 # Author : Christopher Batten, NVIDIA
@@ -7,7 +7,7 @@
 
 import pytest
 
-from pyhdl_eval.cfg  import Config, InputPort, OutputPort
+from pyhdl_eval.cfg  import Config, InputPort, OutputPort, TraceFormat
 from pyhdl_eval.core import run_sim
 from pyhdl_eval      import strategies as pst
 
@@ -20,70 +20,65 @@ from hypothesis import strategies as st
 
 config = Config(
   ports = [
-    ( "clk",   InputPort (1) ),
-    ( "reset", InputPort (1) ),
-    ( "op",    InputPort (1) ),
-    ( "out",   OutputPort(3) ),
+    ( "clk",          InputPort (1) ),
+    ( "reset",        InputPort (1) ),
+    ( "reqs",         InputPort (4) ),
+    ( "grants",       OutputPort(4) ),
   ],
+  trace_format=TraceFormat.BIN,
 )
 
 #-------------------------------------------------------------------------
-# test_case_up
+# test_case_one_req
 #-------------------------------------------------------------------------
 
-def test_case_up( pytestconfig ):
-  run_sim( pytestconfig, __file__, config, [(0,0)]*5 )
-
-#-------------------------------------------------------------------------
-# test_case_up_wraparound
-#-------------------------------------------------------------------------
-
-def test_case_up_wraparound( pytestconfig ):
-  run_sim( pytestconfig, __file__, config, [(0,0)]*20 )
-
-#-------------------------------------------------------------------------
-# test_case_dn
-#-------------------------------------------------------------------------
-
-def test_case_dn( pytestconfig ):
-  run_sim( pytestconfig, __file__, config, [(0,1)]*5 )
-
-#-------------------------------------------------------------------------
-# test_case_dn_wraparound
-#-------------------------------------------------------------------------
-
-def test_case_dn_wraparound( pytestconfig ):
-  run_sim( pytestconfig, __file__, config, [(0,1)]*20 )
-
-#-------------------------------------------------------------------------
-# test_case_up_dn
-#-------------------------------------------------------------------------
-
-def test_case_up_dn( pytestconfig ):
+def test_case_one_req( pytestconfig ):
   run_sim( pytestconfig, __file__, config,
-  [ # rs op
-    ( 0, 0 ),
-    ( 0, 0 ),
-    ( 0, 0 ),
-    ( 0, 0 ),
-    ( 0, 1 ),
-    ( 0, 1 ),
-    ( 0, 0 ),
-    ( 0, 0 ),
-    ( 0, 0 ),
-    ( 0, 0 ),
-    ( 0, 1 ),
-    ( 0, 1 ),
-    ( 0, 0 ),
-    ( 0, 0 ),
-    ( 0, 0 ),
-    ( 0, 0 ),
-    ( 0, 1 ),
-    ( 0, 1 ),
-    ( 0, 1 ),
-    ( 0, 1 ),
-    ( 0, 1 ),
-    ( 0, 1 ),
+  [ # rs reqs
+    ( 0, 0b0000 ),
+    ( 0, 0b0001 ),
+    ( 0, 0b0010 ),
+    ( 0, 0b0100 ),
+    ( 0, 0b1000 ),
+    ( 0, 0b0000 ),
+  ])
+
+#-------------------------------------------------------------------------
+# test_case_all_requesters
+#-------------------------------------------------------------------------
+
+def test_case_all_reqs( pytestconfig ):
+  run_sim( pytestconfig, __file__, config,
+  [ # rs reqs
+    ( 0, 0b1111 ),
+    ( 0, 0b1111 ),
+    ( 0, 0b1111 ),
+    ( 0, 0b1111 ),
+    ( 0, 0b1111 ),
+    ( 0, 0b1111 ),
+    ( 0, 0b1111 ),
+    ( 0, 0b1111 ),
+    ( 0, 0b1111 ),
+    ( 0, 0b1111 ),
+  ])
+
+#-------------------------------------------------------------------------
+# test_case_example
+#-------------------------------------------------------------------------
+
+def test_case_example( pytestconfig ):
+  run_sim( pytestconfig, __file__, config,
+  [ # rs reqs
+    ( 0, 0b1111 ),
+    ( 0, 0b1111 ),
+    ( 0, 0b1111 ),
+    ( 0, 0b1111 ),
+    ( 0, 0b1111 ),
+    ( 0, 0b0000 ),
+    ( 0, 0b1111 ),
+    ( 0, 0b0000 ),
+    ( 0, 0b0000 ),
+    ( 0, 0b1111 ),
   ])
 
 #-------------------------------------------------------------------------
@@ -93,25 +88,17 @@ def test_case_up_dn( pytestconfig ):
 @pytest.mark.multi_reset
 def test_case_directed_reset( pytestconfig ):
   run_sim( pytestconfig, __file__, config,
-  [ # rs op
-    ( 0, 0 ),
-    ( 0, 0 ),
-    ( 0, 0 ),
-    ( 0, 0 ),
-    ( 1, 0 ),
-    ( 1, 0 ),
-    ( 1, 0 ),
-    ( 0, 1 ),
-    ( 0, 1 ),
-    ( 0, 1 ),
-    ( 0, 1 ),
-    ( 1, 0 ),
-    ( 1, 0 ),
-    ( 1, 0 ),
-    ( 0, 0 ),
-    ( 0, 0 ),
-    ( 0, 0 ),
-    ( 0, 0 ),
+  [ # rs reqs
+    ( 0, 0b1111 ),
+    ( 0, 0b1111 ),
+    ( 0, 0b1111 ),
+    ( 1, 0b1111 ),
+    ( 1, 0b1111 ),
+    ( 1, 0b1111 ),
+    ( 0, 0b1111 ),
+    ( 0, 0b1111 ),
+    ( 0, 0b1111 ),
+    ( 0, 0b1111 ),
   ])
 
 #-------------------------------------------------------------------------
@@ -119,7 +106,7 @@ def test_case_directed_reset( pytestconfig ):
 #-------------------------------------------------------------------------
 
 @settings(deadline=1000,max_examples=20)
-@given( st.lists( st.tuples( st.just(0), pst.bits(1) ), min_size=20 ) )
+@given( st.lists( st.tuples( st.just(0), pst.bits(4) ), min_size=10 ))
 def test_case_random( pytestconfig, test_vectors ):
   run_sim( pytestconfig, __file__, config, test_vectors )
 
@@ -129,7 +116,7 @@ def test_case_random( pytestconfig, test_vectors ):
 
 @pytest.mark.multi_reset
 @settings(deadline=1000,max_examples=20)
-@given( st.lists( st.tuples( pst.bits(1), pst.bits(1) ), min_size=20 ) )
+@given( st.lists( st.tuples( pst.bits(1), pst.bits(4) ), min_size=10 ))
 def test_case_random_reset( pytestconfig, test_vectors ):
   run_sim( pytestconfig, __file__, config, test_vectors )
 

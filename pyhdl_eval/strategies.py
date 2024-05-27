@@ -15,14 +15,16 @@ from pyhdl_eval.bits import Bits
 #-------------------------------------------------------------------------
 # Return a Hypothesis search stategy for Bits
 
-def bits( nbits ):
+@st.composite
+def bits( draw, nbits, min_value=None, max_value=None ):
 
-  @st.composite
-  def strategy_bits( draw ):
-    if nbits == 1:
-      return Bits( nbits, draw( st.booleans() ) )
-    else:
-      return Bits( nbits, draw( st.integers(0,2**nbits-1) ) )
+  if min_value == None:
+    min_value = 0
+  if max_value == None:
+    max_value = 2**nbits-1
 
-  return strategy_bits()
+  if nbits == 1:
+    return Bits( nbits, draw( st.booleans() ) )
+  else:
+    return Bits( nbits, draw( st.integers(min_value,max_value) ) )
 

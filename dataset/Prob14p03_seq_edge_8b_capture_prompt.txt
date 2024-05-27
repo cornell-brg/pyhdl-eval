@@ -3,18 +3,17 @@ Implement a hardware module named TopModule with the following interface.
 All input and output ports are one bit unless otherwise specified.
 
  - input  clk
- - input  reset
+ - input  clear
  - input  in_ (8 bits)
  - output out (8 bits)
 
 The module should implement an 8-bit edge capture that will capture
-positive edges (0 to 1 transitions) with an active-high synchronous
-reset. The output should be reset to zero. Output out[i] should then be
+positive edges (0 to 1 transitions). Output out[i] should then be
 (combinationally) set to one if in_[i] was zero on the previous cycle and
 is now one on the current cycle; output out[i] should then remain one
-until reset. Here is an example execution trace. An x indicates that the
-output bit is undefined because it is the first cycle and thus there is
-no previous cycle.
+until cleared using the input clear. Here is an example execution trace.
+An x indicates that the output bit is undefined because it is the first
+cycle and thus there is no previous cycle.
 
    cycle | in_       out
   -------+---------------------
@@ -27,6 +26,7 @@ no previous cycle.
      6   | 0000_0000 0101_0101
      7   | 0000_0000 0101_0101
 
+All internal state should be set to zero when the clear input is one.
 Assume all sequential logic is triggered on the positive edge of the
 clock.
 

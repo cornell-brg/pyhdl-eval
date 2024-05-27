@@ -21,10 +21,12 @@ from hypothesis import strategies as st
 config = Config(
   ports = [
     ( "clk",   InputPort (1) ),
-    ( "reset", InputPort (1) ),
+    ( "clear", InputPort (1) ),
     ( "in_",   InputPort (8) ),
     ( "out",   OutputPort(8) ),
   ],
+  dead_cycles=1,
+  dead_cycle_inputs=(1,0),
   trace_format=TraceFormat.BIN,
 )
 
@@ -34,7 +36,7 @@ config = Config(
 
 def test_case_one_bit_toggle( pytestconfig ):
   run_sim( pytestconfig, __file__, config,
-  [ # rs in_
+  [ # cl in_
     ( 0, 0b0000_0000 ),
     ( 0, 0b0000_0001 ),
     ( 0, 0b0000_0000 ),
@@ -50,7 +52,7 @@ def test_case_one_bit_toggle( pytestconfig ):
 
 def test_case_one_bit_repeat( pytestconfig ):
   run_sim( pytestconfig, __file__, config,
-  [ # rs in_
+  [ # cl in_
     ( 0, 0b0000_0000 ),
     ( 0, 0b0000_0000 ),
     ( 0, 0b0000_0000 ),
@@ -71,7 +73,7 @@ def test_case_one_bit_repeat( pytestconfig ):
 
 def test_case_many_bits( pytestconfig ):
   run_sim( pytestconfig, __file__, config,
-  [ # rs in_
+  [ # cl in_
     ( 0, 0b0000_0000 ),
     ( 0, 0b1010_1010 ),
     ( 0, 0b0000_0000 ),
@@ -92,7 +94,7 @@ def test_case_many_bits( pytestconfig ):
 
 def test_case_example( pytestconfig ):
   run_sim( pytestconfig, __file__, config,
-  [ # rs in_
+  [ # cl in_
     ( 0, 0b0000_0000 ),
     ( 0, 0b0000_0000 ),
     ( 0, 0b0001_0001 ),
@@ -104,13 +106,12 @@ def test_case_example( pytestconfig ):
   ])
 
 #-------------------------------------------------------------------------
-# test_case_directed_reset
+# test_case_directed_clear
 #-------------------------------------------------------------------------
 
-@pytest.mark.multi_reset
-def test_case_directed_reset( pytestconfig ):
+def test_case_directed_clear( pytestconfig ):
   run_sim( pytestconfig, __file__, config,
-  [ # rs in_
+  [ # cl in_
     ( 0, 0b0000_0000 ),
     ( 0, 0b0000_0000 ),
     ( 0, 0b0001_0001 ),
@@ -133,17 +134,16 @@ def test_case_directed_reset( pytestconfig ):
 #-------------------------------------------------------------------------
 
 @settings(deadline=1000,max_examples=20)
-@given( st.lists( st.tuples( st.just(0), pst.bits(8) )))
+@given( st.lists( st.tuples( st.just(0), pst.bits(8) ), min_size=20 ))
 def test_case_random( pytestconfig, test_vectors ):
   run_sim( pytestconfig, __file__, config, test_vectors )
 
 #-------------------------------------------------------------------------
-# test_case_random_reset
+# test_case_random_clear
 #-------------------------------------------------------------------------
 
-@pytest.mark.multi_reset
 @settings(deadline=1000,max_examples=20)
-@given( st.lists( st.tuples( pst.bits(1), pst.bits(8) )))
-def test_case_random_reset( pytestconfig, test_vectors ):
+@given( st.lists( st.tuples( pst.bits(1), pst.bits(8) ), min_size=20 ))
+def test_case_random_clear( pytestconfig, test_vectors ):
   run_sim( pytestconfig, __file__, config, test_vectors )
 

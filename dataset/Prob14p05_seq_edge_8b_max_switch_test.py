@@ -1,11 +1,9 @@
 #=========================================================================
-# Prob13p01_seq_count_4b_dec_up_test
+# Prob14p05_seq_edge_8b_max_switch_test
 #=========================================================================
 # SPDX-License-Identifier: MIT
 # Author : Christopher Batten, NVIDIA
 # Date   : May 20, 2024
-
-import pytest
 
 from pyhdl_eval.cfg  import Config, InputPort, OutputPort, TraceFormat
 from pyhdl_eval.core import run_sim
@@ -20,42 +18,65 @@ from hypothesis import strategies as st
 
 config = Config(
   ports = [
-    ( "clk",   InputPort (1) ),
-    ( "reset", InputPort (1) ),
-    ( "out",   OutputPort(3) ),
+    ( "clk",           InputPort (1) ),
+    ( "in_",           InputPort (8) ),
+    ( "max_switching", OutputPort(1) ),
   ],
+  dead_cycles=1,
+  trace_format=TraceFormat.BIN,
 )
 
 #-------------------------------------------------------------------------
-# test_case_basic
+# test_case_without_max_switching
 #-------------------------------------------------------------------------
 
-def test_case_basic( pytestconfig ):
-  run_sim( pytestconfig, __file__, config, [0]*5 )
-
-#-------------------------------------------------------------------------
-# test_case_wraparound
-#-------------------------------------------------------------------------
-
-def test_case_wraparound( pytestconfig ):
-  run_sim( pytestconfig, __file__, config, [0]*20 )
-
-#-------------------------------------------------------------------------
-# test_case_directed_reset
-#-------------------------------------------------------------------------
-
-@pytest.mark.multi_reset
-def test_case_directed_reset( pytestconfig ):
+def test_case_without_max_switching( pytestconfig ):
   run_sim( pytestconfig, __file__, config,
-           [ 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0 ])
+  [
+    0b0000_0000,
+    0b0001_0001,
+    0b0100_0100,
+    0b0010_1001,
+    0b0100_0010,
+    0b0001_0001,
+    0b0100_0010,
+  ])
 
 #-------------------------------------------------------------------------
-# test_case_random_reset
+# test_case_with_max_switching
 #-------------------------------------------------------------------------
 
-@pytest.mark.multi_reset
+def test_case_with_max_switching( pytestconfig ):
+  run_sim( pytestconfig, __file__, config,
+  [
+    0b0000_0000,
+    0b0001_0001,
+    0b0101_0101,
+    0b1010_1010,
+    0b1010_1010,
+    0b0001_0001,
+    0b1010_1010,
+    0b0101_0101,
+    0b1010_1010,
+    0b0000_0000,
+    0b0000_0000,
+  ])
+
+#-------------------------------------------------------------------------
+# test_case_random1
+#-------------------------------------------------------------------------
+
 @settings(deadline=1000,max_examples=20)
-@given( st.lists( pst.bits(1), min_size=20 ) )
-def test_case_random_reset( pytestconfig, test_vectors ):
+@given( st.lists( st.sampled_from([ 0b0101_0101, 0b1010_1010 ])))
+def test_case_random1( pytestconfig, test_vectors ):
+  run_sim( pytestconfig, __file__, config, test_vectors )
+
+#-------------------------------------------------------------------------
+# test_case_random2
+#-------------------------------------------------------------------------
+
+@settings(deadline=1000,max_examples=20)
+@given( st.lists( pst.bits(8) ))
+def test_case_random2( pytestconfig, test_vectors ):
   run_sim( pytestconfig, __file__, config, test_vectors )
 

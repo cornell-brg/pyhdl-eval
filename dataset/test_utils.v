@@ -53,7 +53,7 @@ module TestUtils
     else
       cycles <= cycles + 1;
 
-    if ( cycles > 1000 ) begin
+    if ( cycles > 10000 ) begin
       $display( "  ERROR (cycles=%0d): timeout!\n", cycles );
       $finish;
     end

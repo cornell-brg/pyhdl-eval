@@ -1,0 +1,47 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  clk
+ - input  reset
+ - input  set_priority_en
+ - input  set_priority (4 bits)
+ - input  reqs         (4 bits)
+ - output grants       (4 bits)
+
+The module should implement a 4-input variable priority arbiter with an
+active-high synchronous reset. Each bit of the input reqs corresponds to
+one of the four requesters; if reqs[i] is high then this means requester
+i has a valid request. The output grants is either all zeros (meaning no
+requesters had a valid request on this cycle) or is a one-hot bit vector
+indicating which requester won the arbitration.
+
+The input set_priority_en can be used to set the current priority. When
+the input set_priority_en is high, the arbiter should write its internal
+priority register with set_priority, and the updated priority should take
+affect on the next cycle of arbitration. The priority is represented as a
+one-hot bit vector; if the ith bit is one then this means the requester i
+should have the highest priority, requester i+1 should have the second
+highest priority, requester i+2 should have the third highest priority
+and so on. The arbiter should not change the priority on its own; the
+only way to change the priority is from outside the arbiter using the
+set_priority_en and set_priority inputs.
+
+The internal priority register should be reset to 0001 (i.e., requester 0
+has the highest priority) when the reset input is one. Here is an example
+execution trace.
+
+   cycle | set_priority_en set_priority reqs grants
+  -------+-----------------------------------------
+     0   | 1               0001         0000 0000
+     1   | 0               0000         0001 0001
+     2   | 0               0000         0011 0001
+     3   | 0               0000         1110 0010
+     4   | 0               0000         1000 1000
+     5   | 1               0100         0000 0000
+     6   | 0               0000         1100 0100
+     7   | 0               0000         0011 0001
+
+Assume all sequential logic is triggered on the positive edge of the
+clock.
+

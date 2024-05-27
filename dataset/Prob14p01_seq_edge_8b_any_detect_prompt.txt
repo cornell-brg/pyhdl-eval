@@ -7,7 +7,7 @@ All input and output ports are one bit unless otherwise specified.
  - output out (8 bits)
 
 The module should implement an 8-bit edge detector that will detect when
-an input bits change from one clock cycle to the next. The module should
+an input bit changes from one clock cycle to the next. The module should
 detect both positive edges (0 to 1 transitions) and negative edges (1 to
 0 transitions). Output out[i] should be (combinationally) set to zero if
 in_[i] has not changed from the previous to the current cycle; output
