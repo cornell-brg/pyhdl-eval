@@ -1,0 +1,34 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  clk
+ - input  reset
+ - input  in_
+ - output state (2 bits)
+ - output out
+
+The module should implement a Mealy finite-state machine (FSM) described
+by the following table. Each next state entry in the table is of the
+format X/Y where X is the next state and Y is the output.
+
+   Current |  Next State/Output
+   State   | if in_=0    if in_=1
+  ---------+----------------------
+      A    |   A/0         B/1
+      B    |   C/1         B/0
+      C    |   A/0         D/1
+      D    |   C/0         B/0
+
+The state machine should use the following state encoding.
+
+ - A : 0
+ - B : 1
+ - C : 2
+ - D : 3
+
+The FSM should reset to state A when the reset input is one. The internal
+state register should be directly connected to the output port state so
+that this output always reflects the current state of the FSM. Assume all
+sequential logic is triggered on the positive edge of the clock.
+
