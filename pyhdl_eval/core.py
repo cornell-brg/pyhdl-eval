@@ -223,10 +223,13 @@ def run_sim( dslstr_or_pytestconfig, script_file_name, config,
     # the beginning of the simulation.
 
     ninputs = len(input_port_names)
-    dead_cycle_inputs = (0,)*ninputs
-    if config.dead_cycle_inputs:
-      dead_cycle_inputs = config.dead_cycle_inputs
-    test_vectors = [ dead_cycle_inputs ]*config.dead_cycles + test_vectors
+    if not config.dead_cycle_inputs:
+      test_vectors = [ (0,)*ninputs ]*config.dead_cycles + test_vectors
+    elif not isinstance( config.dead_cycle_inputs, list ):
+      inputs = config.dead_cycle_inputs
+      test_vectors = [ inputs ]*config.dead_cycles + test_vectors
+    else:
+      test_vectors = config.dead_cycle_inputs + test_vectors
 
     # Reset the test harness
 

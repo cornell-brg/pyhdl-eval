@@ -1,0 +1,36 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  clk
+ - input  reset
+ - input  in_ (8 bits)
+ - output done
+
+The module should implement an FSM to detect message boundries for the
+PS/2 mouse protocol with an active-high synchronous reset. The PS/2 mouse
+protocol sends messages that are three bytes long. However, within a
+continuous byte stream, it's not obvious where messages start and end.
+The only indication is that the first byte of each three byte message
+always has in_[3]=1 (but in_[3] of the other two bytes may be 1 or 0
+depending on data). The module should discard bytes until it sees one
+with in[3]=1. The module should assume that this is byte 1 of a message,
+and should (combinationally) set the output done once all 3 bytes have
+been received. Here is an example execution trace.
+
+   cycle | in_       done
+  -------+----------------
+     0   | 0010_0101 0
+     1   | 0101_0010 0
+     2   | 0011_1000 0
+     3   | 1100_1000 0
+     4   | 0011_0010 1
+     5   | 1010_0011 0
+     6   | 0000_1000 0
+     7   | 0101_0100 0
+     7   | 0000_0010 1
+     7   | 0000_0000 0
+
+Assume all sequential logic is triggered on the positive edge of the
+clock.
+

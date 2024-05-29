@@ -1,0 +1,26 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  clk
+ - input  reset
+ - input  starting_yellow
+ - input  change
+ - output green_on
+ - output yellow_on
+ - output red_on
+
+The module should implement a Moore finite-state machine (FSM) for a
+traffic light controller with an active-high synchronous reset. The three
+outputs are used to turn on one of the three traffic lights. Only one
+light should be on at a time. The FSM should reset to the state which
+turns on the green light. The input change is used to move between the
+states of the FSM in one of two orders depending on whether the input
+starting_yellow is high or low. If starting_yellow is high, then the FSM
+should change from green, to yellow, to red, to yellow, and back to
+green. If starting_yellow is low, then the FSM should change from green,
+to yellow, to red, and back to green. Assume that the starting_yellow
+signal will only switch when the traffic light is in the state which
+turns on the green light. Assume all sequential logic is triggered on the
+positive edge of the clock.
+
