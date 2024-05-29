@@ -24,25 +24,25 @@ module Top();
 
   logic       ref_module_reset;
   logic [7:0] ref_module_in_;
-  logic       ref_module_out;
+  logic       ref_module_done;
 
   RefModule ref_module
   (
     .reset (reset || ref_module_reset),
     .in_   (ref_module_in_),
-    .out   (ref_module_out),
+    .done  (ref_module_done),
     .*
   );
 
   logic       top_module_reset;
   logic [7:0] top_module_in_;
-  logic       top_module_out;
+  logic       top_module_done;
 
   TopModule top_module
   (
     .reset (reset || top_module_reset),
     .in_   (top_module_in_),
-    .out   (top_module_out),
+    .done  (top_module_done),
     .*
   );
 
@@ -71,7 +71,7 @@ module Top();
       $display( "%3d: %x %x > %x", t.cycles,
                 top_module_reset, top_module_in_, top_module_out );
 
-    `TEST_UTILS_CHECK_EQ( top_module_out,   ref_module_out   );
+    `TEST_UTILS_CHECK_EQ( top_module_done, ref_module_done );
 
     #2;
 
@@ -89,14 +89,14 @@ module Top();
     compare( 0, 8'b0000_0000 ); // A -> A
     compare( 0, 8'b0000_1000 ); // A -> B
     compare( 0, 8'b0000_0000 ); // B -> C
-    compare( 0, 8'b0000_0000 ); // C -> A out=1
+    compare( 0, 8'b0000_0000 ); // C -> A done=1
     compare( 0, 8'b0000_0000 ); // A -> A
     compare( 0, 8'b0000_1000 ); // A -> B
     compare( 0, 8'b0000_0000 ); // B -> C
-    compare( 0, 8'b0000_0000 ); // C -> A out=1
+    compare( 0, 8'b0000_0000 ); // C -> A done=1
     compare( 0, 8'b0000_1000 ); // A -> B
     compare( 0, 8'b0000_0000 ); // B -> C
-    compare( 0, 8'b0000_0000 ); // C -> A out=1
+    compare( 0, 8'b0000_0000 ); // C -> A done=1
     compare( 0, 8'b0000_0000 ); // A -> A
 
   endtask
@@ -113,14 +113,14 @@ module Top();
     compare( 0, 8'b0000_0000 ); // A -> A
     compare( 0, 8'b0000_1000 ); // A -> B
     compare( 0, 8'b0000_1000 ); // B -> C
-    compare( 0, 8'b0000_1000 ); // C -> A out=1
+    compare( 0, 8'b0000_1000 ); // C -> A done=1
     compare( 0, 8'b0000_0000 ); // A -> A
     compare( 0, 8'b0000_1000 ); // A -> B
     compare( 0, 8'b0000_1000 ); // B -> C
-    compare( 0, 8'b0000_1000 ); // C -> A out=1
+    compare( 0, 8'b0000_1000 ); // C -> A done=1
     compare( 0, 8'b0000_1000 ); // A -> B
     compare( 0, 8'b0000_1000 ); // B -> C
-    compare( 0, 8'b0000_1000 ); // C -> A out=1
+    compare( 0, 8'b0000_1000 ); // C -> A done=1
     compare( 0, 8'b0000_0000 ); // A -> A
 
   endtask
@@ -138,11 +138,11 @@ module Top();
     compare( 0, 8'b0101_0010 ); // A -> A
     compare( 0, 8'b0011_1000 ); // A -> B
     compare( 0, 8'b1100_1000 ); // B -> C
-    compare( 0, 8'b0011_0010 ); // C -> A out=1
+    compare( 0, 8'b0011_0010 ); // C -> A done=1
     compare( 0, 8'b1010_0011 ); // A -> A
     compare( 0, 8'b0000_1000 ); // A -> B
     compare( 0, 8'b0101_0100 ); // B -> C
-    compare( 0, 8'b0000_0010 ); // C -> A out=1
+    compare( 0, 8'b0000_0010 ); // C -> A done=1
     compare( 0, 8'b0000_0000 ); // A -> A
 
   endtask
@@ -164,11 +164,11 @@ module Top();
     compare( 1, 8'b0000_0000 ); // reset
     compare( 0, 8'b0000_1000 ); // A -> B
     compare( 0, 8'b0000_0000 ); // B -> C
-    compare( 0, 8'b0000_0000 ); // C -> A out=1
+    compare( 0, 8'b0000_0000 ); // C -> A done=1
     compare( 0, 8'b0000_0000 ); // A -> A
     compare( 0, 8'b0000_1000 ); // A -> B
     compare( 0, 8'b0000_0000 ); // B -> C
-    compare( 0, 8'b0000_0000 ); // C -> A out=1
+    compare( 0, 8'b0000_0000 ); // C -> A done=1
 
   endtask
 
