@@ -1,5 +1,5 @@
 //========================================================================
-// Prob17p01_seq_mem_8x8b_1r1w_rf_test
+// Prob17p02_seq_mem_8x8b_1r1w_rf_fw_test
 //========================================================================
 // SPDX-License-Identifier: MIT
 // Author : Christopher Batten, NVIDIA
@@ -167,11 +167,41 @@ module Top();
   endtask
 
   //----------------------------------------------------------------------
-  // test_case_3_random
+  // test_case_3_fordward
   //----------------------------------------------------------------------
 
-  task test_case_3_random();
-    $display( "\ntest_case_3_random" );
+  task test_case_3_forward();
+    $display( "\ntest_case_3_forward" );
+    t.reset_sequence();
+
+    rf_init();
+
+    compare( 0, 1, 0, 8'h01, 1 );
+    compare( 0, 1, 1, 8'h23, 1 );
+    compare( 0, 1, 2, 8'h45, 1 );
+    compare( 0, 1, 3, 8'h67, 1 );
+    compare( 0, 1, 4, 8'h89, 1 );
+    compare( 0, 1, 5, 8'hab, 1 );
+    compare( 0, 1, 6, 8'hcd, 1 );
+    compare( 0, 1, 7, 8'hef, 1 );
+
+    compare( 0, 1, 0, 8'h23, 1 );
+    compare( 1, 1, 1, 8'h45, 1 );
+    compare( 2, 1, 2, 8'h67, 1 );
+    compare( 3, 1, 3, 8'h89, 1 );
+    compare( 4, 1, 4, 8'hab, 1 );
+    compare( 5, 1, 5, 8'hcd, 1 );
+    compare( 6, 1, 6, 8'hef, 1 );
+    compare( 7, 1, 7, 8'h01, 1 );
+
+  endtask
+
+  //----------------------------------------------------------------------
+  // test_case_4_random
+  //----------------------------------------------------------------------
+
+  task test_case_4_random();
+    $display( "\ntest_case_4_random" );
     t.reset_sequence();
 
     rf_init();
@@ -193,7 +223,8 @@ module Top();
 
     if ((t.n <= 0) || (t.n == 1)) test_case_1_simple();
     if ((t.n <= 0) || (t.n == 2)) test_case_2_all_reg();
-    if ((t.n <= 0) || (t.n == 3)) test_case_3_random();
+    if ((t.n <= 0) || (t.n == 3)) test_case_3_forward();
+    if ((t.n <= 0) || (t.n == 4)) test_case_4_random();
 
     $write("\n");
     $finish;

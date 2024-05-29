@@ -1,0 +1,22 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  clk
+ - input  read_addr  (3 bits)
+ - output read_data  (8 bits)
+ - input  write_en
+ - input  write_addr (3 bits)
+ - input  write_data (8 bits)
+
+The module should implement an 8-entry 8-bit register file with one read
+port and one write port. The read port should be combinational (i.e., the
+read data corresponds to the input read address on that cycle) and writes
+should only occur when the write enable is high. The register file should
+always read the value currently stored in the register file even if the
+write address equals the read address. The register file should treat
+register zero specially; reading register zero should always return the
+value zero. Writing register zero is valid but should have no observable
+effect. Assume all sequential logic is triggered on the positive edge of
+the clock.
+

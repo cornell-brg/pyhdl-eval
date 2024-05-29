@@ -1,5 +1,5 @@
 //========================================================================
-// Prob17p01_seq_mem_8x8b_1r1w_rf_test
+// Prob17p03_seq_mem_8x8b_1r1w_rf_z_test
 //========================================================================
 // SPDX-License-Identifier: MIT
 // Author : Christopher Batten, NVIDIA
@@ -99,11 +99,12 @@ module Top();
   //----------------------------------------------------------------------
   // rf_init
   //----------------------------------------------------------------------
+  // We do not initialize register zero since we want to test that it
+  // always returns zero.
 
   task rf_init();
 
     //       ra we wa wd
-    compare( 0, 1, 0, 8'h00, 0 ); // do not check output
     compare( 0, 1, 1, 8'h00, 0 ); // do not check output
     compare( 0, 1, 2, 8'h00, 0 ); // do not check output
     compare( 0, 1, 3, 8'h00, 0 ); // do not check output
@@ -125,13 +126,12 @@ module Top();
     rf_init();
 
     //       ra we wa wd
-    compare( 0, 0, 0, 8'h00, 1 );
-    compare( 0, 1, 0, 8'hab, 1 );
-    compare( 0, 0, 0, 8'h00, 1 );
-    compare( 0, 1, 1, 8'hcd, 1 );
+    compare( 1, 1, 1, 8'hab, 1 );
     compare( 1, 0, 0, 8'h00, 1 );
-    compare( 0, 1, 1, 8'hef, 1 );
-    compare( 1, 0, 0, 8'h00, 1 );
+    compare( 1, 1, 2, 8'hcd, 1 );
+    compare( 2, 0, 0, 8'h00, 1 );
+    compare( 1, 1, 2, 8'hef, 1 );
+    compare( 2, 0, 0, 8'h00, 1 );
 
   endtask
 
@@ -146,16 +146,14 @@ module Top();
     rf_init();
 
     //       ra we wa wd
-    compare( 0, 1, 0, 8'h01, 1 );
-    compare( 0, 1, 1, 8'h23, 1 );
-    compare( 0, 1, 2, 8'h45, 1 );
-    compare( 0, 1, 3, 8'h67, 1 );
-    compare( 0, 1, 4, 8'h89, 1 );
-    compare( 0, 1, 5, 8'hab, 1 );
-    compare( 0, 1, 6, 8'hcd, 1 );
-    compare( 0, 1, 7, 8'hef, 1 );
+    compare( 1, 1, 1, 8'h23, 1 );
+    compare( 1, 1, 2, 8'h45, 1 );
+    compare( 1, 1, 3, 8'h67, 1 );
+    compare( 1, 1, 4, 8'h89, 1 );
+    compare( 1, 1, 5, 8'hab, 1 );
+    compare( 1, 1, 6, 8'hcd, 1 );
+    compare( 1, 1, 7, 8'hef, 1 );
 
-    compare( 0, 1, 0, 8'hff, 1 );
     compare( 1, 1, 0, 8'hff, 1 );
     compare( 2, 1, 0, 8'hff, 1 );
     compare( 3, 1, 0, 8'hff, 1 );
@@ -167,11 +165,41 @@ module Top();
   endtask
 
   //----------------------------------------------------------------------
-  // test_case_3_random
+  // test_case_3_zero
   //----------------------------------------------------------------------
 
-  task test_case_3_random();
-    $display( "\ntest_case_3_random" );
+  task test_case_3_zero();
+    $display( "\ntest_case_3_zero" );
+    t.reset_sequence();
+
+    rf_init();
+
+    //       ra we wa wd
+    compare( 0, 1, 0, 8'h01, 1 );
+    compare( 0, 0, 0, 8'h00, 1 );
+    compare( 0, 1, 0, 8'h23, 1 );
+    compare( 0, 0, 0, 8'h00, 1 );
+    compare( 0, 1, 0, 8'h45, 1 );
+    compare( 0, 0, 0, 8'h00, 1 );
+    compare( 0, 1, 0, 8'h67, 1 );
+    compare( 0, 0, 0, 8'h00, 1 );
+    compare( 0, 1, 0, 8'h89, 1 );
+    compare( 0, 0, 0, 8'h00, 1 );
+    compare( 0, 1, 0, 8'hab, 1 );
+    compare( 0, 0, 0, 8'h00, 1 );
+    compare( 0, 1, 0, 8'hcd, 1 );
+    compare( 0, 0, 0, 8'h00, 1 );
+    compare( 0, 1, 0, 8'hef, 1 );
+    compare( 0, 0, 0, 8'h00, 1 );
+
+  endtask
+
+  //----------------------------------------------------------------------
+  // test_case_4_random
+  //----------------------------------------------------------------------
+
+  task test_case_4_random();
+    $display( "\ntest_case_4_random" );
     t.reset_sequence();
 
     rf_init();
@@ -193,7 +221,8 @@ module Top();
 
     if ((t.n <= 0) || (t.n == 1)) test_case_1_simple();
     if ((t.n <= 0) || (t.n == 2)) test_case_2_all_reg();
-    if ((t.n <= 0) || (t.n == 3)) test_case_3_random();
+    if ((t.n <= 0) || (t.n == 3)) test_case_3_zero();
+    if ((t.n <= 0) || (t.n == 4)) test_case_4_random();
 
     $write("\n");
     $finish;

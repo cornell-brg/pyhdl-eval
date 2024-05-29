@@ -1,0 +1,26 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  clk
+ - input  read_addr       (3 bits)
+ - output read_data       (8 bits)
+ - input  write_nibble_en (2 bits)
+ - input  write_addr      (3 bits)
+ - input  write_data      (8 bits)
+
+The module should implement an 8-entry 8-bit register file with one read
+port and one write port. The read port should be combinational (i.e., the
+read data corresponds to the input read address on that cycle). The input
+write_nibble_en is used to specify a "partial write", i.e., which nibble
+should be written into the register file as follows:
+
+ - 00 : do not write any data
+ - 01 : write least significant four bits
+ - 10 : write most significant four bits
+ - 11 : write all eight bits
+
+The register file should always read the value currently stored in the
+register file even if the write address equals the read address. Assume
+all sequential logic is triggered on the positive edge of the clock.
+

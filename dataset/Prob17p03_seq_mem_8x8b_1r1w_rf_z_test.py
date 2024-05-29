@@ -1,5 +1,5 @@
 #=========================================================================
-# Prob17p01_seq_mem_8x8b_1r1w_rf_test
+# Prob17p03_seq_mem_8x8b_1r1w_rf_z_test
 #=========================================================================
 # SPDX-License-Identifier: MIT
 # Author : Christopher Batten, NVIDIA
@@ -16,7 +16,8 @@ from hypothesis import strategies as st
 # Configuration
 #-------------------------------------------------------------------------
 # Notice how we use the dead cycles to initialize all of the values in
-# the register file to zero.
+# the register file to zero ... except we do not initialize register zero
+# since we want to test that it always returns zero.
 
 config = Config(
   ports = [
@@ -27,9 +28,8 @@ config = Config(
     ( "write_addr",  InputPort (3) ),
     ( "write_data",  InputPort (8) ),
   ],
-  dead_cycles=8,
+  dead_cycles=7,
   dead_cycle_inputs=[
-    (0,1,0,0x00),
     (0,1,1,0x00),
     (0,1,2,0x00),
     (0,1,3,0x00),
@@ -47,13 +47,12 @@ config = Config(
 def test_case_simple( pytestconfig ):
   run_sim( pytestconfig, __file__, config,
   [ # ra we wa wd
-    ( 0, 0, 0, 0x00 ),
-    ( 0, 1, 0, 0xab ),
-    ( 0, 0, 0, 0x00 ),
-    ( 0, 1, 1, 0xcd ),
+    ( 1, 1, 1, 0xab ),
     ( 1, 0, 0, 0x00 ),
-    ( 0, 1, 1, 0xef ),
-    ( 1, 0, 0, 0x00 ),
+    ( 1, 1, 2, 0xcd ),
+    ( 2, 0, 0, 0x00 ),
+    ( 1, 1, 2, 0xef ),
+    ( 2, 0, 0, 0x00 ),
   ])
 
 #-------------------------------------------------------------------------
@@ -63,16 +62,14 @@ def test_case_simple( pytestconfig ):
 def test_case_all_reg( pytestconfig ):
   run_sim( pytestconfig, __file__, config,
   [ # ra we wa wd
-    ( 0, 1, 0, 0x01 ),
-    ( 0, 1, 1, 0x23 ),
-    ( 0, 1, 2, 0x45 ),
-    ( 0, 1, 3, 0x67 ),
-    ( 0, 1, 4, 0x89 ),
-    ( 0, 1, 5, 0xab ),
-    ( 0, 1, 6, 0xcd ),
-    ( 0, 1, 7, 0xef ),
+    ( 1, 1, 1, 0x23 ),
+    ( 1, 1, 2, 0x45 ),
+    ( 1, 1, 3, 0x67 ),
+    ( 1, 1, 4, 0x89 ),
+    ( 1, 1, 5, 0xab ),
+    ( 1, 1, 6, 0xcd ),
+    ( 1, 1, 7, 0xef ),
 
-    ( 0, 0, 0, 0xff ),
     ( 1, 0, 0, 0xff ),
     ( 2, 0, 0, 0xff ),
     ( 3, 0, 0, 0xff ),
@@ -80,6 +77,31 @@ def test_case_all_reg( pytestconfig ):
     ( 5, 0, 0, 0xff ),
     ( 6, 0, 0, 0xff ),
     ( 7, 0, 0, 0xff ),
+  ])
+
+#-------------------------------------------------------------------------
+# test_case_zero
+#-------------------------------------------------------------------------
+
+def test_case_zero( pytestconfig ):
+  run_sim( pytestconfig, __file__, config,
+  [ # ra we wa wd
+    ( 0, 1, 0, 0x01 ),
+    ( 0, 0, 0, 0x00 ),
+    ( 0, 1, 0, 0x23 ),
+    ( 0, 0, 0, 0x00 ),
+    ( 0, 1, 0, 0x45 ),
+    ( 0, 0, 0, 0x00 ),
+    ( 0, 1, 0, 0x67 ),
+    ( 0, 0, 0, 0x00 ),
+    ( 0, 1, 0, 0x89 ),
+    ( 0, 0, 0, 0x00 ),
+    ( 0, 1, 0, 0xab ),
+    ( 0, 0, 0, 0x00 ),
+    ( 0, 1, 0, 0xcd ),
+    ( 0, 0, 0, 0x00 ),
+    ( 0, 1, 0, 0xef ),
+    ( 0, 0, 0, 0x00 ),
   ])
 
 #-------------------------------------------------------------------------
