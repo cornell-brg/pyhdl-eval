@@ -1,0 +1,28 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  clk
+ - input  write_en
+ - input  write_addr   (3 bits)
+ - input  write_data   (8 bits)
+ - input  search_en
+ - input  search_data  (8 bits)
+ - output search_match (8 bits)
+
+The module should implement an 8-entry 8-bit content-addressable-memory
+(CAM) with one write port and one search port. Writes should only occur
+when the write enable is high. When the search enable is high, the given
+search data should be compared to every entry in the CAM and if there is
+a match the corresponding bit should be set in the match output. For
+example, assume we write 0xab into entries 0, 1, 2, 3 of the CAM and 0xcd
+into the entries 4, 5, 6, and 7 of the CAM. If we search for 0xab then
+the match output should be 00001111 and if we search for 0xcd then the
+match output should be 11110000. The search port should be combinational
+(i.e., the match output corresponds to the search data input on that
+cycle). When search enable is low, search match should be set to all
+zeros. The search results should always reflect the values currently
+stored in the register file regardless of whether or not new data is
+being written into the CAM on the same cycle. Assume all sequential logic
+is triggered on the positive edge of the clock.
+

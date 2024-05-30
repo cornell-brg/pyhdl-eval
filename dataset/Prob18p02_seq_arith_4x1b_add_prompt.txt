@@ -1,0 +1,32 @@
+
+Implement a hardware module named TopModule with the following interface.
+All input and output ports are one bit unless otherwise specified.
+
+ - input  clk
+ - input  reset
+ - input  in0
+ - input  in0
+ - output out
+
+The module should implement an 4-bit two-input bit-serial adder which
+adds two 4-bit values sampled at the inputs one bit per cycle. The
+least-significant bits should be the first bits input into the bit-serial
+adder and the first bit output from the bit-serial adder. There should be
+no latency through the adder (i.e., the output should be a combinational
+function of the inputs). The adder should be able to achieve full
+throughput, i.e., it should be able to accept a new input bit every cycle
+and produce a valid output bit every cycle. Here is an example execution
+trace which adds 0010 and 0011.
+
+   cycle | in0 in1 out
+  -------+-------------
+     0   | 0   1   1
+     1   | 1   1   0
+     2   | 0   0   1
+     3   | 0   0   0
+
+The module should include an active-high synchronous reset; all internal
+state should be reset appropriately when the reset input is one. Assume
+all sequential logic is triggered on the positive edge of the clock.
+Assume all values are encoded as two's complement binary numbers.
+
