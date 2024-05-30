@@ -11,8 +11,8 @@ the following five different Python-embedded DSLs:
  - Migen (https://github.com/m-labs/migen)
  - Amaranth (https://github.com/amaranth-lang/amaranth)
 
-The benchmark includes 150+ problems developed using an ontological
-approach to cover almost 20 subclasses of RTL design. The framework
+The benchmark includes 168 brand new problems developed using an
+ontological approach to cover 19 subclasses of RTL design. The framework
 includes workflow orchestration scripts, in-context learning examples,
 Verilog reference solutions, Verilog test benches, Python test scripts,
 and a common Python API to enable easily adding new Python-embedded DSLs
@@ -112,7 +112,7 @@ Amaranth implementations of several examples.
 ```
  % mkdir $TOPDIR/build
  % cd $TOPDIR/build
- % pytest ../dataset
+ % pytest ../pyhdl_eval
 ```
 
 We can then compare the Verilog reference implementation to itself using
