@@ -83,6 +83,8 @@ module Top();
 
     compare( 8'b0000_0000, 0 ); // do not check output
     compare( 8'b0000_0000, 1 );
+    compare( 8'b1111_1111, 1 );
+    compare( 8'b0000_0000, 1 );
     compare( 8'b0001_0001, 1 );
     compare( 8'b0100_0100, 1 );
     compare( 8'b0010_1001, 1 );

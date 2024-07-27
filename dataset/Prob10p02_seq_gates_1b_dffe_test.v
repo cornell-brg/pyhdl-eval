@@ -101,6 +101,10 @@ module Top();
     compare( 0, 1, 1 );
     compare( 0, 0, 1 );
     compare( 0, 0, 1 );
+    compare( 1, 0, 1 );
+    compare( 1, 1, 1 );
+    compare( 0, 0, 1 );
+    compare( 0, 0, 1 );
 
   endtask
 

@@ -173,6 +173,15 @@ module Top();
     nbits13_compare( 13'b0_0000_0000_0010 );
     nbits13_compare( 13'b0_0000_0000_0100 );
     nbits13_compare( 13'b0_0000_0000_1000 );
+    nbits13_compare( 13'b0_0000_0001_0000 );
+    nbits13_compare( 13'b0_0000_0010_0000 );
+    nbits13_compare( 13'b0_0000_0100_0000 );
+    nbits13_compare( 13'b0_0000_1000_0000 );
+    nbits13_compare( 13'b0_0001_0000_0000 );
+    nbits13_compare( 13'b0_0010_0000_0000 );
+    nbits13_compare( 13'b0_0100_0000_0000 );
+    nbits13_compare( 13'b0_1000_0000_0000 );
+
     nbits13_compare( 13'b0_0000_0001_0001 );
     nbits13_compare( 13'b0_0000_0010_0010 );
     nbits13_compare( 13'b0_0000_0100_0100 );

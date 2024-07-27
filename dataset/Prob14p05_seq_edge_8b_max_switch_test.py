@@ -34,6 +34,8 @@ def test_case_without_max_switching( pytestconfig ):
   run_sim( pytestconfig, __file__, config,
   [
     0b0000_0000,
+    0b1111_1111,
+    0b0000_0000,
     0b0001_0001,
     0b0100_0100,
     0b0010_1001,
