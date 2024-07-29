@@ -37,6 +37,24 @@ def test_case_valid( pytestconfig ):
   [
     (0,0,0,0,0,0),
     (1,0,0,0,0,0),
+    (2,0,0,0,0,0),
+    (3,0,0,0,0,0),
+    (4,0,0,0,0,0),
+    (5,0,0,0,0,0),
+    (6,0,0,0,0,0),
+    (7,0,0,0,0,0),
+    (8,0,0,0,0,0),
+
+    (0,1,1,1,1,0),
+    (1,1,1,1,1,0),
+    (2,1,1,1,1,0),
+    (3,1,1,1,1,0),
+    (4,1,1,1,1,0),
+    (5,1,1,1,1,0),
+    (6,1,1,1,1,0),
+    (7,1,1,1,1,0),
+    (8,1,1,1,1,0),
+
     (0,0,0,0,0,1),
     (0,1,0,0,0,1),
     (0,0,0,0,0,2),
@@ -51,7 +69,7 @@ def test_case_valid( pytestconfig ):
 # test_case_invalid
 #-------------------------------------------------------------------------
 
-def test_case_valid( pytestconfig ):
+def test_case_invalid( pytestconfig ):
   run_sim( pytestconfig, __file__, config,
   [
     (0,0,0,0,0,5),
@@ -66,7 +84,7 @@ def test_case_valid( pytestconfig ):
 # test_case_random
 #-------------------------------------------------------------------------
 
-@settings(deadline=1000,max_examples=20)
+@settings(derandomize=True,deadline=1000,max_examples=20)
 @given(
   st.lists(
     st.tuples( pst.bits(4), pst.bits(4), pst.bits(4), pst.bits(4),

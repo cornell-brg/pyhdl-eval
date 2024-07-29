@@ -187,7 +187,7 @@ $$($(1)_sv_test_logs) : %-sv-test.log : %.v $(1)_test.v $(1)_ref.v
 	@$$(ECHO)  Testing $$(notdir $$*) for verilog
 	-$$(QUIET) $(IVERILOG_COMPILE) -s Top -I $(dataset_dir) -o $$* $$^ \
                $(REDIRECT_LOG) $$*-sv-test.log
-	-$$(QUIET) timeout 30 \
+	-$$(QUIET) timeout 45 \
                ./$$* +test-case=-1 $(REDIRECT_APPEND_LOG) $$@; \
              if [[ $$$${PIPESTATUS[0]} == 124 ]]; then \
                echo "TIMEOUT" $(REDIRECT_APPEND_LOG) $$@; \
@@ -242,7 +242,7 @@ $(1)_py_test_logs = \
 $$($(1)_py_test_logs) : %-py-test.log : $(1)_test.py %.py
 	@$$(ECHO)  Testing $$(notdir $$*) for $$(pydsl)
 	-$$(QUIET) cd $(1); \
-             timeout 30 \
+             timeout 45 \
                $(PYTEST) ../$$< -sx --verbose --tb=short \
                  --$$(pydsl)=$$(notdir $$*).py \
                  $(REDIRECT_LOG) $$(notdir $$*)-py-test.log; \

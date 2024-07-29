@@ -77,13 +77,17 @@ def test_case_invalid( pytestconfig ):
     0b0010_0010_0010_0010,
     0b0100_0100_0100_0100,
     0b1111_1111_1111_1111,
+
+    0b0000_0100_0001_0010,
+    0b0000_1000_0010_0100,
+    0b0001_0000_0100_1000,
   ])
 
 #-------------------------------------------------------------------------
 # test_case_random
 #-------------------------------------------------------------------------
 
-@settings(deadline=1000,max_examples=20)
+@settings(derandomize=True,deadline=1000,max_examples=20)
 @given( st.lists( pst.bits(16) ))
 def test_case_random( pytestconfig, test_vectors ):
   run_sim( pytestconfig, __file__, config, test_vectors )

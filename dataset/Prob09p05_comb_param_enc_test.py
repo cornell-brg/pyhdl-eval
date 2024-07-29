@@ -58,6 +58,11 @@ def test_case_nbits8_invalid( pytestconfig ):
     0b0010_0010,
     0b0100_0100,
     0b1000_1000,
+    0b0000_0000,
+    0b0001_0101,
+    0b0010_1010,
+    0b0101_0100,
+    0b1010_1000,
     0b1111_1111,
   ])
 
@@ -65,7 +70,7 @@ def test_case_nbits8_invalid( pytestconfig ):
 # test_case_nbits8_random
 #-------------------------------------------------------------------------
 
-@settings(deadline=1000,max_examples=20)
+@settings(derandomize=True,deadline=1000,max_examples=20)
 @given( st.lists( pst.bits(8) ))
 def test_case_nbits6_random( pytestconfig, test_vectors ):
   run_sim( pytestconfig, __file__, mk_config(nbits=8), test_vectors )
@@ -106,6 +111,9 @@ def test_case_nbits10_invalid( pytestconfig ):
     0b00_1000_1000,
     0b01_0001_0000,
     0b10_0010_0000,
+    0b00_1010_1000,
+    0b01_0101_0000,
+    0b10_1010_0000,
     0b11_1111_1111,
   ])
 
@@ -113,7 +121,7 @@ def test_case_nbits10_invalid( pytestconfig ):
 # test_case_nbits10_random
 #-------------------------------------------------------------------------
 
-@settings(deadline=1000,max_examples=20)
+@settings(derandomize=True,deadline=1000,max_examples=20)
 @given( st.lists( pst.bits(10) ))
 def test_case_nbits10_random( pytestconfig, test_vectors ):
   run_sim( pytestconfig, __file__, mk_config(nbits=10), test_vectors )

@@ -112,16 +112,48 @@ module Top();
     compare( 8'b0000_1110 );
     compare( 8'b0000_1111 );
 
+    compare( 8'b0001_0000 );
+    compare( 8'b0001_0001 );
+    compare( 8'b0001_0010 );
+    compare( 8'b0001_0011 );
+
+    compare( 8'b0001_0100 );
+    compare( 8'b0001_0101 );
+    compare( 8'b0001_0110 );
+    compare( 8'b0001_0111 );
+
+    compare( 8'b0001_1000 );
+    compare( 8'b0001_1001 );
+    compare( 8'b0001_1010 );
+    compare( 8'b0001_1011 );
+
+    compare( 8'b0001_1100 );
+    compare( 8'b0001_1101 );
+    compare( 8'b0001_1110 );
+    compare( 8'b0001_1111 );
+
     compare( 8'b0010_0000 );
     compare( 8'b0010_0001 );
     compare( 8'b0010_0010 );
     compare( 8'b0010_0011 );
+
     compare( 8'b0010_0100 );
     compare( 8'b0010_0101 );
     compare( 8'b0010_0110 );
     compare( 8'b0010_0111 );
+
     compare( 8'b0010_1000 );
     compare( 8'b0010_1001 );
+    compare( 8'b0010_1010 );
+    compare( 8'b0010_1011 );
+
+    compare( 8'b0010_1100 );
+    compare( 8'b0010_1101 );
+    compare( 8'b0010_1110 );
+    compare( 8'b0010_1111 );
+
+    compare( 8'b0100_1111 );
+    compare( 8'b1000_1111 );
 
   endtask
 

@@ -120,7 +120,7 @@ def test_case_directed_reset( pytestconfig ):
 # test_case_random
 #-------------------------------------------------------------------------
 
-@settings(deadline=1000,max_examples=20)
+@settings(derandomize=True,deadline=1000,max_examples=20)
 @given( st.lists( st.tuples( st.just(0), pst.bits(4), pst.bits(4) ) ))
 def test_case_random( pytestconfig, test_vectors ):
   run_sim( pytestconfig, __file__, config, test_vectors )
@@ -129,7 +129,8 @@ def test_case_random( pytestconfig, test_vectors ):
 # test_case_random_reset
 #-------------------------------------------------------------------------
 
-@settings(deadline=1000,max_examples=20)
+@pytest.mark.multi_reset
+@settings(derandomize=True,deadline=1000,max_examples=20)
 @given( st.lists( st.tuples( pst.bits(1), pst.bits(4), pst.bits(4) ) ))
 def test_case_random_reset( pytestconfig, test_vectors ):
   run_sim( pytestconfig, __file__, config, test_vectors )

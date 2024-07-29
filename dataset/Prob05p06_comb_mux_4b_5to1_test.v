@@ -115,6 +115,24 @@ module Top();
 
     compare(0,0,0,0,0,0);
     compare(1,0,0,0,0,0);
+    compare(2,0,0,0,0,0);
+    compare(3,0,0,0,0,0);
+    compare(4,0,0,0,0,0);
+    compare(5,0,0,0,0,0);
+    compare(6,0,0,0,0,0);
+    compare(7,0,0,0,0,0);
+    compare(8,0,0,0,0,0);
+
+    compare(0,1,1,1,1,0);
+    compare(1,1,1,1,1,0);
+    compare(2,1,1,1,1,0);
+    compare(3,1,1,1,1,0);
+    compare(4,1,1,1,1,0);
+    compare(5,1,1,1,1,0);
+    compare(6,1,1,1,1,0);
+    compare(7,1,1,1,1,0);
+    compare(8,1,1,1,1,0);
+
     compare(0,0,0,0,0,1);
     compare(0,1,0,0,0,1);
     compare(0,0,0,0,0,2);

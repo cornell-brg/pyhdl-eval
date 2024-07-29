@@ -107,6 +107,10 @@ module Top();
     nbits8_compare( 8'b0010_0010 );
     nbits8_compare( 8'b0100_0100 );
     nbits8_compare( 8'b1000_1000 );
+    nbits8_compare( 8'b0001_0101 );
+    nbits8_compare( 8'b0010_1010 );
+    nbits8_compare( 8'b0101_0100 );
+    nbits8_compare( 8'b1010_1000 );
     nbits8_compare( 8'b1111_1111 );
 
   endtask
@@ -221,8 +225,11 @@ module Top();
     nbits10_compare( 10'b00_0100_0100 );
 
     nbits10_compare( 10'b00_1000_1000 );
-    nbits10_compare( 10'b01_0000_1000 );
-    nbits10_compare( 10'b10_0000_1000 );
+    nbits10_compare( 10'b01_0001_0000 );
+    nbits10_compare( 10'b10_0010_0000 );
+    nbits10_compare( 10'b00_1010_1000 );
+    nbits10_compare( 10'b01_0101_0000 );
+    nbits10_compare( 10'b10_1010_0000 );
     nbits10_compare( 10'b11_1111_1111 );
 
   endtask

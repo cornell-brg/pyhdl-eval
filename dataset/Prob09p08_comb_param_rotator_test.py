@@ -62,7 +62,7 @@ def test_case_nbits4_right_rotate( pytestconfig ):
 # test_case_nbits4_random
 #-------------------------------------------------------------------------
 
-@settings(deadline=1000,max_examples=20)
+@settings(derandomize=True,deadline=1000,max_examples=20)
 @given( st.lists( st.tuples( pst.bits(4), pst.bits(2), pst.bits(1) ) ))
 def test_case_nbits4_random( pytestconfig, test_vectors ):
   run_sim( pytestconfig, __file__, mk_config(nbits=4), test_vectors )
@@ -105,7 +105,7 @@ def test_case_nbits8_right_rotate( pytestconfig ):
 # test_case_nbits8_random
 #-------------------------------------------------------------------------
 
-@settings(deadline=1000,max_examples=20)
+@settings(derandomize=True,deadline=1000,max_examples=20)
 @given( st.lists( st.tuples( pst.bits(8), pst.bits(3), pst.bits(1) ) ))
 def test_case_nbits8_random( pytestconfig, test_vectors ):
   run_sim( pytestconfig, __file__, mk_config(nbits=8), test_vectors )

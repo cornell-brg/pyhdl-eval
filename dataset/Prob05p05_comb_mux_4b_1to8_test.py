@@ -40,6 +40,14 @@ def test_case_directed( pytestconfig ):
   [
     (0,0),
     (1,0),
+    (2,0),
+    (3,0),
+    (4,0),
+    (5,0),
+    (6,0),
+    (7,0),
+    (8,0),
+
     (0,1),
     (1,1),
     (0,2),
@@ -61,7 +69,7 @@ def test_case_directed( pytestconfig ):
 # test_case_random
 #-------------------------------------------------------------------------
 
-@settings(deadline=1000,max_examples=20)
+@settings(derandomize=True,deadline=1000,max_examples=20)
 @given( st.lists( st.tuples( pst.bits(4), pst.bits(3) )))
 def test_case_random( pytestconfig, test_vectors ):
   run_sim( pytestconfig, __file__, config, test_vectors )

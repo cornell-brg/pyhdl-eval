@@ -106,6 +106,17 @@ module Top();
     t.reset_sequence();
 
     compare( 16'h0000 );
+    compare( 16'h0001 );
+    compare( 16'h0002 );
+    compare( 16'h0003 );
+    compare( 16'h0004 );
+    compare( 16'h0005 );
+    compare( 16'h0006 );
+    compare( 16'h0007 );
+    compare( 16'h0008 );
+    compare( 16'h0009 );
+    compare( 16'h0010 );
+
     compare( 16'h1010 );
     compare( 16'h2020 );
     compare( 16'h4040 );

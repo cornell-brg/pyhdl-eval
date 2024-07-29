@@ -123,6 +123,14 @@ module Top();
 
     compare(0,0);
     compare(1,0);
+    compare(2,0);
+    compare(3,0);
+    compare(4,0);
+    compare(5,0);
+    compare(6,0);
+    compare(7,0);
+    compare(8,0);
+
     compare(0,1);
     compare(1,1);
     compare(0,2);

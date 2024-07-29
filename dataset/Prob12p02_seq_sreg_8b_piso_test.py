@@ -159,7 +159,7 @@ def test_case_directed_reset( pytestconfig ):
 # We need to make sure our random tests are long enough so we can
 # observe the output of what we are shifting into the shift register.
 
-@settings(deadline=1000,max_examples=20)
+@settings(derandomize=True,deadline=1000,max_examples=20)
 @given(
   st.lists(
     st.tuples(

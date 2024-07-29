@@ -93,7 +93,7 @@ def test_case_nbits13_directed( pytestconfig ):
 # test_case_nbits13_random
 #-------------------------------------------------------------------------
 
-@settings(deadline=1000,max_examples=20)
+@settings(derandomize=True,deadline=1000,max_examples=20)
 @given( st.lists(pst.bits(13)) )
 def test_case_nbits13_random( pytestconfig, test_vectors ):
   run_sim( pytestconfig, __file__, mk_config(nbits=13), test_vectors )

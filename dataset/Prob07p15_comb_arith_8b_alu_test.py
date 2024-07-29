@@ -139,10 +139,26 @@ def test_case_gt( pytestconfig ):
   ])
 
 #-------------------------------------------------------------------------
+# test_case_invalid
+#-------------------------------------------------------------------------
+
+def test_case_invalid( pytestconfig ):
+  run_sim( pytestconfig, __file__, config,
+  [
+    (   0,  0, 7 ),
+    (   1,  1, 7 ),
+    (   2,  1, 7 ),
+    (   1,  2, 7 ),
+    (  13,  2, 7 ),
+    (  42,  9, 7 ),
+    (  42, 13, 7 ),
+  ])
+
+#-------------------------------------------------------------------------
 # test_case_random
 #-------------------------------------------------------------------------
 
-@settings(deadline=1000,max_examples=20)
+@settings(derandomize=True,deadline=1000,max_examples=20)
 @given( st.lists( st.tuples( pst.bits(8), pst.bits(8), pst.bits(3) ) ))
 def test_case_random( pytestconfig, test_vectors ):
   run_sim( pytestconfig, __file__, config, test_vectors )

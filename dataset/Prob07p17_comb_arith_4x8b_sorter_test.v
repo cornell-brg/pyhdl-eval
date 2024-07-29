@@ -161,14 +161,29 @@ module Top();
   endtask
 
   //----------------------------------------------------------------------
-  // test_case_4_random
+  // test_case_4_signed
+  //----------------------------------------------------------------------
+
+  task test_case_4_signed();
+    $display( "\ntest_case_4_signed" );
+    t.reset_sequence();
+
+    compare( 8'h00, 8'h00, 8'h00, 8'h80 );
+    compare( 8'h00, 8'h00, 8'h80, 8'h00 );
+    compare( 8'h00, 8'h80, 8'h00, 8'h00 );
+    compare( 8'h80, 8'h00, 8'h00, 8'h00 );
+
+  endtask
+
+  //----------------------------------------------------------------------
+  // test_case_5_random
   //----------------------------------------------------------------------
   // svt.seed is set to a known value in the reset() task, so when use
   // $urandom(t.seed) we will get reproducible random numbers no matter
   // the order that test cases are executed.
 
-  task test_case_4_random();
-    $display( "\ntest_case_4_random" );
+  task test_case_5_random();
+    $display( "\ntest_case_5_random" );
     t.reset_sequence();
 
     for ( int i = 0; i < 20; i = i+1 ) begin
@@ -190,7 +205,8 @@ module Top();
     if ((t.n <= 0) || (t.n == 1)) test_case_1_small();
     if ((t.n <= 0) || (t.n == 2)) test_case_2_dups();
     if ((t.n <= 0) || (t.n == 3)) test_case_3_large();
-    if ((t.n <= 0) || (t.n == 4)) test_case_4_random();
+    if ((t.n <= 0) || (t.n == 4)) test_case_4_signed();
+    if ((t.n <= 0) || (t.n == 5)) test_case_5_random();
 
     $write("\n");
     $finish;
