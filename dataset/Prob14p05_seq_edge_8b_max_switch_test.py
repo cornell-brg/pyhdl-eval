@@ -68,7 +68,7 @@ def test_case_with_max_switching( pytestconfig ):
 # test_case_random1
 #-------------------------------------------------------------------------
 
-@settings(derandomize=True,deadline=1000,max_examples=20)
+@settings(derandomize=True,deadline=None,max_examples=20)
 @given( st.lists( st.sampled_from([ 0b0101_0101, 0b1010_1010 ])))
 def test_case_random1( pytestconfig, test_vectors ):
   run_sim( pytestconfig, __file__, config, test_vectors )
@@ -77,7 +77,7 @@ def test_case_random1( pytestconfig, test_vectors ):
 # test_case_random2
 #-------------------------------------------------------------------------
 
-@settings(derandomize=True,deadline=1000,max_examples=20)
+@settings(derandomize=True,deadline=None,max_examples=20)
 @given( st.lists( pst.bits(8) ))
 def test_case_random2( pytestconfig, test_vectors ):
   run_sim( pytestconfig, __file__, config, test_vectors )

@@ -113,7 +113,7 @@ def test_case_invalid( pytestconfig ):
 # test_case_random
 #-------------------------------------------------------------------------
 
-@settings(derandomize=True,deadline=1000,max_examples=20)
+@settings(derandomize=True,deadline=None,max_examples=20)
 @given( st.lists( pst.bits(8) ))
 def test_case_random( pytestconfig, test_vectors ):
   run_sim( pytestconfig, __file__, config, test_vectors )

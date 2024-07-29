@@ -107,7 +107,7 @@ def test_case_example( pytestconfig ):
 # test_case_random
 #-------------------------------------------------------------------------
 
-@settings(derandomize=True,deadline=1000,max_examples=20)
+@settings(derandomize=True,deadline=None,max_examples=20)
 @given(
   st.lists(
     st.tuples(

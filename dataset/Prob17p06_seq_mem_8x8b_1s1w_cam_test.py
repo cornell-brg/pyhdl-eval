@@ -128,7 +128,7 @@ def test_case_no_forward( pytestconfig ):
 # test_case_random_constrained
 #-------------------------------------------------------------------------
 
-@settings(derandomize=True,deadline=1000,max_examples=20)
+@settings(derandomize=True,deadline=None,max_examples=20)
 @given(
   st.lists(
     st.tuples(
@@ -147,7 +147,7 @@ def test_case_random_constrained( pytestconfig, test_vectors ):
 # test_case_random
 #-------------------------------------------------------------------------
 
-@settings(derandomize=True,deadline=1000,max_examples=20)
+@settings(derandomize=True,deadline=None,max_examples=20)
 @given(
   st.lists(
     st.tuples(

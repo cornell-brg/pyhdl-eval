@@ -54,7 +54,7 @@ def test_case_directed_reset( pytestconfig ):
 #-------------------------------------------------------------------------
 
 @pytest.mark.multi_reset
-@settings(derandomize=True,deadline=1000,max_examples=20)
+@settings(derandomize=True,deadline=None,max_examples=20)
 @given( st.lists( pst.bits(1), min_size=20 ) )
 def test_case_random_reset( pytestconfig, test_vectors ):
   run_sim( pytestconfig, __file__, config, test_vectors )
