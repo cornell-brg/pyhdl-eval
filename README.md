@@ -48,6 +48,14 @@ instructions, and a Docker image which includes
  - RTL modules pre-generated using all five LLMs (CodeGemma 7B, Llama3
    8B/70B, GPT4, GPT4 Turbo)
 
+### Verilog Reference Solutions
+
+Note that the Verilog reference solutions have been removed from this
+public GitHub repo to avoid LLMs from including these solutions in their
+training data. You can find the Verilog reference solutions in the
+artifact's Docker container mentioned above, or email cbatten@cornell.edu
+to request access.
+
 ### Setup Linux Environment
 
 In order to use PyHDL-Eval you will need to install iverilog, verilator,
