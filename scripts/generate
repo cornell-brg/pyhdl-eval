@@ -28,11 +28,11 @@ import os
 import re
 import time
 
-from adlrchat.langchain import LLMGatewayChat
+from langchain_openai import ChatOpenAI
 from langchain_nvidia_ai_endpoints import ChatNVIDIA
 from langchain_community.chat_models import ChatAnyscale
-from langchain.schema   import SystemMessage, HumanMessage
-from langchain.callbacks import get_openai_callback
+from langchain.schema import SystemMessage, HumanMessage
+from langchain_community.callbacks import get_openai_callback
 
 #-------------------------------------------------------------------------
 # Command line processing
@@ -53,7 +53,7 @@ def parse_cmdline():
   p.add_argument( "-h", "--help",        action="store_true" )
   p.add_argument( "-v", "--verbose",     action="store_true" )
   p.add_argument( "-l", "--list-models", action="store_true" )
-  p.add_argument(       "--model",       type=str,   default="openai/gpt-3.5-turbo" )
+  p.add_argument(       "--model",       type=str,   default="openai/gpt3.5-turbo" )
   p.add_argument(       "--temperature", type=float, default=0.8 )
   p.add_argument(       "--max-tokens",  type=int,   default=1024 )
   p.add_argument(       "--top-p",       type=float, default=0.95 )
@@ -70,7 +70,7 @@ def parse_cmdline():
 # Models
 #-------------------------------------------------------------------------
 
-llm_gateway_chat_models = [
+openai_chat_models = [
   "gpt-3.5-turbo",
   "gpt-4",
   "gpt-4-turbo",
@@ -95,7 +95,7 @@ anyscale_chat_models = [
 ]
 
 all_chat_models = [
-  *llm_gateway_chat_models,
+  *openai_chat_models,
   *nim_chat_models,
   *anyscale_chat_models,
 ]
@@ -185,9 +185,9 @@ def main():
   if opts.list_models:
 
     print( "" )
-    print( "LLMGatewayChat Models" )
+    print( "OpenAI Models" )
 
-    for model in llm_gateway_chat_models:
+    for model in openai_chat_models:
       print( f" - {model}" )
 
     print( "" )
@@ -299,12 +299,12 @@ def main():
 
   # Query the LLM
 
-  if model in llm_gateway_chat_models:
-    llm = LLMGatewayChat(
-      model       = model,
-      temperature = temperature,
-      top_p       = top_p,
-      max_tokens  = max_tokens,
+  if model in openai_chat_models:
+    llm = ChatOpenAI(
+      model        = model,
+      temperature  = temperature,
+      top_p        = top_p,
+      max_tokens   = max_tokens,
     )
   elif model in nim_chat_models:
     llm = ChatNVIDIA(
