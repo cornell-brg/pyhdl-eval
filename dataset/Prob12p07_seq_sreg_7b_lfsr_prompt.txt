@@ -4,7 +4,7 @@ All input and output ports are one bit unless otherwise specified.
 
  - input  clk
  - input  reset
- - output out (5 bits)
+ - output out (7 bits)
 
 The module should implement a 7-bit maximum-length Galios linear feedback
 shift register (LFSR) with an active-high synchronous reset.
