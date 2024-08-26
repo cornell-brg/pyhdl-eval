@@ -144,7 +144,7 @@ Verilog syntax.
 
 pymtl_system_msg="""
 You are a PyMTL3 RTL designer that only writes code using correct
-PyMTL syntax.
+PyMTL3 syntax.
 """
 
 pyrtl_system_msg="""
